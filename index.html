@@ -89,12 +89,12 @@
                  <span id="saving-indicator" class="text-sm text-gray-500 opacity-0">กำลังบันทึก...</span>
             </div>
             <form id="transaction-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
-                <!-- START: Date Picker Input -->
+                <!-- START: Date Input changed from type=date to type=text to force DD/MM/YYYY format -->
                 <div class="col-span-1">
-                    <label for="dateInput" class="block text-sm font-medium text-gray-700">วันที่</label>
-                    <input type="date" id="dateInput" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required>
+                    <label for="dateInput" class="block text-sm font-medium text-gray-700">วันที่ (DD/MM/YYYY)</label>
+                    <input type="text" id="dateInput" placeholder="DD/MM/YYYY" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required>
                 </div>
-                <!-- END: Date Picker Input -->
+                <!-- END: Date Input -->
                 <div>
                     <label for="type" class="block text-sm font-medium text-gray-700">ประเภท</label>
                     <select id="type" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2">
@@ -317,10 +317,56 @@
         }
         
         // --- Transaction Logic ---
+        
+        /**
+         * Helper function to format Date object into DD/MM/YYYY string for display
+         */
+        function formatDisplayDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+        
+        /**
+         * Helper function to parse DD/MM/YYYY string into YYYY-MM-DD string for backend
+         */
+        function parseInputDate(dateString) {
+            const parts = dateString.split('/');
+            // Expecting 3 parts (D, M, Y)
+            if (parts.length === 3) {
+                const [day, month, year] = parts.map(p => p.trim());
+                
+                // Basic length and numeric check
+                if (day.length === 2 && month.length === 2 && year.length === 4 && 
+                    !isNaN(parseInt(day)) && !isNaN(parseInt(month)) && !isNaN(parseInt(year))) {
+                    
+                    // Validate if it is a real date (e.g., 30/02/2024 is invalid)
+                    const date = new Date(`${year}-${month}-${day}`);
+                    
+                    // Check if the date object matches the input values
+                    if (date.getFullYear() === parseInt(year) && date.getMonth() + 1 === parseInt(month) && date.getDate() === parseInt(day)) {
+                        return `${year}-${month}-${day}`; // Return YYYY-MM-DD format for backend
+                    }
+                }
+            }
+            return null; // Invalid format or invalid date
+        }
+
 
         async function addTransaction(e) {
             e.preventDefault();
             
+            // --- Date Validation and Conversion ---
+            const inputDateString = dateInput.value.trim();
+            const dateString = parseInputDate(inputDateString); // This is the YYYY-MM-DD format
+            
+            if (!dateString) {
+                showMessage('รูปแบบวันที่ไม่ถูกต้อง กรุณาใช้รูปแบบ DD/MM/YYYY (เช่น 15/07/2025)');
+                return;
+            }
+            // --- End Date Validation ---
+
             if (amountInput.value.trim() === '') {
                 showMessage('กรุณากรอกจำนวนเงินให้ครบถ้วน');
                 return;
@@ -331,9 +377,6 @@
                  showMessage('จำนวนเงินไม่ถูกต้อง กรุณาใส่ตัวเลขที่มากกว่า 0');
                  return;
             }
-            
-            // Get date string from input (already YYYY-MM-DD format)
-            const dateString = dateInput.value;
             
             const typeValue = typeInput.value;
             // Get the user-entered value first
@@ -349,7 +392,7 @@
 
             const transaction = {
                 id: generateID(),
-                date: dateString, // Use the date from the input
+                date: dateString, // Use the YYYY-MM-DD string
                 type: typeValue,
                 platform: platformInput.value,
                 description: descriptionForTransaction || '', // Use the determined description value
@@ -715,8 +758,8 @@
             
             // 1. Initialize Date Input (set to today's date)
             const today = new Date();
-            // dateInput is always set to YYYY-MM-DD for internal processing
-            dateInput.value = today.toISOString().split('T')[0];
+            // dateInput is now text input, display in DD/MM/YYYY format
+            dateInput.value = formatDisplayDate(today);
 
             // 2. Load cached data and render UI instantly (non-blocking)
             const cachedTransactions = JSON.parse(localStorage.getItem('transactions_cache'));
