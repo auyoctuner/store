@@ -60,39 +60,41 @@
             <p class="text-md text-gray-500 mt-2">บันทึกรายรับ-รายจ่ายสำหรับ Shopee, Lazada และอื่นๆ</p>
         </header>
 
-        <!-- Summary Cards -->
-        <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div class="summary-card bg-green-100 p-6 rounded-xl shadow-md text-center">
-                <h2 class="text-lg font-semibold text-green-800">รายรับ (เดือนที่เลือก)</h2>
-                <p id="total-income" class="text-2xl font-bold text-green-600 mt-2">฿0.00</p>
+        <!-- POSITION 1: Transaction List (ประวัติรายการ) -->
+        <section class="bg-white p-6 rounded-xl shadow-md mb-8">
+             <div class="flex flex-col md:flex-row justify-between items-center mb-4 border-b pb-4">
+                <h2 class="text-2xl font-bold mb-4 md:mb-0">ประวัติรายการ</h2>
+                <div class="flex flex-wrap items-center gap-2 md:gap-4">
+                    <div class="flex items-center gap-2">
+                        <label for="filter-year" class="text-base font-medium text-gray-700">ปี:</label>
+                        <!-- FILTER SIZE INCREASED -->
+                        <select id="filter-year" class="border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base p-3"></select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label for="filter-month" class="text-base font-medium text-gray-700">เดือน:</label>
+                        <!-- FILTER SIZE INCREASED -->
+                        <select id="filter-month" class="border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base p-3"></select>
+                    </div>
+                </div>
             </div>
-            <div class="summary-card bg-red-100 p-6 rounded-xl shadow-md text-center">
-                <h2 class="text-lg font-semibold text-red-800">รายจ่าย (เดือนที่เลือก)</h2>
-                <p id="total-expense" class="text-2xl font-bold text-red-600 mt-2">฿0.00</p>
-            </div>
-            <div class="summary-card bg-blue-100 p-6 rounded-xl shadow-md text-center">
-                <h2 class="text-lg font-semibold text-blue-800">คงเหลือ (เดือนที่เลือก)</h2>
-                <p id="balance" class="text-2xl font-bold text-blue-600 mt-2">฿0.00</p>
-            </div>
+            <ul id="transaction-list" class="space-y-3">
+                 <li class="text-center text-gray-500 py-4">ยังไม่มีรายการ...</li>
+            </ul>
         </section>
 
-        <!-- Transaction Form -->
+        <!-- POSITION 2: Transaction Form (เพิ่มรายการใหม่) -->
         <section class="bg-white p-6 rounded-xl shadow-md mb-8">
             <div class="flex justify-between items-center mb-4 border-b pb-2">
                  <h2 class="text-2xl font-bold">เพิ่มรายการใหม่</h2>
                  <span id="saving-indicator" class="text-sm text-gray-500 opacity-0">กำลังบันทึก...</span>
             </div>
             <form id="transaction-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
-                <!-- START: Date Select Dropdowns -->
+                <!-- START: Date Picker Input -->
                 <div class="col-span-1">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">วันที่</label>
-                    <div class="flex space-x-2">
-                        <select id="date_day" class="mt-1 block w-1/3 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required></select>
-                        <select id="date_month" class="mt-1 block w-1/3 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required></select>
-                        <select id="date_year" class="mt-1 block w-1/3 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required></select>
-                    </div>
+                    <label for="dateInput" class="block text-sm font-medium text-gray-700">วันที่</label>
+                    <input type="date" id="dateInput" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required>
                 </div>
-                <!-- END: Date Select Dropdowns -->
+                <!-- END: Date Picker Input -->
                 <div>
                     <label for="type" class="block text-sm font-medium text-gray-700">ประเภท</label>
                     <select id="type" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2">
@@ -109,12 +111,12 @@
                         <option value="สั่งอะไหล่">สั่งอะไหล่</option>
                     </select>
                 </div>
-                <!-- START: Changed back to text input with 'หมายเหตุ' label -->
+                <!-- START: Text input with 'หมายเหตุ' label -->
                 <div class="lg:col-span-1">
                     <label for="description" class="block text-sm font-medium text-gray-700">หมายเหตุ</label>
                     <input type="text" id="description" placeholder="เช่น ค่าโฆษณา, ค่าสต๊อกสินค้า" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2">
                 </div>
-                <!-- END: Changed back to text input with 'หมายเหตุ' label -->
+                <!-- END: Text input with 'หมายเหตุ' label -->
                 <div class="lg:col-span-1">
                     <label for="amount" class="block text-sm font-medium text-gray-700">จำนวนเงิน</label>
                     <input type="number" step="0.01" id="amount" placeholder="0.00" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required>
@@ -125,35 +127,34 @@
             </form>
         </section>
 
-        <!-- Transaction List -->
-        <section class="bg-white p-6 rounded-xl shadow-md mb-8">
-             <div class="flex flex-col md:flex-row justify-between items-center mb-4 border-b pb-4">
-                <h2 class="text-2xl font-bold mb-4 md:mb-0">ประวัติรายการ</h2>
-                <div class="flex flex-wrap items-center gap-2 md:gap-4">
-                    <div class="flex items-center gap-2">
-                        <label for="filter-year" class="text-sm font-medium text-gray-700">ปี:</label>
-                        <select id="filter-year" class="border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2"></select>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <label for="filter-month" class="text-sm font-medium text-gray-700">เดือน:</label>
-                        <select id="filter-month" class="border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2"></select>
-                    </div>
-                </div>
+        <!-- POSITION 3: Summary Cards -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="summary-card bg-green-100 p-6 rounded-xl shadow-md text-center">
+                <!-- ADDED ID for dynamic update -->
+                <h2 id="income-title" class="text-lg font-semibold text-green-800">รายรับ</h2>
+                <p id="total-income" class="text-2xl font-bold text-green-600 mt-2">฿0.00</p>
             </div>
-            <ul id="transaction-list" class="space-y-3">
-                 <li class="text-center text-gray-500 py-4">ยังไม่มีรายการ...</li>
-            </ul>
+            <div class="summary-card bg-red-100 p-6 rounded-xl shadow-md text-center">
+                <!-- ADDED ID for dynamic update -->
+                <h2 id="expense-title" class="text-lg font-semibold text-red-800">รายจ่าย</h2>
+                <p id="total-expense" class="text-2xl font-bold text-red-600 mt-2">฿0.00</p>
+            </div>
+            <div class="summary-card bg-blue-100 p-6 rounded-xl shadow-md text-center">
+                <!-- ADDED ID for dynamic update -->
+                <h2 id="balance-title" class="text-lg font-semibold text-blue-800">คงเหลือ</h2>
+                <p id="balance" class="text-2xl font-bold text-blue-600 mt-2">฿0.00</p>
+            </div>
         </section>
         
-        <!-- Monthly Summary (New Location: Above Platform Summary) -->
-        <section id="monthly-summary-section" class="bg-white p-6 rounded-xl shadow-md mb-8">
+        <!-- POSITION 4: Monthly Summary - NOW HIDDEN -->
+        <section id="monthly-summary-section" class="bg-white p-6 rounded-xl shadow-md mb-8 hidden">
             <h2 class="text-2xl font-bold mb-4 border-b pb-2">สรุปภาพรวมรายเดือน</h2>
             <ul id="monthly-summary-list" class="space-y-4">
                  <li class="text-center text-gray-500 py-4">ยังไม่มีข้อมูลสรุป...</li>
             </ul>
         </section>
         
-        <!-- Platform Income Summary (New Location: At the very bottom) -->
+        <!-- POSITION 5: Platform Income Summary -->
         <section id="platform-summary-section" class="bg-white p-6 rounded-xl shadow-md">
             <h2 class="text-2xl font-bold mb-4 border-b pb-2">สรุปรายรับตามแพลตฟอร์ม (เดือนที่เลือก)</h2>
             <ul id="platform-summary-list" class="space-y-4">
@@ -209,9 +210,7 @@
         const form = document.getElementById('transaction-form');
         
         // NEW DATE INPUTS
-        const dayInput = document.getElementById('date_day');
-        const monthInput = document.getElementById('date_month');
-        const yearInput = document.getElementById('date_year');
+        const dateInput = document.getElementById('dateInput'); // Consolidated date input
         
         const typeInput = document.getElementById('type');
         const platformInput = document.getElementById('platform');
@@ -225,6 +224,11 @@
         const loadingOverlay = document.getElementById('loading-overlay');
         const addTransactionBtn = document.getElementById('add-transaction-btn');
         
+        // NEW TITLE ELEMENTS
+        const incomeTitleEl = document.getElementById('income-title');
+        const expenseTitleEl = document.getElementById('expense-title');
+        const balanceTitleEl = document.getElementById('balance-title');
+        
         // Custom Modal Elements
         const customModal = document.getElementById('custom-modal');
         const modalMessageEl = document.getElementById('modal-message');
@@ -236,82 +240,6 @@
 
         // --- State and Init ---
         let transactions = [];
-
-        // --- Date Select Population ---
-
-        const THAI_MONTHS = [
-            { val: '01', name: 'มกราคม' }, { val: '02', name: 'กุมภาพันธ์' },
-            { val: '03', name: 'มีนาคม' }, { val: '04', name: 'เมษายน' },
-            { val: '05', name: 'พฤษภาคม' }, { val: '06', name: 'มิถุนายน' },
-            { val: '07', name: 'กรกฎาคม' }, { val: '08', name: 'สิงหาคม' },
-            { val: '09', name: 'กันยายน' }, { val: '10', name: 'ตุลาคม' },
-            { val: '11', name: 'พฤศจิกายน' }, { val: '12', name: 'ธันวาคม' }
-        ];
-
-        function updateDaySelects() {
-            const selectedYear = parseInt(yearInput.value);
-            const selectedMonth = parseInt(monthInput.value);
-            // Calculate days in the new selected month/year
-            // Month is 1-indexed (Jan=1). Date(Y, M, 0) gives the last day of the previous month.
-            const daysInMonth = new Date(selectedYear, selectedMonth, 0).getDate();
-
-            const previousDay = dayInput.value;
-            dayInput.innerHTML = ''; // Clear previous days
-
-            for (let i = 1; i <= daysInMonth; i++) {
-                const day = i.toString().padStart(2, '0');
-                const option = document.createElement('option');
-                option.value = day;
-                option.textContent = day;
-                dayInput.appendChild(option);
-            }
-            
-            // Try to keep the previously selected day, or select the last day of the new month if the previous day is out of range
-            if (parseInt(previousDay) <= daysInMonth) {
-                dayInput.value = previousDay;
-            } else {
-                dayInput.value = daysInMonth.toString().padStart(2, '0');
-            }
-        }
-
-        function populateDateSelects(currentDate = new Date()) {
-            const currentYear = currentDate.getFullYear();
-            const currentMonth = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-            const currentDay = currentDate.getDate().toString().padStart(2, '0');
-            
-            // Reset inputs
-            dayInput.innerHTML = '';
-            monthInput.innerHTML = '';
-            yearInput.innerHTML = '';
-
-            // Populate Year (Current year + 2 previous years)
-            for (let i = 0; i < 3; i++) {
-                const year = currentYear - i;
-                const option = document.createElement('option');
-                option.value = year.toString();
-                option.textContent = year + 543; // พ.ศ.
-                yearInput.appendChild(option);
-            }
-            yearInput.value = currentYear.toString();
-
-
-            // Populate Month
-            THAI_MONTHS.forEach(month => {
-                const option = document.createElement('option');
-                option.value = month.val;
-                option.textContent = month.name;
-                monthInput.appendChild(option);
-            });
-            monthInput.value = currentMonth;
-            
-            // Populate Day for the first time
-            updateDaySelects();
-            dayInput.value = currentDay;
-            
-            // Add event listeners for dynamic day update only once
-            yearInput.addEventListener('change', updateDaySelects);
-            monthInput.addEventListener('change', updateDaySelects);
-        }
 
         // --- Custom Modal Logic (Replaces alert/confirm) ---
         
@@ -404,12 +332,12 @@
                  return;
             }
             
-            // Construct date from dropdowns (YYYY-MM-DD)
-            const dateString = `${yearInput.value}-${monthInput.value}-${dayInput.value}`;
+            // Get date string from input (already YYYY-MM-DD format)
+            const dateString = dateInput.value;
 
             const transaction = {
                 id: generateID(),
-                date: dateString, // Use the constructed date string
+                date: dateString, // Use the date from the input
                 type: typeInput.value,
                 platform: platformInput.value,
                 description: descriptionInput.value, // Read value from text input
@@ -436,8 +364,8 @@
             } finally {
                 savingIndicator.style.opacity = '0';
                 setTimeout(() => { savingIndicator.style.display = 'none'; }, 300);
-                // Clear form inputs
-                descriptionInput.value = ''; // Clear text input (leave date unchanged)
+                // Clear form inputs (leave date unchanged)
+                descriptionInput.value = ''; 
                 amountInput.value = '';
                 addTransactionBtn.disabled = false;
             }
@@ -494,6 +422,25 @@
             const date = new Date(year, parseInt(month) - 1); 
             return date.toLocaleDateString('th-TH', { year: 'numeric', month: 'long' });
         }
+
+        /**
+         * Formats selected year/month from filters into Thai string.
+         * @param {string} year - Selected year (e.g., "2024")
+         * @param {string} month - Selected month (e.g., "07")
+         * @returns {string} - Formatted string (e.g., "(กรกฎาคม 2567)")
+         */
+        function getFormattedMonthAndYear(year, month) {
+            if (!year || !month) return '(กำลังโหลด...)';
+            
+            // Create a date object using the selected year and month (day doesn't matter)
+            const date = new Date(parseInt(year), parseInt(month) - 1, 1);
+            
+            // Get Thai month name and Thai year (P.E. = year + 543 is handled by toLocaleDateString('th-TH'))
+            const monthYearString = date.toLocaleDateString('th-TH', { year: 'numeric', month: 'long' });
+
+            return `(${monthYearString})`;
+        }
+
 
         function updateLocalStorage() {
             localStorage.setItem('transactions_cache', JSON.stringify(transactions));
@@ -554,6 +501,19 @@
                 .reduce((acc, t) => acc + t.amount, 0);
             
             const balance = income - expense;
+            
+            // Get current filter selection
+            const selectedYear = filterYearInput.value;
+            const selectedMonth = filterMonthInput.value;
+            
+            // Format the month/year string
+            const monthYearText = getFormattedMonthAndYear(selectedYear, selectedMonth);
+
+            // Update Titles to show the selected month/year
+            incomeTitleEl.innerText = `รายรับ ${monthYearText}`;
+            expenseTitleEl.innerText = `รายจ่าย ${monthYearText}`;
+            balanceTitleEl.innerText = `คงเหลือ ${monthYearText}`;
+
 
             balanceEl.innerText = `฿${formatMoney(balance)}`;
             totalIncomeEl.innerText = `฿${formatMoney(income)}`;
@@ -679,7 +639,7 @@
             populateMonthFilter(); // Make sure month dropdown is initialized even if year changes
             render();
             renderPlatformSummary(); // NEW: Call platform summary render
-            renderMonthlySummary();
+            // renderMonthlySummary(); // ถูกซ่อนตามคำขอ
         }
 
         function render() {
@@ -702,6 +662,7 @@
         }
 
         function renderMonthlySummary() {
+            // ฟังก์ชันนี้ถูกคอมเมนต์ใน updateUI() แล้ว และส่วน HTML ถูกซ่อนไว้
             monthlySummaryListEl.innerHTML = '';
             if(transactions.length === 0) {
                 monthlySummaryListEl.innerHTML = '<li class="text-center text-gray-500 py-4">ยังไม่มีข้อมูลสรุป...</li>';
@@ -740,8 +701,10 @@
          */
         async function init(isInitialLoad = true) {
             
-            // 1. Initialize Date Selects
-            populateDateSelects(new Date());
+            // 1. Initialize Date Input (set to today's date)
+            const today = new Date();
+            // dateInput is always set to YYYY-MM-DD for internal processing
+            dateInput.value = today.toISOString().split('T')[0];
 
             // 2. Load cached data and render UI instantly (non-blocking)
             const cachedTransactions = JSON.parse(localStorage.getItem('transactions_cache'));
