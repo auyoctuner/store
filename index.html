@@ -65,15 +65,15 @@
              <div class="flex flex-col md:flex-row justify-between items-center mb-4 border-b pb-4">
                 <h2 class="text-2xl font-bold mb-4 md:mb-0">ประวัติรายการ</h2>
                 <div class="flex flex-wrap items-center gap-2 md:gap-4">
-                    <div class="flex items-center gap-2">
-                        <label for="filter-year" class="text-base font-medium text-gray-700">ปี:</label>
-                        <!-- FILTER SIZE INCREASED -->
-                        <select id="filter-year" class="border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base p-3"></select>
-                    </div>
+                    <!-- SWAPPED ORDER: MONTH FIRST -->
                     <div class="flex items-center gap-2">
                         <label for="filter-month" class="text-base font-medium text-gray-700">เดือน:</label>
-                        <!-- FILTER SIZE INCREASED -->
                         <select id="filter-month" class="border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base p-3"></select>
+                    </div>
+                    <!-- SWAPPED ORDER: YEAR SECOND -->
+                    <div class="flex items-center gap-2">
+                        <label for="filter-year" class="text-base font-medium text-gray-700">ปี:</label>
+                        <select id="filter-year" class="border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base p-3"></select>
                     </div>
                 </div>
             </div>
@@ -89,7 +89,7 @@
                  <span id="saving-indicator" class="text-sm text-gray-500 opacity-0">กำลังบันทึก...</span>
             </div>
             <form id="transaction-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
-                <!-- START: Date Input changed from type=date to type=text to force DD/MM/YYYY format -->
+                <!-- START: Date Input DD/MM/YYYY format -->
                 <div class="col-span-1">
                     <label for="dateInput" class="block text-sm font-medium text-gray-700">วันที่ (DD/MM/YYYY)</label>
                     <input type="text" id="dateInput" placeholder="DD/MM/YYYY" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required>
@@ -216,8 +216,11 @@
         const platformInput = document.getElementById('platform');
         const descriptionInput = document.getElementById('description'); // Input text
         const amountInput = document.getElementById('amount');
-        const filterYearInput = document.getElementById('filter-year');
+        
+        // RE-ADDED SEPARATE FILTERS
+        const filterYearInput = document.getElementById('filter-year'); 
         const filterMonthInput = document.getElementById('filter-month');
+        
         const monthlySummaryListEl = document.getElementById('monthly-summary-list');
         const platformSummaryListEl = document.getElementById('platform-summary-list'); // NEW ELEMENT
         const savingIndicator = document.getElementById('saving-indicator');
@@ -480,6 +483,7 @@
 
         /**
          * Formats selected year/month from filters into Thai string.
+         * Accepts YYYY and MM as separate strings for backward compatibility with existing utility calls
          * @param {string} year - Selected year (e.g., "2024")
          * @param {string} month - Selected month (e.g., "07")
          * @returns {string} - Formatted string (e.g., "(กรกฎาคม 2567)")
@@ -510,89 +514,6 @@
                 case 'Lazada(Aom)': return 'text-sky-600';
                 case 'สั่งอะไหล่': return 'text-red-600';
                 default: return 'text-gray-600';
-            }
-        }
-
-        /**
-         * เพิ่ม transaction.date ในการเรียก removeTransaction
-         */
-        function addTransactionDOM(transaction) {
-            const item = document.createElement('li');
-            const isIncome = transaction.type === 'income';
-            const sign = isIncome ? '+' : '-';
-            const amountColor = isIncome ? 'text-green-600' : 'text-red-600';
-            const platformColor = getPlatformColor(transaction.platform);
-            const rowColor = isIncome ? 'bg-green-50 hover:bg-green-100' : 'bg-red-50 hover:bg-red-100';
-
-            item.classList.add('transaction-item', ...rowColor.split(' '), 'p-4', 'border', 'rounded-xl', 'flex', 'flex-wrap', 'justify-between', 'items-center', 'transition', 'duration-200');
-            item.innerHTML = `
-                <div class="flex items-center space-x-4 mb-2 md:mb-0">
-                    <div>
-                        <div class="font-bold text-gray-800">${transaction.description}</div>
-                        <div class="text-sm text-gray-500">
-                            <span>${new Date(transaction.date).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' })}</span> | 
-                            <span class="${platformColor} font-semibold">${transaction.platform}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <span class="font-bold text-lg ${amountColor}">${sign}฿${formatMoney(transaction.amount)}</span>
-                    <button class="bg-red-500 hover:bg-red-600 text-white text-xs py-1 px-2 rounded-full shadow-md" onclick="removeTransaction('${transaction.id}', '${transaction.date}')">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                           <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 10-2 0v6a1 1 0 102 0V8z" clip-rule="evenodd" />
-                        </svg>
-                    </button>
-                </div>
-            `;
-            transactionListEl.appendChild(item);
-        }
-
-        function updateValues(filteredTransactions) {
-            const income = filteredTransactions
-                .filter(t => t.type === 'income')
-                .reduce((acc, t) => acc + t.amount, 0);
-            const expense = filteredTransactions
-                .filter(t => t.type === 'expense')
-                .reduce((acc, t) => acc + t.amount, 0);
-            
-            const balance = income - expense;
-            
-            // Get current filter selection
-            const selectedYear = filterYearInput.value;
-            const selectedMonth = filterMonthInput.value;
-            
-            // Format the month/year string
-            const monthYearText = getFormattedMonthAndYear(selectedYear, selectedMonth);
-
-            // Update Titles to show the selected month/year
-            incomeTitleEl.innerText = `รายรับ ${monthYearText}`;
-            expenseTitleEl.innerText = `รายจ่าย ${monthYearText}`;
-            balanceTitleEl.innerText = `คงเหลือ ${monthYearText}`;
-
-
-            balanceEl.innerText = `฿${formatMoney(balance)}`;
-            totalIncomeEl.innerText = `฿${formatMoney(income)}`;
-            totalExpenseEl.innerText = `฿${formatMoney(expense)}`;
-            
-            // Update balance card color based on result
-            if (balance < 0) {
-                balanceEl.parentElement.classList.replace('bg-blue-100', 'bg-red-100');
-                balanceEl.classList.replace('text-blue-600', 'text-red-600');
-            } else {
-                balanceEl.parentElement.classList.replace('bg-red-100', 'bg-blue-100');
-                balanceEl.classList.replace('text-red-600', 'text-blue-600');
-            }
-        }
-        
-        function updatePlatformOptions() {
-            const selectedType = typeInput.value;
-            const allPlatforms = platformInput.options;
-            if (selectedType === 'expense') {
-                Array.from(allPlatforms).forEach(opt => opt.hidden = (opt.value !== 'สั่งอะไหล่'));
-                platformInput.value = 'สั่งอะไหล่';
-            } else {
-                Array.from(allPlatforms).forEach(opt => opt.hidden = (opt.value === 'สั่งอะไหล่'));
-                if (platformInput.value === 'สั่งอะไหล่') platformInput.value = 'Shopee';
             }
         }
 
@@ -646,20 +567,112 @@
                  filterMonthInput.value = (new Date().getMonth() + 1).toString().padStart(2, '0');
             }
         }
+
+
+        /**
+         * เพิ่ม transaction.date ในการเรียก removeTransaction
+         */
+        function addTransactionDOM(transaction) {
+            const item = document.createElement('li');
+            const isIncome = transaction.type === 'income';
+            const sign = isIncome ? '+' : '-';
+            const amountColor = isIncome ? 'text-green-600' : 'text-red-600';
+            const platformColor = getPlatformColor(transaction.platform);
+            const rowColor = isIncome ? 'bg-green-50 hover:bg-green-100' : 'bg-red-50 hover:bg-red-100';
+
+            item.classList.add('transaction-item', ...rowColor.split(' '), 'p-4', 'border', 'rounded-xl', 'flex', 'flex-wrap', 'justify-between', 'items-center', 'transition', 'duration-200');
+            item.innerHTML = `
+                <div class="flex items-center space-x-4 mb-2 md:mb-0">
+                    <div>
+                        <div class="font-bold text-gray-800">${transaction.description}</div>
+                        <div class="text-sm text-gray-500">
+                            <span>${new Date(transaction.date).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' })}</span> | 
+                            <span class="${platformColor} font-semibold">${transaction.platform}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="font-bold text-lg ${amountColor}">${sign}฿${formatMoney(transaction.amount)}</span>
+                    <button class="bg-red-500 hover:bg-red-600 text-white text-xs py-1 px-2 rounded-full shadow-md" onclick="removeTransaction('${transaction.id}', '${transaction.date}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                           <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 10-2 0v6a1 1 0 102 0V8z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+            `;
+            transactionListEl.appendChild(item);
+        }
+
+        function updateValues(filteredTransactions) {
+            const income = filteredTransactions
+                .filter(t => t.type === 'income')
+                .reduce((acc, t) => acc + t.amount, 0);
+            const expense = filteredTransactions
+                .filter(t => t.type === 'expense')
+                .reduce((acc, t) => acc + t.amount, 0);
+            
+            const balance = income - expense;
+            
+            // Get current filter selection
+            const selectedYear = filterYearInput.value;
+            const selectedMonth = filterMonthInput.value;
+            
+            if (!selectedYear || !selectedMonth) { // Handle empty filter case gracefully
+                incomeTitleEl.innerText = `รายรับ`;
+                expenseTitleEl.innerText = `รายจ่าย`;
+                balanceTitleEl.innerText = `คงเหลือ`;
+                return;
+            }
+            
+            // Format the month/year string
+            const monthYearText = getFormattedMonthAndYear(selectedYear, selectedMonth);
+
+            // Update Titles to show the selected month/year
+            incomeTitleEl.innerText = `รายรับ ${monthYearText}`;
+            expenseTitleEl.innerText = `รายจ่าย ${monthYearText}`;
+            balanceTitleEl.innerText = `คงเหลือ ${monthYearText}`;
+
+
+            balanceEl.innerText = `฿${formatMoney(balance)}`;
+            totalIncomeEl.innerText = `฿${formatMoney(income)}`;
+            totalExpenseEl.innerText = `฿${formatMoney(expense)}`;
+            
+            // Update balance card color based on result
+            if (balance < 0) {
+                balanceEl.parentElement.classList.replace('bg-blue-100', 'bg-red-100');
+                balanceEl.classList.replace('text-blue-600', 'text-red-600');
+            } else {
+                balanceEl.parentElement.classList.replace('bg-red-100', 'bg-blue-100');
+                balanceEl.classList.replace('text-red-600', 'text-blue-600');
+            }
+        }
         
+        function updatePlatformOptions() {
+            const selectedType = typeInput.value;
+            const allPlatforms = platformInput.options;
+            if (selectedType === 'expense') {
+                Array.from(allPlatforms).forEach(opt => opt.hidden = (opt.value !== 'สั่งอะไหล่'));
+                platformInput.value = 'สั่งอะไหล่';
+            } else {
+                Array.from(allPlatforms).forEach(opt => opt.hidden = (opt.value === 'สั่งอะไหล่'));
+                if (platformInput.value === 'สั่งอะไหล่') platformInput.value = 'Shopee';
+            }
+        }
+
         function renderPlatformSummary() {
             platformSummaryListEl.innerHTML = ''; // Clear previous summary
 
             const selectedYear = filterYearInput.value;
             const selectedMonth = filterMonthInput.value;
+            const selectedMonthYear = `${selectedYear}-${selectedMonth}`;
 
-            if (!selectedYear || !selectedMonth || transactions.length === 0) {
+            if (!selectedMonthYear || transactions.length === 0) {
                 platformSummaryListEl.innerHTML = '<li class="text-center text-gray-500 py-4">ยังไม่มีข้อมูลรายรับ...</li>';
                 return;
             }
 
             const filteredTransactions = transactions.filter(t => 
-                t.date.startsWith(`${selectedYear}-${selectedMonth}`) && t.type === 'income'
+                t.date.startsWith(selectedMonthYear) && t.type === 'income'
             );
             
             if (filteredTransactions.length === 0) {
@@ -689,20 +702,26 @@
         }
         
         function updateUI() {
-            // Re-populate filters and render based on the current (newly loaded) transactions state
+            // Re-populate filters (now separate) and render based on the current (newly loaded) transactions state
             populateYearFilter(); 
-            populateMonthFilter(); // Make sure month dropdown is initialized even if year changes
+            populateMonthFilter();
             render();
-            renderPlatformSummary(); // NEW: Call platform summary render
-            // renderMonthlySummary(); // ถูกซ่อนตามคำขอ
+            renderPlatformSummary(); // Call platform summary render
         }
 
         function render() {
             const selectedYear = filterYearInput.value;
             const selectedMonth = filterMonthInput.value;
-            if (!selectedYear || !selectedMonth) return;
+            const selectedMonthYear = `${selectedYear}-${selectedMonth}`;
 
-            const filteredTransactions = transactions.filter(t => t.date.startsWith(`${selectedYear}-${selectedMonth}`));
+            if (!selectedMonthYear) {
+                 transactionListEl.innerHTML = '<li class="text-center text-gray-500 py-4">ยังไม่มีรายการ...</li>';
+                 updateValues([]); 
+                 return;
+            }
+
+            // Filter using the YYYY-MM string
+            const filteredTransactions = transactions.filter(t => t.date.startsWith(selectedMonthYear));
             
             // Sort by date ascending (Oldest first/FIFO)
             filteredTransactions.sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -718,35 +737,6 @@
 
         function renderMonthlySummary() {
             // ฟังก์ชันนี้ถูกคอมเมนต์ใน updateUI() แล้ว และส่วน HTML ถูกซ่อนไว้
-            monthlySummaryListEl.innerHTML = '';
-            if(transactions.length === 0) {
-                monthlySummaryListEl.innerHTML = '<li class="text-center text-gray-500 py-4">ยังไม่มีข้อมูลสรุป...</li>';
-                return;
-            }
-
-            const summaryData = transactions.reduce((acc, t) => {
-                const month = t.date.substring(0, 7);
-                if (!acc[month]) acc[month] = { income: 0, expense: 0, month: month };
-                if (t.type === 'income') acc[month].income += t.amount;
-                else acc[month].expense += t.amount;
-                return acc;
-            }, {});
-
-            const sortedMonths = Object.values(summaryData).sort((a, b) => b.month.localeCompare(a.month));
-            sortedMonths.forEach(data => {
-                const balance = data.income - data.expense;
-                const balanceColor = balance >= 0 ? 'text-green-600' : 'text-red-600';
-                
-                const item = document.createElement('li');
-                item.classList.add('p-4', 'border', 'rounded-xl', 'grid', 'grid-cols-2', 'md:grid-cols-4', 'gap-4', 'items-center', 'text-center', 'shadow-sm', 'hover:bg-gray-50', 'transition');
-                item.innerHTML = `
-                    <div class="font-bold text-lg text-left md:text-center">${formatMonth(data.month)}</div>
-                    <div><div class="text-sm text-gray-500">รายรับ</div><div class="font-semibold text-green-600">฿${formatMoney(data.income)}</div></div>
-                    <div><div class="text-sm text-gray-500">รายจ่าย</div><div class="font-semibold text-red-600">฿${formatMoney(data.expense)}</div></div>
-                    <div><div class="font-bold text-sm text-gray-500">คงเหลือสุทธิ</div><div class="font-bold text-xl ${balanceColor}">฿${formatMoney(balance)}</div></div>
-                `;
-                monthlySummaryListEl.appendChild(item);
-            });
         }
 
         /**
