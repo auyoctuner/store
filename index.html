@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แอปบันทึกรายรับ-รายจ่าย Shopee & Lazada</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f7fafc;
+        }
+        .summary-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        #saving-indicator {
+            display: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            font-size: 1.2rem;
+            color: #4a5568;
+        }
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .modal {
+             transition: opacity 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div id="loading-overlay">
+        <span>กำลังโหลดข้อมูลจาก Google Sheet...</span>
+    </div>
+
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-700">แอปบัญชีร้านค้าออนไลน์</h1>
+            <p class="text-md text-gray-500 mt-2">บันทึกรายรับ-รายจ่ายสำหรับ Shopee, Lazada และอื่นๆ</p>
+        </header>
+
+        <!-- Summary Cards -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="summary-card bg-green-100 p-6 rounded-xl shadow-md text-center">
+                <h2 class="text-lg font-semibold text-green-800">รายรับ (เดือนที่เลือก)</h2>
+                <p id="total-income" class="text-2xl font-bold text-green-600 mt-2">฿0.00</p>
+            </div>
+            <div class="summary-card bg-red-100 p-6 rounded-xl shadow-md text-center">
+                <h2 class="text-lg font-semibold text-red-800">รายจ่าย (เดือนที่เลือก)</h2>
+                <p id="total-expense" class="text-2xl font-bold text-red-600 mt-2">฿0.00</p>
+            </div>
+            <div class="summary-card bg-blue-100 p-6 rounded-xl shadow-md text-center">
+                <h2 class="text-lg font-semibold text-blue-800">คงเหลือ (เดือนที่เลือก)</h2>
+                <p id="balance" class="text-2xl font-bold text-blue-600 mt-2">฿0.00</p>
+            </div>
+        </section>
+
+        <!-- Transaction Form -->
+        <section class="bg-white p-6 rounded-xl shadow-md mb-8">
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                 <h2 class="text-2xl font-bold">เพิ่มรายการใหม่</h2>
+                 <span id="saving-indicator" class="text-sm text-gray-500 opacity-0">กำลังบันทึก...</span>
+            </div>
+            <form id="transaction-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+                <div>
+                    <label for="date" class="block text-sm font-medium text-gray-700">วันที่</label>
+                    <input type="date" id="date" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required>
+                </div>
+                <div>
+                    <label for="type" class="block text-sm font-medium text-gray-700">ประเภท</label>
+                    <select id="type" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2">
+                        <option value="income">รายรับ</option>
+                        <option value="expense">รายจ่าย</option>
+                    </select>
+                </div>
+                 <div>
+                    <label for="platform" class="block text-sm font-medium text-gray-700">แพลตฟอร์ม</label>
+                    <select id="platform" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2">
+                        <option value="Shopee">Shopee</option>
+                        <option value="Lazada(Auy)">Lazada(Auy)</option>
+                        <option value="Lazada(Aom)">Lazada(Aom)</option>
+                        <option value="สั่งอะไหล่">สั่งอะไหล่</option>
+                    </select>
+                </div>
+                <div class="lg:col-span-1">
+                    <label for="description" class="block text-sm font-medium text-gray-700">รายการ</label>
+                    <input type="text" id="description" placeholder="เช่น ค่าสต๊อค, ค่าโฆษณา" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required>
+                </div>
+                <div class="lg:col-span-1">
+                    <label for="amount" class="block text-sm font-medium text-gray-700">จำนวนเงิน</label>
+                    <input type="number" step="0.01" id="amount" placeholder="0.00" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required>
+                </div>
+                <button id="add-transaction-btn" type="submit" class="w-full md:w-auto lg:col-start-5 bg-indigo-600 text-white py-2 px-4 rounded-lg shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    เพิ่มรายการ
+                </button>
+            </form>
+        </section>
+
+        <!-- Transaction List -->
+        <section class="bg-white p-6 rounded-xl shadow-md mb-8">
+             <div class="flex flex-col md:flex-row justify-between items-center mb-4 border-b pb-4">
+                <h2 class="text-2xl font-bold mb-4 md:mb-0">ประวัติรายการ</h2>
+                <div class="flex flex-wrap items-center gap-2 md:gap-4">
+                    <div class="flex items-center gap-2">
+                        <label for="filter-year" class="text-sm font-medium text-gray-700">ปี:</label>
+                        <select id="filter-year" class="border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2"></select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label for="filter-month" class="text-sm font-medium text-gray-700">เดือน:</label>
+                        <select id="filter-month" class="border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2"></select>
+                    </div>
+                </div>
+            </div>
+            <ul id="transaction-list" class="space-y-3">
+                 <li class="text-center text-gray-500 py-4">ยังไม่มีรายการ...</li>
+            </ul>
+        </section>
+
+        <!-- Monthly Summary -->
+        <section id="monthly-summary-section" class="bg-white p-6 rounded-xl shadow-md">
+            <h2 class="text-2xl font-bold mb-4 border-b pb-2">สรุปภาพรวมรายเดือน</h2>
+            <ul id="monthly-summary-list" class="space-y-4">
+                 <li class="text-center text-gray-500 py-4">ยังไม่มีข้อมูลสรุป...</li>
+            </ul>
+        </section>
+    </div>
+
+    <!-- Custom Message Modal (Alert replacement) -->
+    <div id="custom-modal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full transform transition-all duration-300 scale-100">
+            <div class="p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">แจ้งเตือน</h3>
+                <p id="modal-message" class="text-gray-700 mb-6"></p>
+                <div class="flex justify-end">
+                    <button id="modal-close-btn" class="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-150">
+                        ตกลง
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Confirmation Modal (Confirm replacement) -->
+    <div id="confirm-modal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full transform transition-all duration-300 scale-100">
+            <div class="p-6">
+                <h3 class="text-xl font-bold text-red-700 mb-4">ยืนยันการดำเนินการ</h3>
+                <p id="confirm-message" class="text-gray-700 mb-6"></p>
+                <div class="flex justify-end space-x-3">
+                    <button id="confirm-cancel-btn" class="bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition duration-150">
+                        ยกเลิก
+                    </button>
+                    <button id="confirm-ok-btn" class="bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 transition duration-150">
+                        ยืนยัน
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // **IMPORTANT: Replace this with your deployed Google Apps Script URL**
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw9ImlQQ860LcJNjojx6XCJB7ohJz0SC13ZeE_UblzoAdeRNRqk7tLVD71DazRgCaA6vg/exec";
+        const SHEET_ID = "1PHtLUtMEYmOLzLYPGxjesMPDtTj3l4DRpsUZUGtHdqg";
+
+        // --- DOM Elements ---
+        const balanceEl = document.getElementById('balance');
+        const totalIncomeEl = document.getElementById('total-income');
+        const totalExpenseEl = document.getElementById('total-expense');
+        const transactionListEl = document.getElementById('transaction-list');
+        const form = document.getElementById('transaction-form');
+        const dateInput = document.getElementById('date');
+        const typeInput = document.getElementById('type');
+        const platformInput = document.getElementById('platform');
+        const descriptionInput = document.getElementById('description');
+        const amountInput = document.getElementById('amount');
+        const filterYearInput = document.getElementById('filter-year');
+        const filterMonthInput = document.getElementById('filter-month');
+        const monthlySummaryListEl = document.getElementById('monthly-summary-list');
+        const savingIndicator = document.getElementById('saving-indicator');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const addTransactionBtn = document.getElementById('add-transaction-btn');
+        
+        // Custom Modal Elements
+        const customModal = document.getElementById('custom-modal');
+        const modalMessageEl = document.getElementById('modal-message');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+        const confirmModal = document.getElementById('confirm-modal');
+        const confirmMessageEl = document.getElementById('confirm-message');
+        const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+        let confirmOkBtn = document.getElementById('confirm-ok-btn'); 
+
+        // --- State and Init ---
+        dateInput.valueAsDate = new Date();
+        let transactions = [];
+
+        // --- Custom Modal Logic (Replaces alert/confirm) ---
+        
+        function showMessage(message) {
+            modalMessageEl.textContent = message;
+            customModal.classList.remove('hidden');
+        }
+
+        function showConfirm(message, onConfirm) {
+            confirmMessageEl.textContent = message;
+            confirmModal.classList.remove('hidden');
+
+            // Clone and replace buttons to ensure fresh event listeners (Critical for proper confirmation flow)
+            confirmOkBtn.replaceWith(confirmOkBtn.cloneNode(true));
+            confirmCancelBtn.replaceWith(confirmCancelBtn.cloneNode(true));
+            
+            let newConfirmOkBtn = document.getElementById('confirm-ok-btn');
+            let newConfirmCancelBtn = document.getElementById('confirm-cancel-btn');
+
+            const closeConfirm = () => {
+                confirmModal.classList.add('hidden');
+            };
+
+            newConfirmOkBtn.addEventListener('click', () => {
+                closeConfirm();
+                onConfirm(true);
+            }, { once: true });
+
+            newConfirmCancelBtn.addEventListener('click', () => {
+                closeConfirm();
+                onConfirm(false);
+            }, { once: true });
+
+            confirmOkBtn = newConfirmOkBtn;
+        }
+        
+        modalCloseBtn.addEventListener('click', () => {
+            customModal.classList.add('hidden');
+        });
+
+        // --- Google Apps Script Connector (JSONP) ---
+
+        /**
+         * ใช้สำหรับเรียก Google Apps Script (GS) โดยใช้เทคนิค JSONP
+         */
+        function callGoogleScript(action, payload = {}) {
+            const callbackName = 'jsonpCallback_' + new Date().getTime() + Math.random().toString(36).substr(2, 5);
+            
+            return new Promise((resolve, reject) => {
+                window[callbackName] = function(response) {
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    if (response && response.status === 'success') {
+                        resolve(response);
+                    } else if (response) {
+                        console.error('Google Script Error:', response.message);
+                        reject(new Error(response.message));
+                    } else {
+                         reject(new Error('Received empty or invalid response from Google Script.'));
+                    }
+                };
+
+                const params = new URLSearchParams({
+                    sheetId: SHEET_ID,
+                    action: action,
+                    ...payload,
+                    callback: callbackName
+                });
+
+                const script = document.createElement('script');
+                script.src = `${SCRIPT_URL}?${params.toString()}`;
+                script.onerror = () => reject(new Error('Failed to load Google Script. Check SCRIPT_URL deployment.'));
+                document.body.appendChild(script);
+            });
+        }
+        
+        // --- Transaction Logic ---
+
+        async function addTransaction(e) {
+            e.preventDefault();
+            if (descriptionInput.value.trim() === '' || amountInput.value.trim() === '') {
+                showMessage('กรุณากรอกรายการและจำนวนเงินให้ครบถ้วน');
+                return;
+            }
+            // Ensure amount is float before sending
+            const amountValue = parseFloat(amountInput.value);
+            if (isNaN(amountValue) || amountValue <= 0) {
+                 showMessage('จำนวนเงินไม่ถูกต้อง กรุณาใส่ตัวเลขที่มากกว่า 0');
+                 return;
+            }
+            
+            const transaction = {
+                id: generateID(),
+                date: dateInput.value,
+                type: typeInput.value,
+                platform: platformInput.value,
+                description: descriptionInput.value,
+                amount: amountValue
+            };
+
+            // 1. Optimistic Update: Add to local array and update UI immediately
+            transactions.push(transaction);
+            updateLocalStorage();
+            updateUI(); // Quick render for immediate feedback
+            
+            // Show saving indicator while background saving is happening
+            savingIndicator.style.display = 'inline';
+            savingIndicator.style.opacity = '1';
+            addTransactionBtn.disabled = true;
+            
+            try {
+                // 2. Background Saving to Google Sheet
+                await callGoogleScript('addData', transaction);
+            } catch (error) {
+                // 3. Handle failure (inform user and initiate full reload to sync)
+                showMessage('ไม่สามารถบันทึกข้อมูลไปยัง Google Sheet ได้: ' + error.message + ' รายการจะถูกดึงกลับมาในหน้าจอเมื่อรีโหลด');
+                await init(false); // Force reload to revert failed transaction
+            } finally {
+                savingIndicator.style.opacity = '0';
+                setTimeout(() => { savingIndicator.style.display = 'none'; }, 300);
+                // Clear form inputs
+                descriptionInput.value = '';
+                amountInput.value = '';
+                dateInput.valueAsDate = new Date();
+                addTransactionBtn.disabled = false;
+            }
+        }
+        
+        /**
+         * รับ parameter date เพื่อส่งไปยัง GS ให้รู้ว่าจะลบจากชีทเดือนใด
+         * (Optimistic Delete)
+         */
+        function removeTransaction(id, date) { 
+            showConfirm('คุณต้องการลบรายการนี้ใช่หรือไม่? การดำเนินการนี้ไม่สามารถย้อนกลับได้', async (confirmed) => {
+                if (!confirmed) return;
+                
+                // --- 1. Optimistic Update (Immediate) ---
+                const originalTransactions = [...transactions];
+                transactions = transactions.filter(t => t.id.toString() !== id.toString());
+                updateLocalStorage();
+                updateUI();
+                
+                // Show saving indicator for background process (Non-blocking indicator)
+                savingIndicator.style.display = 'inline';
+                savingIndicator.style.opacity = '1';
+                
+                try {
+                    // 2. Background Deleting from Google Sheet (Awaited for rollback logic, but UI is already updated)
+                    await callGoogleScript('deleteData', { id: id, date: date }); 
+                } catch (error) {
+                    // 3. Handle failure (revert local state and inform user)
+                    showMessage('เกิดข้อผิดพลาดในการลบรายการใน Google Sheet: ' + error.message + ' รายการจะถูกดึงกลับมาในหน้าจอ');
+                    transactions = originalTransactions; // Revert local state
+                    updateLocalStorage();
+                    updateUI();
+                } finally {
+                    // Hide saving indicator
+                    savingIndicator.style.opacity = '0';
+                    setTimeout(() => { savingIndicator.style.display = 'none'; }, 300);
+                }
+            });
+        }
+
+        // --- Utility Functions ---
+
+        function generateID() {
+            return new Date().getTime().toString(36) + Math.random().toString(36).substr(2, 9);
+        }
+
+        function formatMoney(number) {
+            if (typeof number !== 'number' || isNaN(number)) return '0.00'; 
+            return number.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        }
+        
+        function formatMonth(dateString) {
+            const [year, month] = dateString.split('-');
+            const date = new Date(year, parseInt(month) - 1); 
+            return date.toLocaleDateString('th-TH', { year: 'numeric', month: 'long' });
+        }
+
+        function updateLocalStorage() {
+            localStorage.setItem('transactions_cache', JSON.stringify(transactions));
+        }
+        
+        // --- UI Rendering and Filtering ---
+
+        function getPlatformColor(platform) {
+            switch(platform) {
+                case 'Shopee': return 'text-orange-500';
+                case 'Lazada(Auy)': return 'text-blue-500';
+                case 'Lazada(Aom)': return 'text-sky-600';
+                case 'สั่งอะไหล่': return 'text-red-600';
+                default: return 'text-gray-600';
+            }
+        }
+
+        /**
+         * เพิ่ม transaction.date ในการเรียก removeTransaction
+         */
+        function addTransactionDOM(transaction) {
+            const item = document.createElement('li');
+            const isIncome = transaction.type === 'income';
+            const sign = isIncome ? '+' : '-';
+            const amountColor = isIncome ? 'text-green-600' : 'text-red-600';
+            const platformColor = getPlatformColor(transaction.platform);
+            const rowColor = isIncome ? 'bg-green-50 hover:bg-green-100' : 'bg-red-50 hover:bg-red-100';
+
+            item.classList.add('transaction-item', ...rowColor.split(' '), 'p-4', 'border', 'rounded-xl', 'flex', 'flex-wrap', 'justify-between', 'items-center', 'transition', 'duration-200');
+            item.innerHTML = `
+                <div class="flex items-center space-x-4 mb-2 md:mb-0">
+                    <div>
+                        <div class="font-bold text-gray-800">${transaction.description}</div>
+                        <div class="text-sm text-gray-500">
+                            <span>${new Date(transaction.date).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' })}</span> | 
+                            <span class="${platformColor} font-semibold">${transaction.platform}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="font-bold text-lg ${amountColor}">${sign}฿${formatMoney(transaction.amount)}</span>
+                    <button class="bg-red-500 hover:bg-red-600 text-white text-xs py-1 px-2 rounded-full shadow-md" onclick="removeTransaction('${transaction.id}', '${transaction.date}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                           <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 10-2 0v6a1 1 0 102 0V8z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+            `;
+            transactionListEl.appendChild(item);
+        }
+
+        function updateValues(filteredTransactions) {
+            const income = filteredTransactions
+                .filter(t => t.type === 'income')
+                .reduce((acc, t) => acc + t.amount, 0);
+            const expense = filteredTransactions
+                .filter(t => t.type === 'expense')
+                .reduce((acc, t) => acc + t.amount, 0);
+            
+            const balance = income - expense;
+
+            balanceEl.innerText = `฿${formatMoney(balance)}`;
+            totalIncomeEl.innerText = `฿${formatMoney(income)}`;
+            totalExpenseEl.innerText = `฿${formatMoney(expense)}`;
+            
+            // Update balance card color based on result
+            if (balance < 0) {
+                balanceEl.parentElement.classList.replace('bg-blue-100', 'bg-red-100');
+                balanceEl.classList.replace('text-blue-600', 'text-red-600');
+            } else {
+                balanceEl.parentElement.classList.replace('bg-red-100', 'bg-blue-100');
+                balanceEl.classList.replace('text-red-600', 'text-blue-600');
+            }
+        }
+        
+        function updatePlatformOptions() {
+            const selectedType = typeInput.value;
+            const allPlatforms = platformInput.options;
+            if (selectedType === 'expense') {
+                Array.from(allPlatforms).forEach(opt => opt.hidden = (opt.value !== 'สั่งอะไหล่'));
+                platformInput.value = 'สั่งอะไหล่';
+            } else {
+                Array.from(allPlatforms).forEach(opt => opt.hidden = (opt.value === 'สั่งอะไหล่'));
+                if (platformInput.value === 'สั่งอะไหล่') platformInput.value = 'Shopee';
+            }
+        }
+
+        function populateYearFilter() {
+            const selectedValue = filterYearInput.value;
+            filterYearInput.innerHTML = '';
+            const years = [...new Set(transactions.map(t => t.date.substring(0, 4)))];
+            const currentYear = new Date().getFullYear().toString();
+            if (!years.includes(currentYear)) {
+                years.push(currentYear);
+            }
+            years.sort((a, b) => b.localeCompare(a));
+
+            years.forEach(year => {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = parseInt(year) + 543; // พ.ศ.
+                filterYearInput.appendChild(option);
+            });
+            
+            // Restore selection or default to latest year
+            if (selectedValue && years.includes(selectedValue)) {
+                filterYearInput.value = selectedValue;
+            } else if (years.length > 0) {
+                filterYearInput.value = years[0];
+            }
+        }
+
+        function populateMonthFilter() {
+            const selectedValue = filterMonthInput.value;
+            filterMonthInput.innerHTML = '';
+            const months = [
+                { val: '01', name: 'มกราคม' }, { val: '02', name: 'กุมภาพันธ์' },
+                { val: '03', name: 'มีนาคม' }, { val: '04', name: 'เมษายน' },
+                { val: '05', name: 'พฤษภาคม' }, { val: '06', name: 'มิถุนายน' },
+                { val: '07', name: 'กรกฎาคม' }, { val: '08', name: 'สิงหาคม' },
+                { val: '09', name: 'กันยายน' }, { val: '10', name: 'ตุลาคม' },
+                { val: '11', name: 'พฤศจิกายน' }, { val: '12', name: 'ธันวาคม' }
+            ];
+            months.forEach(month => {
+                const option = document.createElement('option');
+                option.value = month.val;
+                option.textContent = month.name;
+                filterMonthInput.appendChild(option);
+            });
+
+            // Restore selection or default to current month
+            if (selectedValue) {
+                 filterMonthInput.value = selectedValue;
+            } else {
+                 filterMonthInput.value = (new Date().getMonth() + 1).toString().padStart(2, '0');
+            }
+        }
+        
+        function updateUI() {
+            // Re-populate filters and render based on the current (newly loaded) transactions state
+            populateYearFilter(); 
+            populateMonthFilter(); // Make sure month dropdown is initialized even if year changes
+            render();
+            renderMonthlySummary();
+        }
+
+        function render() {
+            const selectedYear = filterYearInput.value;
+            const selectedMonth = filterMonthInput.value;
+            if (!selectedYear || !selectedMonth) return;
+
+            const filteredTransactions = transactions.filter(t => t.date.startsWith(`${selectedYear}-${selectedMonth}`));
+            
+            // Sort by date descending
+            filteredTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            transactionListEl.innerHTML = '';
+            if (filteredTransactions.length === 0) {
+                 transactionListEl.innerHTML = '<li class="text-center text-gray-500 py-4">ไม่พบรายการในเดือนที่เลือก...</li>';
+            } else {
+                 filteredTransactions.forEach(addTransactionDOM);
+            }
+            updateValues(filteredTransactions);
+        }
+
+        function renderMonthlySummary() {
+            monthlySummaryListEl.innerHTML = '';
+            if(transactions.length === 0) {
+                monthlySummaryListEl.innerHTML = '<li class="text-center text-gray-500 py-4">ยังไม่มีข้อมูลสรุป...</li>';
+                return;
+            }
+
+            const summaryData = transactions.reduce((acc, t) => {
+                const month = t.date.substring(0, 7);
+                if (!acc[month]) acc[month] = { income: 0, expense: 0, month: month };
+                if (t.type === 'income') acc[month].income += t.amount;
+                else acc[month].expense += t.amount;
+                return acc;
+            }, {});
+
+            const sortedMonths = Object.values(summaryData).sort((a, b) => b.month.localeCompare(a.month));
+            sortedMonths.forEach(data => {
+                const balance = data.income - data.expense;
+                const balanceColor = balance >= 0 ? 'text-green-600' : 'text-red-600';
+                
+                const item = document.createElement('li');
+                item.classList.add('p-4', 'border', 'rounded-xl', 'grid', 'grid-cols-2', 'md:grid-cols-4', 'gap-4', 'items-center', 'text-center', 'shadow-sm', 'hover:bg-gray-50', 'transition');
+                item.innerHTML = `
+                    <div class="font-bold text-lg text-left md:text-center">${formatMonth(data.month)}</div>
+                    <div><div class="text-sm text-gray-500">รายรับ</div><div class="font-semibold text-green-600">฿${formatMoney(data.income)}</div></div>
+                    <div><div class="text-sm text-gray-500">รายจ่าย</div><div class="font-semibold text-red-600">฿${formatMoney(data.expense)}</div></div>
+                    <div><div class="font-bold text-sm text-gray-500">คงเหลือสุทธิ</div><div class="font-bold text-xl ${balanceColor}">฿${formatMoney(balance)}</div></div>
+                `;
+                monthlySummaryListEl.appendChild(item);
+            });
+        }
+
+        /**
+         * Initial load function: Always tries to sync with Google Sheet.
+         * Falls back to Local Storage if sheet sync fails.
+         * @param {boolean} initialLoad - Flag to determine if this is the very first load.
+         */
+        async function init(initialLoad = true) {
+            if(initialLoad) {
+                loadingOverlay.style.display = 'flex';
+                const cachedTransactions = JSON.parse(localStorage.getItem('transactions_cache'));
+                if (cachedTransactions) {
+                     // Load cached data first to show something quickly
+                    transactions = cachedTransactions.map(t => ({
+                        ...t, 
+                        amount: parseFloat(t.amount) || 0
+                    })); 
+                    // Update UI quickly with cached data
+                    updateUI(); 
+                }
+            }
+            
+            try {
+                // Try to get fresh data from Google Sheet
+                const response = await callGoogleScript('getData');
+                
+                // Process data from sheet: ensure amount is float and set as source of truth
+                const sheetData = (response.data || []).map(t => ({
+                    ...t, 
+                    amount: parseFloat(t.amount) || 0 
+                }));
+
+                transactions = sheetData; 
+                updateLocalStorage(); // Update cache with fresh data
+
+            } catch (error) {
+                console.error("Could not sync with Google Sheet on initial load. Using cached data.", error);
+                // แก้ไขข้อความแจ้งเตือนให้ชัดเจนขึ้นเมื่อเกิดข้อผิดพลาดในการโหลดชีท
+                const errorMessage = error.message || "Unknown error occurred.";
+                if (transactions.length === 0) {
+                    showMessage(`ไม่สามารถโหลดข้อมูลล่าสุดจาก Google Sheet ได้ (Error: ${errorMessage}) โปรดตรวจสอบว่าคุณได้ Deploy โค้ด Google Apps Script ล่าสุดแล้ว`);
+                } else if (initialLoad) {
+                    // Show error but don't force immediate action if cached data is present
+                    console.warn(`แสดงข้อมูลสำรองล่าสุดในเครื่อง เนื่องจากเกิดข้อผิดพลาดในการเชื่อมต่อ Google Sheet (Error: ${errorMessage})`);
+                }
+            } finally {
+                // Re-render the UI based on the final 'transactions' state (either fresh or cached)
+                updateUI();
+                if(initialLoad) {
+                    loadingOverlay.style.display = 'none';
+                }
+            }
+        }
+
+        // --- Event Listeners ---
+        form.addEventListener('submit', addTransaction);
+        // Change filter events call updateUI to ensure all elements (list + summary) refresh correctly
+        filterYearInput.addEventListener('change', updateUI); 
+        filterMonthInput.addEventListener('change', updateUI); // *** แก้ไข: ให้เรียก updateUI เพื่อซิงค์สถานะตัวกรองปี-เดือน ***
+        typeInput.addEventListener('change', updatePlatformOptions);
+
+        // Export removeTransaction to global scope for use in inline onclick (DOM)
+        window.removeTransaction = removeTransaction;
+
+        // Start App
+        init();
+    </script>
+</body>
+</html>
