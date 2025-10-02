@@ -29,7 +29,7 @@
             width: 100%;
             height: 100%;
             background-color: rgba(255, 255, 255, 0.8);
-            display: flex;
+            display: none; /* ซ่อนโดยค่าเริ่มต้น ตามคำขอ */
             justify-content: center;
             align-items: center;
             z-index: 9999;
@@ -47,6 +47,8 @@
 </head>
 <body class="bg-gray-100 text-gray-800">
 
+    <!-- ลบ #loading-overlay ออกจาก DOM ได้เลย หากไม่ต้องการใช้เป็นส่วนของ UI เลย -->
+    <!-- แต่เพื่อคงโครงสร้างเดิมไว้และแค่ซ่อน, เราจะคง div นี้ไว้ -->
     <div id="loading-overlay">
         <span>กำลังโหลดข้อมูลจาก Google Sheet...</span>
     </div>
@@ -102,8 +104,8 @@
                     </select>
                 </div>
                 <div class="lg:col-span-1">
-                    <label for="description" class="block text-sm font-medium text-gray-700">รายการ</label>
-                    <input type="text" id="description" placeholder="เช่น ค่าสต๊อค, ค่าโฆษณา" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required>
+                    <label for="description" class="block text-sm font-medium text-gray-700">หมายเหตุ</label>
+                    <input type="text" id="description" placeholder="เช่น ค่าสต๊อค, ค่าโฆษณา" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2">
                 </div>
                 <div class="lg:col-span-1">
                     <label for="amount" class="block text-sm font-medium text-gray-700">จำนวนเงิน</label>
@@ -292,8 +294,9 @@
 
         async function addTransaction(e) {
             e.preventDefault();
-            if (descriptionInput.value.trim() === '' || amountInput.value.trim() === '') {
-                showMessage('กรุณากรอกรายการและจำนวนเงินให้ครบถ้วน');
+            
+            if (amountInput.value.trim() === '') {
+                showMessage('กรุณากรอกจำนวนเงินให้ครบถ้วน');
                 return;
             }
             // Ensure amount is float before sending
@@ -308,7 +311,7 @@
                 date: dateInput.value,
                 type: typeInput.value,
                 platform: platformInput.value,
-                description: descriptionInput.value,
+                description: descriptionInput.value, // จะบันทึกเป็น string ว่างถ้าไม่ได้กรอก
                 amount: amountValue
             };
 
@@ -591,22 +594,21 @@
         /**
          * Initial load function: Always tries to sync with Google Sheet.
          * Falls back to Local Storage if sheet sync fails.
-         * @param {boolean} initialLoad - Flag to determine if this is the very first load.
+         * @param {boolean} isInitialLoad - Flag to determine if this is the very first load.
          */
-        async function init(initialLoad = true) {
-            if(initialLoad) {
-                loadingOverlay.style.display = 'flex';
-                const cachedTransactions = JSON.parse(localStorage.getItem('transactions_cache'));
-                if (cachedTransactions) {
-                     // Load cached data first to show something quickly
-                    transactions = cachedTransactions.map(t => ({
-                        ...t, 
-                        amount: parseFloat(t.amount) || 0
-                    })); 
-                    // Update UI quickly with cached data
-                    updateUI(); 
-                }
+        async function init(isInitialLoad = true) {
+            
+            // 1. Load cached data and render UI instantly (non-blocking)
+            const cachedTransactions = JSON.parse(localStorage.getItem('transactions_cache'));
+            if (cachedTransactions) {
+                transactions = cachedTransactions.map(t => ({
+                    ...t, 
+                    amount: parseFloat(t.amount) || 0
+                })); 
+                updateUI();
             }
+
+            // *** ลบส่วนแสดง loadingOverlay ออกไปเพื่อให้หน้าเว็บแสดงผลทันทีและโหลดในเบื้องหลัง ***
             
             try {
                 // Try to get fresh data from Google Sheet
@@ -627,16 +629,14 @@
                 const errorMessage = error.message || "Unknown error occurred.";
                 if (transactions.length === 0) {
                     showMessage(`ไม่สามารถโหลดข้อมูลล่าสุดจาก Google Sheet ได้ (Error: ${errorMessage}) โปรดตรวจสอบว่าคุณได้ Deploy โค้ด Google Apps Script ล่าสุดแล้ว`);
-                } else if (initialLoad) {
+                } else if (isInitialLoad) {
                     // Show error but don't force immediate action if cached data is present
                     console.warn(`แสดงข้อมูลสำรองล่าสุดในเครื่อง เนื่องจากเกิดข้อผิดพลาดในการเชื่อมต่อ Google Sheet (Error: ${errorMessage})`);
                 }
             } finally {
                 // Re-render the UI based on the final 'transactions' state (either fresh or cached)
                 updateUI();
-                if(initialLoad) {
-                    loadingOverlay.style.display = 'none';
-                }
+                // *** ลบส่วนซ่อน loadingOverlay ออกไป เนื่องจากไม่เคยแสดงผล ***
             }
         }
 
@@ -644,7 +644,7 @@
         form.addEventListener('submit', addTransaction);
         // Change filter events call updateUI to ensure all elements (list + summary) refresh correctly
         filterYearInput.addEventListener('change', updateUI); 
-        filterMonthInput.addEventListener('change', updateUI); // *** แก้ไข: ให้เรียก updateUI เพื่อซิงค์สถานะตัวกรองปี-เดือน ***
+        filterMonthInput.addEventListener('change', updateUI); 
         typeInput.addEventListener('change', updatePlatformOptions);
 
         // Export removeTransaction to global scope for use in inline onclick (DOM)
