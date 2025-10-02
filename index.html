@@ -334,13 +334,25 @@
             
             // Get date string from input (already YYYY-MM-DD format)
             const dateString = dateInput.value;
+            
+            const typeValue = typeInput.value;
+            // Get the user-entered value first
+            let descriptionForTransaction = descriptionInput.value.trim(); 
+
+            // --- Implement Auto Description Logic (Overwrite for Income) ---
+            if (typeValue === 'income') {
+                // Automatically set description for all income types to "ยอดโอนเข้าบัญชี" as requested.
+                // This overwrites any user input in the description field for income transactions.
+                descriptionForTransaction = "ยอดโอนเข้าบัญชี";
+            }
+            // --- End Auto Description Logic ---
 
             const transaction = {
                 id: generateID(),
                 date: dateString, // Use the date from the input
-                type: typeInput.value,
+                type: typeValue,
                 platform: platformInput.value,
-                description: descriptionInput.value, // Read value from text input
+                description: descriptionForTransaction || '', // Use the determined description value
                 amount: amountValue
             };
 
