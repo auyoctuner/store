@@ -649,8 +649,8 @@
 
             const filteredTransactions = transactions.filter(t => t.date.startsWith(`${selectedYear}-${selectedMonth}`));
             
-            // Sort by date descending
-            filteredTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+            // Sort by date ascending (Oldest first/FIFO)
+            filteredTransactions.sort((a, b) => new Date(a.date) - new Date(b.date));
             
             transactionListEl.innerHTML = '';
             if (filteredTransactions.length === 0) {
