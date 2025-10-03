@@ -104,7 +104,8 @@
                 <!-- END: Date Input -->
                 <div>
                     <label for="type" class="block text-sm font-medium text-gray-700">ประเภท</label>
-                    <select id="type" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2">
+                    <select id="type" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required>
+                        <option value="" disabled selected>-- เลือกประเภท --</option>
                         <option value="income">รายรับ</option>
                         <option value="expense">รายจ่าย</option>
                     </select>
@@ -112,7 +113,8 @@
                  <!-- START: CHANGED LABEL TO "รายการ" -->
                  <div>
                     <label for="platform" class="block text-sm font-medium text-gray-700">รายการ</label>
-                    <select id="platform" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2">
+                    <select id="platform" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" disabled>
+                        <option value="" disabled selected>-- เลือกรายการ --</option> <!-- NEW PLACEHOLDER -->
                         <option value="Shopee">Shopee</option>
                         <option value="Lazada(Auy)">Lazada(Auy)</option>
                         <option value="Lazada(Aom)">Lazada(Aom)</option>
@@ -481,6 +483,12 @@
         async function addTransaction(e) {
             e.preventDefault();
             
+            // --- Type Validation (Ensure a type is selected) ---
+            if (typeInput.value === "") {
+                showMessage('กรุณาเลือกประเภท (รายรับ/รายจ่าย) ก่อน');
+                return;
+            }
+            
             // --- Date Validation and Conversion ---
             const dateString = getDateFromDropdowns(); // Retrieve YYYY-MM-DD
             
@@ -637,6 +645,41 @@
             }
         }
 
+        /**
+         * Handles enabling/disabling the platform select and filtering options.
+         */
+        function updatePlatformOptions() {
+            const selectedType = typeInput.value;
+            const allPlatforms = platformInput.options;
+            const placeholderOption = allPlatforms[0]; // The new placeholder option
+
+            if (selectedType === 'income' || selectedType === 'expense') {
+                platformInput.disabled = false; // Enable the select
+                placeholderOption.hidden = true; // Hide the placeholder
+                
+                // Filter visible options based on type
+                if (selectedType === 'expense') {
+                    // Show only 'สั่งสินค้า' for expense
+                    Array.from(allPlatforms).forEach((opt, index) => opt.hidden = (opt.value !== 'สั่งสินค้า' && index !== 0));
+                    platformInput.value = 'สั่งสินค้า'; // Select the expense default
+                } else {
+                    // Show platforms (hide 'สั่งสินค้า') for income
+                    Array.from(allPlatforms).forEach((opt, index) => opt.hidden = (opt.value === 'สั่งสินค้า' && index !== 0));
+                    // Ensure the selected value is not the hidden 'สั่งสินค้า' or the placeholder
+                    if (platformInput.value === 'สั่งสินค้า' || platformInput.value === "") {
+                        platformInput.value = 'Shopee'; // Default to Shopee
+                    }
+                }
+            } else {
+                // No valid type selected (placeholder is selected)
+                platformInput.disabled = true; // Disable the select
+                placeholderOption.hidden = false; // Show the placeholder
+                platformInput.value = ""; // Select the placeholder value
+                // Make sure all platform options are shown (not hidden) in case they were filtered
+                Array.from(allPlatforms).forEach(opt => { if (opt !== placeholderOption) opt.hidden = false; }); 
+            }
+        }
+
         function populateYearFilter() {
             const selectedValue = filterYearInput.value;
             filterYearInput.innerHTML = '';
@@ -767,18 +810,10 @@
             }
         }
         
-        function updatePlatformOptions() {
-            const selectedType = typeInput.value;
-            const allPlatforms = platformInput.options;
-            // Updated logic to use "สั่งสินค้า"
-            if (selectedType === 'expense') {
-                Array.from(allPlatforms).forEach(opt => opt.hidden = (opt.value !== 'สั่งสินค้า'));
-                platformInput.value = 'สั่งสินค้า';
-            } else {
-                Array.from(allPlatforms).forEach(opt => opt.hidden = (opt.value === 'สั่งสินค้า'));
-                if (platformInput.value === 'สั่งสินค้า') platformInput.value = 'Shopee';
-            }
-        }
+        /**
+         * This function is now used to filter and enable/disable the platform dropdown
+         */
+        /* function updatePlatformOptions() { ... } (Defined above) */
 
         function renderPlatformSummary() {
             platformSummaryListEl.innerHTML = ''; // Clear previous summary
@@ -915,6 +950,8 @@
             } finally {
                 // Re-render the UI based on the final 'transactions' state (either fresh or cached)
                 updateUI();
+                // Ensure form initial state is correct: platform select disabled
+                updatePlatformOptions(); 
             }
         }
 
@@ -923,7 +960,7 @@
         // Change filter events call updateUI to ensure all elements (list + summary) refresh correctly
         filterYearInput.addEventListener('change', updateUI); 
         filterMonthInput.addEventListener('change', updateUI); 
-        typeInput.addEventListener('change', updatePlatformOptions);
+        typeInput.addEventListener('change', updatePlatformOptions); // This now handles enabling/disabling platform
 
         // Export removeTransaction to global scope for use in inline onclick (DOM)
         window.removeTransaction = removeTransaction;
