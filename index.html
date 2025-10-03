@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>แอปรายรับ-รายจ่าย Shopee & Lazada</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Sarabun', sans-serif;
@@ -43,12 +43,14 @@
         .modal {
              transition: opacity 0.3s ease-in-out;
         }
+        /* Ensure inputs take full width of their grid cell on all screens */
+        .input-full-width {
+            width: 100%;
+        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
 
-    <!-- ลบ #loading-overlay ออกจาก DOM ได้เลย หากไม่ต้องการใช้เป็นส่วนของ UI เลย -->
-    <!-- แต่เพื่อคงโครงสร้างเดิมไว้และแค่ซ่อน, เราจะคง div นี้ไว้ -->
     <div id="loading-overlay">
         <span>กำลังโหลดข้อมูลจาก Google Sheet...</span>
     </div>
@@ -68,12 +70,12 @@
                     <!-- SWAPPED ORDER: MONTH FIRST -->
                     <div class="flex items-center gap-2">
                         <label for="filter-month" class="text-base font-medium text-gray-700">เดือน:</label>
-                        <select id="filter-month" class="border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base p-3"></select>
+                        <select id="filter-month" class="border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base p-3 input-full-width"></select>
                     </div>
                     <!-- SWAPPED ORDER: YEAR SECOND -->
                     <div class="flex items-center gap-2">
                         <label for="filter-year" class="text-base font-medium text-gray-700">ปี:</label>
-                        <select id="filter-year" class="border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base p-3"></select>
+                        <select id="filter-year" class="border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base p-3 input-full-width"></select>
                     </div>
                 </div>
             </div>
@@ -88,11 +90,16 @@
                  <h2 class="text-2xl font-bold">เพิ่มรายการใหม่</h2>
                  <span id="saving-indicator" class="text-sm text-gray-500 opacity-0">กำลังบันทึก...</span>
             </div>
+            <!-- Responsive Form Grid: 1 col (mobile), 2 cols (tablet), 5 cols (desktop) -->
             <form id="transaction-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
-                <!-- START: Date Input DD/MM/YYYY format -->
+                <!-- START: Date Input reverted to 3 Selects (Day, Month, Year) -->
                 <div class="col-span-1">
-                    <label for="dateInput" class="block text-sm font-medium text-gray-700">วันที่ (DD/MM/YYYY)</label>
-                    <input type="text" id="dateInput" placeholder="DD/MM/YYYY" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required>
+                    <label class="block text-sm font-medium text-gray-700">วันที่</label>
+                    <div class="flex space-x-2 mt-1">
+                        <select id="dayInput" class="block w-1/4 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required></select>
+                        <select id="monthInput" class="block w-1/2 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required></select>
+                        <select id="yearInput" class="block w-1/4 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required></select>
+                    </div>
                 </div>
                 <!-- END: Date Input -->
                 <div>
@@ -102,15 +109,18 @@
                         <option value="expense">รายจ่าย</option>
                     </select>
                 </div>
+                 <!-- START: CHANGED LABEL TO "รายการ" -->
                  <div>
-                    <label for="platform" class="block text-sm font-medium text-gray-700">แพลตฟอร์ม</label>
+                    <label for="platform" class="block text-sm font-medium text-gray-700">รายการ</label>
                     <select id="platform" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2">
                         <option value="Shopee">Shopee</option>
                         <option value="Lazada(Auy)">Lazada(Auy)</option>
                         <option value="Lazada(Aom)">Lazada(Aom)</option>
-                        <option value="สั่งอะไหล่">สั่งอะไหล่</option>
+                        <!-- CHANGED VALUE AND TEXT TO "สั่งสินค้า" -->
+                        <option value="สั่งสินค้า">สั่งสินค้า</option>
                     </select>
                 </div>
+                <!-- END: CHANGED LABEL TO "รายการ" -->
                 <!-- START: Text input with 'หมายเหตุ' label -->
                 <div class="lg:col-span-1">
                     <label for="description" class="block text-sm font-medium text-gray-700">หมายเหตุ</label>
@@ -121,13 +131,14 @@
                     <label for="amount" class="block text-sm font-medium text-gray-700">จำนวนเงิน</label>
                     <input type="number" step="0.01" id="amount" placeholder="0.00" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required>
                 </div>
+                <!-- Button spans full width on mobile/tablet, single column on desktop -->
                 <button id="add-transaction-btn" type="submit" class="w-full md:w-auto lg:col-start-5 bg-indigo-600 text-white py-2 px-4 rounded-lg shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     เพิ่มรายการ
                 </button>
             </form>
         </section>
 
-        <!-- POSITION 3: Summary Cards -->
+        <!-- POSITION 3: Summary Cards (Stacks on mobile, 3 columns on tablet/desktop) -->
         <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <div class="summary-card bg-green-100 p-6 rounded-xl shadow-md text-center">
                 <!-- ADDED ID for dynamic update -->
@@ -209,8 +220,10 @@
         const transactionListEl = document.getElementById('transaction-list');
         const form = document.getElementById('transaction-form');
         
-        // NEW DATE INPUTS
-        const dateInput = document.getElementById('dateInput'); // Consolidated date input
+        // NEW DATE INPUTS (3 Dropdowns)
+        const dayInput = document.getElementById('dayInput');
+        const monthInput = document.getElementById('monthInput');
+        const yearInput = document.getElementById('yearInput');
         
         const typeInput = document.getElementById('type');
         const platformInput = document.getElementById('platform');
@@ -319,53 +332,158 @@
             });
         }
         
+        // --- Date Dropdown Logic ---
+        
+        // Thai month names (0-indexed array for JS Date Month)
+        const THAI_MONTHS = [
+            { value: '01', name: 'มกราคม' }, { value: '02', name: 'กุมภาพันธ์' },
+            { value: '03', name: 'มีนาคม' }, { value: '04', name: 'เมษายน' },
+            { value: '05', name: 'พฤษภาคม' }, { value: '06', name: 'มิถุนายน' },
+            { value: '07', name: 'กรกฎาคม' }, { value: '08', name: 'สิงหาคม' },
+            { value: '09', name: 'กันยายน' }, { value: '10', name: 'ตุลาคม' },
+            { value: '11', name: 'พฤศจิกายน' }, { value: '12', name: 'ธันวาคม' }
+        ];
+
+        function isLeapYear(year) {
+            return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+        }
+
+        /**
+         * Dynamically populates the day dropdown based on selected month and year.
+         */
+        function updateDayOptions(selectedYear, selectedMonth) {
+            const currentSelectedDay = dayInput.value;
+            dayInput.innerHTML = '';
+            
+            const month = parseInt(selectedMonth, 10);
+            const year = parseInt(selectedYear, 10);
+
+            if (isNaN(month) || isNaN(year)) {
+                return; // Cannot determine days
+            }
+            
+            let daysInMonth;
+            if (month === 2) { // February
+                daysInMonth = isLeapYear(year) ? 29 : 28;
+            } else if ([4, 6, 9, 11].includes(month)) { // April, June, Sept, Nov
+                daysInMonth = 30;
+            } else { // Jan, Mar, May, Jul, Aug, Oct, Dec
+                daysInMonth = 31;
+            }
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const option = document.createElement('option');
+                const dayStr = String(i).padStart(2, '0');
+                option.value = dayStr;
+                option.textContent = i;
+                dayInput.appendChild(option);
+            }
+            
+            // Attempt to restore selected day, or default to 01 if the current day is out of range
+            if (currentSelectedDay && parseInt(currentSelectedDay) <= daysInMonth) {
+                 dayInput.value = currentSelectedDay;
+            } else {
+                 dayInput.value = '01';
+            }
+        }
+
+        /**
+         * Populates the year dropdown (B.E. for display, A.D. for value).
+         */
+        function populateYearOptions() {
+            yearInput.innerHTML = '';
+            const currentADYear = new Date().getFullYear();
+            
+            // Generate years B.E. (Show current year and 9 previous years)
+            for (let i = 0; i < 10; i++) { 
+                const adYear = currentADYear - i;
+                const beYear = adYear + 543;
+                
+                const option = document.createElement('option');
+                option.value = String(adYear); // Value must be AD year for JS Date() compatibility
+                option.textContent = String(beYear); // Text is BE year for display
+                yearInput.appendChild(option);
+            }
+        }
+
+        /**
+         * Populates the month dropdown (Thai names).
+         */
+        function populateMonthOptions() {
+            monthInput.innerHTML = '';
+            THAI_MONTHS.forEach(month => {
+                const option = document.createElement('option');
+                option.value = month.value;
+                option.textContent = month.name;
+                monthInput.appendChild(option);
+            });
+        }
+        
+        /**
+         * Set initial date to today and configure event listeners.
+         */
+        function initializeDateDropdowns() {
+            populateYearOptions();
+            populateMonthOptions();
+            
+            const today = new Date();
+            const currentDay = String(today.getDate()).padStart(2, '0');
+            const currentMonth = String(today.getMonth() + 1).padStart(2, '0');
+            const currentADYear = String(today.getFullYear());
+            
+            // Set initial values
+            monthInput.value = currentMonth;
+            yearInput.value = currentADYear;
+            
+            // Populate days based on initial month/year
+            updateDayOptions(currentADYear, currentMonth);
+            dayInput.value = currentDay;
+            
+            // Add event listeners for dynamic day updates
+            monthInput.addEventListener('change', () => {
+                updateDayOptions(yearInput.value, monthInput.value);
+            });
+            yearInput.addEventListener('change', () => {
+                updateDayOptions(yearInput.value, monthInput.value);
+            });
+        }
+        
+        /**
+         * Retrieves selected date and returns in YYYY-MM-DD format for the backend.
+         */
+        function getDateFromDropdowns() {
+            const day = dayInput.value;
+            const month = monthInput.value;
+            const year = yearInput.value; // This is the AD year
+            
+            if (!day || !month || !year) {
+                return null;
+            }
+            
+            // Simple validation: check if the date actually exists (e.g., prevents selecting Feb 30)
+            // We can trust updateDayOptions keeps the list correct, but this is a final check.
+            const dateCheck = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+            
+            if (dateCheck.getFullYear() === parseInt(year) && 
+                dateCheck.getMonth() + 1 === parseInt(month) && 
+                dateCheck.getDate() === parseInt(day)) {
+                
+                return `${year}-${month}-${day}`; // Return YYYY-MM-DD for backend
+            }
+            
+            return null; // Invalid date combination
+        }
+        
         // --- Transaction Logic ---
         
-        /**
-         * Helper function to format Date object into DD/MM/YYYY string for display
-         */
-        function formatDisplayDate(date) {
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const year = date.getFullYear();
-            return `${day}/${month}/${year}`;
-        }
-        
-        /**
-         * Helper function to parse DD/MM/YYYY string into YYYY-MM-DD string for backend
-         */
-        function parseInputDate(dateString) {
-            const parts = dateString.split('/');
-            // Expecting 3 parts (D, M, Y)
-            if (parts.length === 3) {
-                const [day, month, year] = parts.map(p => p.trim());
-                
-                // Basic length and numeric check
-                if (day.length === 2 && month.length === 2 && year.length === 4 && 
-                    !isNaN(parseInt(day)) && !isNaN(parseInt(month)) && !isNaN(parseInt(year))) {
-                    
-                    // Validate if it is a real date (e.g., 30/02/2024 is invalid)
-                    const date = new Date(`${year}-${month}-${day}`);
-                    
-                    // Check if the date object matches the input values
-                    if (date.getFullYear() === parseInt(year) && date.getMonth() + 1 === parseInt(month) && date.getDate() === parseInt(day)) {
-                        return `${year}-${month}-${day}`; // Return YYYY-MM-DD format for backend
-                    }
-                }
-            }
-            return null; // Invalid format or invalid date
-        }
-
-
         async function addTransaction(e) {
             e.preventDefault();
             
             // --- Date Validation and Conversion ---
-            const inputDateString = dateInput.value.trim();
-            const dateString = parseInputDate(inputDateString); // This is the YYYY-MM-DD format
+            const dateString = getDateFromDropdowns(); // Retrieve YYYY-MM-DD
             
             if (!dateString) {
-                showMessage('รูปแบบวันที่ไม่ถูกต้อง กรุณาใช้รูปแบบ DD/MM/YYYY (เช่น 15/07/2025)');
+                showMessage('รูปแบบวันที่ไม่ถูกต้อง กรุณาเลือก วันที่ เดือน และ ปี ให้ครบถ้วน');
                 return;
             }
             // --- End Date Validation ---
@@ -388,7 +506,6 @@
             // --- Implement Auto Description Logic (Overwrite for Income) ---
             if (typeValue === 'income') {
                 // Automatically set description for all income types to "ยอดโอนเข้าบัญชี" as requested.
-                // This overwrites any user input in the description field for income transactions.
                 descriptionForTransaction = "ยอดโอนเข้าบัญชี";
             }
             // --- End Auto Description Logic ---
@@ -508,11 +625,12 @@
         // --- UI Rendering and Filtering ---
 
         function getPlatformColor(platform) {
+            // Updated case name
             switch(platform) {
                 case 'Shopee': return 'text-orange-500';
                 case 'Lazada(Auy)': return 'text-blue-500';
                 case 'Lazada(Aom)': return 'text-sky-600';
-                case 'สั่งอะไหล่': return 'text-red-600';
+                case 'สั่งสินค้า': return 'text-red-600'; // Updated case name
                 default: return 'text-gray-600';
             }
         }
@@ -650,12 +768,13 @@
         function updatePlatformOptions() {
             const selectedType = typeInput.value;
             const allPlatforms = platformInput.options;
+            // Updated logic to use "สั่งสินค้า"
             if (selectedType === 'expense') {
-                Array.from(allPlatforms).forEach(opt => opt.hidden = (opt.value !== 'สั่งอะไหล่'));
-                platformInput.value = 'สั่งอะไหล่';
+                Array.from(allPlatforms).forEach(opt => opt.hidden = (opt.value !== 'สั่งสินค้า'));
+                platformInput.value = 'สั่งสินค้า';
             } else {
-                Array.from(allPlatforms).forEach(opt => opt.hidden = (opt.value === 'สั่งอะไหล่'));
-                if (platformInput.value === 'สั่งอะไหล่') platformInput.value = 'Shopee';
+                Array.from(allPlatforms).forEach(opt => opt.hidden = (opt.value === 'สั่งสินค้า'));
+                if (platformInput.value === 'สั่งสินค้า') platformInput.value = 'Shopee';
             }
         }
 
@@ -746,10 +865,8 @@
          */
         async function init(isInitialLoad = true) {
             
-            // 1. Initialize Date Input (set to today's date)
-            const today = new Date();
-            // dateInput is now text input, display in DD/MM/YYYY format
-            dateInput.value = formatDisplayDate(today);
+            // 1. Initialize Date Input Dropdowns
+            initializeDateDropdowns();
 
             // 2. Load cached data and render UI instantly (non-blocking)
             const cachedTransactions = JSON.parse(localStorage.getItem('transactions_cache'));
