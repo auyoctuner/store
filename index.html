@@ -167,7 +167,8 @@
         
         <!-- POSITION 5: Platform Income Summary -->
         <section id="platform-summary-section" class="bg-white p-6 rounded-xl shadow-md">
-            <h2 class="text-2xl font-bold mb-4 border-b pb-2">สรุปรายรับตามแพลตฟอร์ม (เดือนที่เลือก)</h2>
+            <!-- ADDED ID to this H2 for dynamic month display -->
+            <h2 id="platform-summary-title" class="text-2xl font-bold mb-4 border-b pb-2">สรุปรายรับ</h2> 
             <ul id="platform-summary-list" class="space-y-4">
                  <li class="text-center text-gray-500 py-4">ยังไม่มีข้อมูลรายรับ...</li>
             </ul>
@@ -236,6 +237,7 @@
         
         const monthlySummaryListEl = document.getElementById('monthly-summary-list');
         const platformSummaryListEl = document.getElementById('platform-summary-list'); // NEW ELEMENT
+        const platformSummaryTitleEl = document.getElementById('platform-summary-title'); // NEW TITLE ELEMENT
         const savingIndicator = document.getElementById('saving-indicator');
         const loadingOverlay = document.getElementById('loading-overlay');
         const addTransactionBtn = document.getElementById('add-transaction-btn');
@@ -784,6 +786,15 @@
             const selectedYear = filterYearInput.value;
             const selectedMonth = filterMonthInput.value;
             const selectedMonthYear = `${selectedYear}-${selectedMonth}`;
+
+            // --- START: Dynamic Title Update for Platform Summary ---
+            if (selectedYear && selectedMonth) {
+                const monthYearText = getFormattedMonthAndYear(selectedYear, selectedMonth); 
+                platformSummaryTitleEl.innerText = `สรุปรายรับ ${monthYearText}`;
+            } else {
+                platformSummaryTitleEl.innerText = `สรุปรายรับ (กำลังโหลด...)`;
+            }
+            // --- END: Dynamic Title Update for Platform Summary ---
 
             if (!selectedMonthYear || transactions.length === 0) {
                 platformSummaryListEl.innerHTML = '<li class="text-center text-gray-500 py-4">ยังไม่มีข้อมูลรายรับ...</li>';
