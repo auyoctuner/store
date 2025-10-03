@@ -9,7 +9,6 @@
     <style>
         body {
             font-family: 'Sarabun', sans-serif;
-            background-color: #f7fafc;
         }
         .summary-card {
             transition: transform 0.2s, box-shadow 0.2s;
@@ -92,16 +91,23 @@
             </div>
             <!-- Responsive Form Grid: 1 col (mobile), 2 cols (tablet), 5 cols (desktop) -->
             <form id="transaction-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
-                <!-- START: Date Input reverted to 3 Selects (Day, Month, Year) -->
-                <div class="col-span-1">
+                
+                <!-- ROW 1 (Cols 1-3) -->
+                
+                <!-- 1. วันที่ (3 selects, spanning 2 cols on LG) -->
+                <div class="col-span-1 lg:col-span-2">
                     <label class="block text-sm font-medium text-gray-700">วันที่</label>
                     <div class="flex space-x-2 mt-1">
-                        <select id="dayInput" class="block w-1/4 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required></select>
-                        <select id="monthInput" class="block w-1/2 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required></select>
-                        <select id="yearInput" class="block w-1/4 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required></select>
+                        <!-- Day: w-1/4 (25%) -->
+                        <select id="dayInput" class="block w-1/4 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base p-3" required></select>
+                        <!-- Month: w-1/3 (~33.3%) -->
+                        <select id="monthInput" class="block w-1/3 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base p-3" required></select>
+                        <!-- Year: w-1/3 (~33.3%) -->
+                        <select id="yearInput" class="block w-1/3 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base p-3" required></select>
                     </div>
                 </div>
-                <!-- END: Date Input -->
+                
+                <!-- 2. ประเภท (1 col) -->
                 <div>
                     <label for="type" class="block text-sm font-medium text-gray-700">ประเภท</label>
                     <select id="type" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required>
@@ -110,31 +116,40 @@
                         <option value="expense">รายจ่าย</option>
                     </select>
                 </div>
-                 <!-- START: CHANGED LABEL TO "รายการ" -->
+                 
+                <!-- 3. ตัวเลือก (1 col) -->
                  <div>
-                    <label for="platform" class="block text-sm font-medium text-gray-700">รายการ</label>
+                    <label for="platform" class="block text-sm font-medium text-gray-700">ตัวเลือก</label>
                     <select id="platform" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" disabled>
-                        <option value="" disabled selected>-- เลือกรายการ --</option> <!-- NEW PLACEHOLDER -->
+                        <option value="" disabled selected>-- เลือกธุรกรรม --</option> <!-- NEW PLACEHOLDER -->
                         <option value="Shopee">Shopee</option>
                         <option value="Lazada(Auy)">Lazada(Auy)</option>
                         <option value="Lazada(Aom)">Lazada(Aom)</option>
-                        <!-- CHANGED VALUE AND TEXT TO "สั่งสินค้า" -->
                         <option value="สั่งสินค้า">สั่งสินค้า</option>
+                        <option value="เงินเดือนพนักงาน" class="expense-only">เงินเดือนพนักงาน</option> <!-- NEW OPTION -->
                     </select>
                 </div>
-                <!-- END: CHANGED LABEL TO "รายการ" -->
-                <!-- START: Text input with 'หมายเหตุ' label -->
-                <div class="lg:col-span-1">
-                    <label for="description" class="block text-sm font-medium text-gray-700">หมายเหตุ</label>
-                    <input type="text" id="description" placeholder="" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2">
+                
+                <!-- 4. SPACER (Takes 1 column on lg, forces next item to row 2) -->
+                <div class="hidden lg:block lg:col-span-1"></div> 
+                
+                <!-- ROW 2 (Cols 1-5) -->
+                
+                <!-- 5. รายการ (Now on Row 2, spanning 2 cols on lg) -->
+                <div class="lg:col-span-2">
+                    <label for="description" class="block text-sm font-medium text-gray-700">รายการ</label>
+                    <!-- REMOVED PLACEHOLDER: placeholder="เช่น ค่าสต๊อค, โอนเงินจาก Shopee" -->
+                    <input type="text" id="description" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2">
                 </div>
-                <!-- END: Text input with 'หมายเหตุ' label -->
+                
+                <!-- 6. จำนวนเงิน (Now on Row 2, 1 col) -->
                 <div class="lg:col-span-1">
                     <label for="amount" class="block text-sm font-medium text-gray-700">จำนวนเงิน</label>
                     <input type="number" step="0.01" id="amount" placeholder="0.00" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required>
                 </div>
-                <!-- Button spans full width on mobile/tablet, single column on desktop -->
-                <button id="add-transaction-btn" type="submit" class="w-full md:w-auto lg:col-start-5 bg-indigo-600 text-white py-2 px-4 rounded-lg shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                
+                <!-- 7. ปุ่มเพิ่มรายการ (Repositioned to start at Col 4 and span 2 cols) -->
+                <button id="add-transaction-btn" type="submit" class="w-full md:w-auto lg:col-start-4 lg:col-span-2 bg-indigo-600 text-white py-2 px-4 rounded-lg shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     เพิ่มรายการ
                 </button>
             </form>
@@ -230,7 +245,7 @@
         
         const typeInput = document.getElementById('type');
         const platformInput = document.getElementById('platform');
-        const descriptionInput = document.getElementById('description'); // Input text
+        const descriptionInput = document.getElementById('description'); // Now a Text Input
         const amountInput = document.getElementById('amount');
         
         // RE-ADDED SEPARATE FILTERS
@@ -510,22 +525,28 @@
             }
             
             const typeValue = typeInput.value;
-            // Get the user-entered value first
+            // Get the user-entered description value (trim whitespace)
             let descriptionForTransaction = descriptionInput.value.trim(); 
 
-            // --- Implement Auto Description Logic (Overwrite for Income) ---
+            // --- Implement Auto Description Logic (Overwrite for Income/Specific Expense) ---
             if (typeValue === 'income') {
-                // Automatically set description for all income types to "ยอดโอนเข้าบัญชี" as requested.
+                // If it's income, force the description value to "ยอดโอนเข้าบัญชี"
                 descriptionForTransaction = "ยอดโอนเข้าบัญชี";
+            } else if (typeValue === 'expense' && platformInput.value === 'เงินเดือนพนักงาน') {
+                // If it's a specific expense type, force the description
+                descriptionForTransaction = "เงินเดือน(Aom)";
             }
             // --- End Auto Description Logic ---
 
+            // Check if user selected an item from the description dropdown (if not set by auto logic)
+            // NOTE: Since this is a text input now, it is optional unless autofilled.
+            
             const transaction = {
                 id: generateID(),
                 date: dateString, // Use the YYYY-MM-DD string
                 type: typeValue,
                 platform: platformInput.value,
-                description: descriptionForTransaction || '', // Use the determined description value
+                description: descriptionForTransaction || '', // Use the determined description value, allow empty string if not autofilled
                 amount: amountValue
             };
 
@@ -586,7 +607,7 @@
                 } finally {
                     // Hide saving indicator
                     savingIndicator.style.opacity = '0';
-                    setTimeout(() => { savingSaving.style.display = 'none'; }, 300);
+                    setTimeout(() => { savingIndicator.style.display = 'none'; }, 300);
                 }
             });
         }
@@ -641,42 +662,148 @@
                 case 'Lazada(Auy)': return 'text-blue-500';
                 case 'Lazada(Aom)': return 'text-sky-600';
                 case 'สั่งสินค้า': return 'text-red-600'; // Updated case name
+                case 'เงินเดือนพนักงาน': return 'text-purple-600'; // New color for employee salary
                 default: return 'text-gray-600';
+            }
+        }
+        
+        /**
+         * This function is updated to match the mobile layout (Description stacked, then Date/Platform/Amount/Delete side-by-side)
+         */
+        function addTransactionDOM(transaction) {
+            const item = document.createElement('li');
+            const isIncome = transaction.type === 'income';
+            const sign = isIncome ? '+' : '-';
+            const amountColor = isIncome ? 'text-green-600' : 'text-red-600';
+            const platformColor = getPlatformColor(transaction.platform);
+            const rowColor = isIncome ? 'bg-green-50 hover:bg-green-100' : 'bg-red-50 hover:bg-red-100';
+            
+            // Format Date to Thai locale (e.g., 1 ต.ค. 2568)
+            const formattedDate = new Date(transaction.date).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+
+            // Use flex flex-col to stack main content on mobile, and justify-between for the sub-row
+            item.classList.add('transaction-item', ...rowColor.split(' '), 'p-4', 'border', 'rounded-xl', 'flex', 'flex-col', 'transition', 'duration-200', 'space-y-1');
+
+            item.innerHTML = `
+                <!-- Row 1: Description (Full Width) -->
+                <div class="font-bold text-gray-800 text-base mb-1">${transaction.description}</div>
+                
+                <!-- Row 2: Date/Platform and Amount/Delete on the same row (justify-between) -->
+                <div class="flex justify-between items-center w-full">
+                    
+                    <!-- Left Side: Date and Platform -->
+                    <div class="text-sm text-gray-500 flex-grow pr-4">
+                        <span>${formattedDate}</span> | 
+                        <span class="${platformColor} font-semibold">${transaction.platform}</span>
+                    </div>
+
+                    <!-- Right Side: Amount and Delete Button -->
+                    <div class="flex items-center space-x-2 flex-shrink-0">
+                        <!-- Amount -->
+                        <span class="font-bold text-lg ${amountColor}">${sign}฿${formatMoney(transaction.amount)}</span>
+                        
+                        <!-- Delete Button -->
+                        <button class="bg-red-500 hover:bg-red-600 text-white text-xs py-1 px-2 rounded-full shadow-md w-8 h-8 flex items-center justify-center" onclick="removeTransaction('${transaction.id}', '${transaction.date}')">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                               <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 10-2 0v6a1 1 0 102 0V8z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+            transactionListEl.appendChild(item);
+        }
+
+        /**
+         * Calculates and updates the total income, expense, and balance in the summary cards.
+         */
+        function updateValues(filteredTransactions) {
+            const income = filteredTransactions
+                .filter(t => t.type === 'income')
+                .reduce((acc, t) => acc + t.amount, 0);
+            const expense = filteredTransactions
+                .filter(t => t.type === 'expense')
+                .reduce((acc, t) => acc + t.amount, 0);
+            
+            const balance = income - expense;
+            
+            // Get current filter selection
+            const selectedYear = filterYearInput.value;
+            const selectedMonth = filterMonthInput.value;
+            
+            if (!selectedYear || !selectedMonth) { // Handle empty filter case gracefully
+                incomeTitleEl.innerText = `รายรับ`;
+                expenseTitleEl.innerText = `รายจ่าย`;
+                balanceTitleEl.innerText = `คงเหลือ`;
+                return;
+            }
+            
+            // Format the month/year string
+            const monthYearText = getFormattedMonthAndYear(selectedYear, selectedMonth);
+
+            // Update Titles to show the selected month/year
+            incomeTitleEl.innerText = `รายรับ ${monthYearText}`;
+            expenseTitleEl.innerText = `รายจ่าย ${monthYearText}`;
+            balanceTitleEl.innerText = `คงเหลือ ${monthYearText}`;
+
+
+            balanceEl.innerText = `฿${formatMoney(balance)}`;
+            totalIncomeEl.innerText = `฿${formatMoney(income)}`;
+            totalExpenseEl.innerText = `฿${formatMoney(expense)}`;
+            
+            // Update balance card color based on result
+            if (balance < 0) {
+                balanceEl.parentElement.classList.replace('bg-blue-100', 'bg-red-100');
+                balanceEl.classList.replace('text-blue-600', 'text-red-600');
+            } else {
+                balanceEl.parentElement.classList.replace('bg-red-100', 'bg-blue-100');
+                balanceEl.classList.replace('text-red-600', 'text-blue-600');
             }
         }
 
         /**
          * Handles enabling/disabling the platform select and filtering options.
+         * NOTE: Description is now a text input, so description-related filtering is removed.
          */
         function updatePlatformOptions() {
             const selectedType = typeInput.value;
             const allPlatforms = platformInput.options;
-            const placeholderOption = allPlatforms[0]; // The new placeholder option
-
+            const placeholderPlatformOption = allPlatforms[0];
+            
             if (selectedType === 'income' || selectedType === 'expense') {
-                platformInput.disabled = false; // Enable the select
-                placeholderOption.hidden = true; // Hide the placeholder
+                platformInput.disabled = false; 
+                placeholderPlatformOption.hidden = true;
                 
-                // Filter visible options based on type
                 if (selectedType === 'expense') {
-                    // Show only 'สั่งสินค้า' for expense
-                    Array.from(allPlatforms).forEach((opt, index) => opt.hidden = (opt.value !== 'สั่งสินค้า' && index !== 0));
-                    platformInput.value = 'สั่งสินค้า'; // Select the expense default
-                } else {
-                    // Show platforms (hide 'สั่งสินค้า') for income
-                    Array.from(allPlatforms).forEach((opt, index) => opt.hidden = (opt.value === 'สั่งสินค้า' && index !== 0));
-                    // Ensure the selected value is not the hidden 'สั่งสินค้า' or the placeholder
-                    if (platformInput.value === 'สั่งสินค้า' || platformInput.value === "") {
-                        platformInput.value = 'Shopee'; // Default to Shopee
+                    // Filter Platform options for Expense
+                    Array.from(allPlatforms).forEach((opt, index) => {
+                        const isExpenseItem = opt.value === 'สั่งสินค้า' || opt.value === 'เงินเดือนพนักงาน';
+                        opt.hidden = !isExpenseItem && index !== 0;
+                    });
+                    
+                    if (['Shopee', 'Lazada(Auy)', 'Lazada(Aom)'].includes(platformInput.value)) {
+                         platformInput.value = 'สั่งสินค้า';
+                    }
+                    
+                } else { // Income
+                    // Filter Platform options for Income
+                    Array.from(allPlatforms).forEach((opt, index) => {
+                        const isIncomeItem = opt.value !== 'สั่งสินค้า' && opt.value !== 'เงินเดือนพนักงาน';
+                        opt.hidden = !isIncomeItem && index !== 0;
+                    });
+                    
+                    if (['สั่งสินค้า', 'เงินเดือนพนักงาน'].includes(platformInput.value) || platformInput.value === "") {
+                        platformInput.value = 'Shopee';
                     }
                 }
             } else {
-                // No valid type selected (placeholder is selected)
-                platformInput.disabled = true; // Disable the select
-                placeholderOption.hidden = false; // Show the placeholder
-                platformInput.value = ""; // Select the placeholder value
-                // Make sure all platform options are shown (not hidden) in case they were filtered
-                Array.from(allPlatforms).forEach(opt => { if (opt !== placeholderOption) opt.hidden = false; }); 
+                // Initial/Default state
+                platformInput.disabled = true;
+                placeholderPlatformOption.hidden = false;
+                platformInput.value = "";
+                Array.from(allPlatforms).forEach(opt => { if (opt !== placeholderPlatformOption) opt.hidden = false; }); 
+                
+                // Since Description is a text input, it remains enabled but is cleared upon success.
             }
         }
 
@@ -731,89 +858,6 @@
             }
         }
 
-
-        /**
-         * เพิ่ม transaction.date ในการเรียก removeTransaction
-         */
-        function addTransactionDOM(transaction) {
-            const item = document.createElement('li');
-            const isIncome = transaction.type === 'income';
-            const sign = isIncome ? '+' : '-';
-            const amountColor = isIncome ? 'text-green-600' : 'text-red-600';
-            const platformColor = getPlatformColor(transaction.platform);
-            const rowColor = isIncome ? 'bg-green-50 hover:bg-green-100' : 'bg-red-50 hover:bg-red-100';
-
-            item.classList.add('transaction-item', ...rowColor.split(' '), 'p-4', 'border', 'rounded-xl', 'flex', 'flex-wrap', 'justify-between', 'items-center', 'transition', 'duration-200');
-            item.innerHTML = `
-                <div class="flex items-center space-x-4 mb-2 md:mb-0">
-                    <div>
-                        <div class="font-bold text-gray-800">${transaction.description}</div>
-                        <div class="text-sm text-gray-500">
-                            <span>${new Date(transaction.date).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' })}</span> | 
-                            <span class="${platformColor} font-semibold">${transaction.platform}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <span class="font-bold text-lg ${amountColor}">${sign}฿${formatMoney(transaction.amount)}</span>
-                    <button class="bg-red-500 hover:bg-red-600 text-white text-xs py-1 px-2 rounded-full shadow-md" onclick="removeTransaction('${transaction.id}', '${transaction.date}')">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                           <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 10-2 0v6a1 1 0 102 0V8z" clip-rule="evenodd" />
-                        </svg>
-                    </button>
-                </div>
-            `;
-            transactionListEl.appendChild(item);
-        }
-
-        function updateValues(filteredTransactions) {
-            const income = filteredTransactions
-                .filter(t => t.type === 'income')
-                .reduce((acc, t) => acc + t.amount, 0);
-            const expense = filteredTransactions
-                .filter(t => t.type === 'expense')
-                .reduce((acc, t) => acc + t.amount, 0);
-            
-            const balance = income - expense;
-            
-            // Get current filter selection
-            const selectedYear = filterYearInput.value;
-            const selectedMonth = filterMonthInput.value;
-            
-            if (!selectedYear || !selectedMonth) { // Handle empty filter case gracefully
-                incomeTitleEl.innerText = `รายรับ`;
-                expenseTitleEl.innerText = `รายจ่าย`;
-                balanceTitleEl.innerText = `คงเหลือ`;
-                return;
-            }
-            
-            // Format the month/year string
-            const monthYearText = getFormattedMonthAndYear(selectedYear, selectedMonth);
-
-            // Update Titles to show the selected month/year
-            incomeTitleEl.innerText = `รายรับ ${monthYearText}`;
-            expenseTitleEl.innerText = `รายจ่าย ${monthYearText}`;
-            balanceTitleEl.innerText = `คงเหลือ ${monthYearText}`;
-
-
-            balanceEl.innerText = `฿${formatMoney(balance)}`;
-            totalIncomeEl.innerText = `฿${formatMoney(income)}`;
-            totalExpenseEl.innerText = `฿${formatMoney(expense)}`;
-            
-            // Update balance card color based on result
-            if (balance < 0) {
-                balanceEl.parentElement.classList.replace('bg-blue-100', 'bg-red-100');
-                balanceEl.classList.replace('text-blue-600', 'text-red-600');
-            } else {
-                balanceEl.parentElement.classList.replace('bg-red-100', 'bg-blue-100');
-                balanceEl.classList.replace('text-red-600', 'text-blue-600');
-            }
-        }
-        
-        /**
-         * This function is now used to filter and enable/disable the platform dropdown
-         */
-        /* function updatePlatformOptions() { ... } (Defined above) */
 
         function renderPlatformSummary() {
             platformSummaryListEl.innerHTML = ''; // Clear previous summary
@@ -872,6 +916,7 @@
             populateMonthFilter();
             render();
             renderPlatformSummary(); // Call platform summary render
+            updatePlatformOptions(); // Ensure form inputs are in the correct initial state
         }
 
         function render() {
@@ -950,8 +995,6 @@
             } finally {
                 // Re-render the UI based on the final 'transactions' state (either fresh or cached)
                 updateUI();
-                // Ensure form initial state is correct: platform select disabled
-                updatePlatformOptions(); 
             }
         }
 
@@ -961,7 +1004,7 @@
         filterYearInput.addEventListener('change', updateUI); 
         filterMonthInput.addEventListener('change', updateUI); 
         typeInput.addEventListener('change', updatePlatformOptions); // This now handles enabling/disabling platform
-
+        
         // Export removeTransaction to global scope for use in inline onclick (DOM)
         window.removeTransaction = removeTransaction;
 
