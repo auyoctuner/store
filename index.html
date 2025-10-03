@@ -183,11 +183,19 @@
         </section>
         
         <!-- POSITION 5: Platform Income Summary -->
-        <section id="platform-summary-section" class="bg-white p-6 rounded-xl shadow-md">
+        <section id="platform-summary-section" class="bg-white p-6 rounded-xl shadow-md mb-8">
             <!-- ADDED ID to this H2 for dynamic month display -->
-            <h2 id="platform-summary-title" class="text-2xl font-bold mb-4 border-b pb-2">สรุปรายรับ</h2> 
+            <h2 id="platform-summary-title" class="text-2xl font-bold mb-4 border-b pb-2 text-green-700">สรุปรายรับ</h2> 
             <ul id="platform-summary-list" class="space-y-4">
                  <li class="text-center text-gray-500 py-4">ยังไม่มีข้อมูลรายรับ...</li>
+            </ul>
+        </section>
+
+        <!-- POSITION 6: Platform Expense Summary (NEW) -->
+        <section id="platform-expense-summary-section" class="bg-white p-6 rounded-xl shadow-md">
+            <h2 id="platform-expense-summary-title" class="text-2xl font-bold mb-4 border-b pb-2 text-red-700">สรุปรายจ่าย</h2> 
+            <ul id="platform-expense-summary-list" class="space-y-4">
+                 <li class="text-center text-gray-500 py-4">ยังไม่มีข้อมูลรายจ่าย...</li>
             </ul>
         </section>
 
@@ -255,6 +263,10 @@
         const monthlySummaryListEl = document.getElementById('monthly-summary-list');
         const platformSummaryListEl = document.getElementById('platform-summary-list'); // NEW ELEMENT
         const platformSummaryTitleEl = document.getElementById('platform-summary-title'); // NEW TITLE ELEMENT
+        // NEW EXPENSE SUMMARY ELEMENTS
+        const platformExpenseSummaryListEl = document.getElementById('platform-expense-summary-list');
+        const platformExpenseSummaryTitleEl = document.getElementById('platform-expense-summary-title');
+
         const savingIndicator = document.getElementById('saving-indicator');
         const loadingOverlay = document.getElementById('loading-overlay');
         const addTransactionBtn = document.getElementById('add-transaction-btn');
@@ -910,12 +922,67 @@
             });
         }
         
+        /**
+         * Renders the Platform Expense Summary section.
+         */
+        function renderPlatformExpenseSummary() {
+            platformExpenseSummaryListEl.innerHTML = ''; // Clear previous summary
+
+            const selectedYear = filterYearInput.value;
+            const selectedMonth = filterMonthInput.value;
+            const selectedMonthYear = `${selectedYear}-${selectedMonth}`;
+
+            // --- START: Dynamic Title Update for Platform Expense Summary ---
+            if (selectedYear && selectedMonth) {
+                const monthYearText = getFormattedMonthAndYear(selectedYear, selectedMonth); 
+                platformExpenseSummaryTitleEl.innerText = `สรุปรายจ่าย ${monthYearText}`;
+            } else {
+                platformExpenseSummaryTitleEl.innerText = `สรุปรายจ่าย (กำลังโหลด...)`;
+            }
+            // --- END: Dynamic Title Update for Platform Expense Summary ---
+
+            if (!selectedMonthYear || transactions.length === 0) {
+                platformExpenseSummaryListEl.innerHTML = '<li class="text-center text-gray-500 py-4">ยังไม่มีข้อมูลรายจ่าย...</li>';
+                return;
+            }
+
+            const filteredTransactions = transactions.filter(t => 
+                t.date.startsWith(selectedMonthYear) && t.type === 'expense'
+            );
+            
+            if (filteredTransactions.length === 0) {
+                platformExpenseSummaryListEl.innerHTML = '<li class="text-center text-gray-500 py-4">ไม่พบรายการรายจ่ายในเดือนที่เลือก...</li>';
+                return;
+            }
+
+            const platformSummary = filteredTransactions.reduce((acc, t) => {
+                const platform = t.platform || 'ไม่ระบุ';
+                acc[platform] = (acc[platform] || 0) + t.amount;
+                return acc;
+            }, {});
+            
+            // Sort summary by amount descending
+            const sortedPlatforms = Object.entries(platformSummary).sort(([, a], [, b]) => b - a);
+
+            sortedPlatforms.forEach(([platform, amount]) => {
+                const platformColor = getPlatformColor(platform); // Reuse existing color logic
+                const item = document.createElement('li');
+                item.classList.add('p-3', 'border', 'rounded-xl', 'flex', 'justify-between', 'items-center', 'shadow-sm', 'bg-white', 'hover:bg-red-50', 'transition'); // Use hover-red for expense
+                item.innerHTML = `
+                    <div class="font-semibold ${platformColor}">${platform}</div>
+                    <div class="font-bold text-lg text-red-600">฿${formatMoney(amount)}</div>
+                `;
+                platformExpenseSummaryListEl.appendChild(item);
+            });
+        }
+        
         function updateUI() {
             // Re-populate filters (now separate) and render based on the current (newly loaded) transactions state
             populateYearFilter(); 
             populateMonthFilter();
             render();
-            renderPlatformSummary(); // Call platform summary render
+            renderPlatformSummary(); // Call platform income summary render
+            renderPlatformExpenseSummary(); // NEW: Call platform expense summary render
             updatePlatformOptions(); // Ensure form inputs are in the correct initial state
         }
 
