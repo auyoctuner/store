@@ -125,7 +125,7 @@
                         <option value="Shopee">Shopee</option>
                         <option value="Lazada(Auy)">Lazada(Auy)</option>
                         <option value="Lazada(Aom)">Lazada(Aom)</option>
-                        <option value="สั่งสินค้า">สั่งสินค้า</option>
+                        <option value="สั่งซื้อสินค้า">สั่งซื้อสินค้า</option>
                         <option value="เงินเดือนพนักงาน" class="expense-only">เงินเดือนพนักงาน</option> <!-- NEW OPTION -->
                     </select>
                 </div>
@@ -673,7 +673,8 @@
                 case 'Shopee': return 'text-orange-500';
                 case 'Lazada(Auy)': return 'text-blue-500';
                 case 'Lazada(Aom)': return 'text-sky-600';
-                case 'สั่งสินค้า': return 'text-red-600'; // Updated case name
+                case 'สั่งสินค้า': // Check for old stored value
+                case 'สั่งซื้อสินค้า': return 'text-red-600'; // New value
                 case 'เงินเดือนพนักงาน': return 'text-purple-600'; // New color for employee salary
                 default: return 'text-gray-600';
             }
@@ -789,22 +790,22 @@
                 if (selectedType === 'expense') {
                     // Filter Platform options for Expense
                     Array.from(allPlatforms).forEach((opt, index) => {
-                        const isExpenseItem = opt.value === 'สั่งสินค้า' || opt.value === 'เงินเดือนพนักงาน';
+                        const isExpenseItem = opt.value === 'สั่งซื้อสินค้า' || opt.value === 'เงินเดือนพนักงาน';
                         opt.hidden = !isExpenseItem && index !== 0;
                     });
                     
                     if (['Shopee', 'Lazada(Auy)', 'Lazada(Aom)'].includes(platformInput.value)) {
-                         platformInput.value = 'สั่งสินค้า';
+                         platformInput.value = 'สั่งซื้อสินค้า';
                     }
                     
                 } else { // Income
                     // Filter Platform options for Income
                     Array.from(allPlatforms).forEach((opt, index) => {
-                        const isIncomeItem = opt.value !== 'สั่งสินค้า' && opt.value !== 'เงินเดือนพนักงาน';
+                        const isIncomeItem = opt.value !== 'สั่งซื้อสินค้า' && opt.value !== 'เงินเดือนพนักงาน';
                         opt.hidden = !isIncomeItem && index !== 0;
                     });
                     
-                    if (['สั่งสินค้า', 'เงินเดือนพนักงาน'].includes(platformInput.value) || platformInput.value === "") {
+                    if (['สั่งซื้อสินค้า', 'เงินเดือนพนักงาน'].includes(platformInput.value) || platformInput.value === "") {
                         platformInput.value = 'Shopee';
                     }
                 }
