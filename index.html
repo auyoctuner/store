@@ -124,7 +124,7 @@
                 <!-- START: Text input with 'หมายเหตุ' label -->
                 <div class="lg:col-span-1">
                     <label for="description" class="block text-sm font-medium text-gray-700">หมายเหตุ</label>
-                    <input type="text" id="description" placeholder="เช่น ค่าโฆษณา, ค่าสต๊อกสินค้า" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2">
+                    <input type="text" id="description" placeholder="" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2">
                 </div>
                 <!-- END: Text input with 'หมายเหตุ' label -->
                 <div class="lg:col-span-1">
@@ -578,7 +578,7 @@
                 } finally {
                     // Hide saving indicator
                     savingIndicator.style.opacity = '0';
-                    setTimeout(() => { savingIndicator.style.display = 'none'; }, 300);
+                    setTimeout(() => { savingSaving.style.display = 'none'; }, 300);
                 }
             });
         }
