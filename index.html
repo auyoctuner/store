@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>แอปรายรับ-รายจ่าย Shopee & Lazada</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Sarabun', sans-serif;
+            /* Removed padding-bottom as the sticky bar is now a badge */
         }
         .summary-card {
             transition: transform 0.2s, box-shadow 0.2s;
@@ -45,6 +46,10 @@
         /* Ensure inputs take full width of their grid cell on all screens */
         .input-full-width {
             width: 100%;
+        }
+        /* Style for the sticky badge visibility */
+        #sticky-balance-badge.visible {
+            transform: scale(1);
         }
     </style>
 </head>
@@ -234,6 +239,11 @@
         </div>
     </div>
 
+    <!-- Sticky Total Balance Badge -->
+    <div id="sticky-balance-badge" class="fixed top-4 right-4 bg-gray-800 text-white p-2 px-4 rounded-full shadow-lg z-40 transform scale-0 transition-transform duration-300 ease-in-out">
+        <span id="sticky-total-balance" class="font-bold text-lg">฿0.00</span>
+    </div>
+
     <script>
         // **IMPORTANT: Replace this with your deployed Google Apps Script URL**
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw9ImlQQ860LcJNjojx6XCJB7ohJz0SC13ZeE_UblzoAdeRNRqk7tLVD71DazRgCaA6vg/exec";
@@ -284,6 +294,10 @@
         const confirmMessageEl = document.getElementById('confirm-message');
         const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
         let confirmOkBtn = document.getElementById('confirm-ok-btn'); 
+
+        // Sticky Badge Elements
+        const stickyBalanceBadge = document.getElementById('sticky-balance-badge');
+        const stickyTotalBalanceEl = document.getElementById('sticky-total-balance');
 
         // --- State and Init ---
         let transactions = [];
@@ -565,6 +579,7 @@
             // 1. Optimistic Update: Add to local array and update UI immediately
             transactions.push(transaction);
             updateLocalStorage();
+            updateStickyBalance(); // Update the total balance immediately
             updateUI(); // Quick render for immediate feedback
             
             // Show saving indicator while background saving is happening
@@ -601,6 +616,7 @@
                 const originalTransactions = [...transactions];
                 transactions = transactions.filter(t => t.id.toString() !== id.toString());
                 updateLocalStorage();
+                updateStickyBalance(); // Update the total balance immediately
                 updateUI();
                 
                 // Show saving indicator for background process (Non-blocking indicator)
@@ -615,6 +631,7 @@
                     showMessage('เกิดข้อผิดพลาดในการลบรายการใน Google Sheet: ' + error.message + ' รายการจะถูกดึงกลับมาในหน้าจอ');
                     transactions = originalTransactions; // Revert local state
                     updateLocalStorage();
+                    updateStickyBalance(); // Revert the sticky balance too
                     updateUI();
                 } finally {
                     // Hide saving indicator
@@ -663,6 +680,39 @@
 
         function updateLocalStorage() {
             localStorage.setItem('transactions_cache', JSON.stringify(transactions));
+        }
+
+        /**
+         * Updates the sticky balance badge with the total balance from ALL transactions.
+         */
+        function updateStickyBalance() {
+            if (!transactions || transactions.length === 0) {
+                stickyBalanceBadge.classList.remove('visible');
+                return;
+            }
+
+            const totalIncome = transactions
+                .filter(t => t.type === 'income')
+                .reduce((acc, t) => acc + t.amount, 0);
+
+            const totalExpense = transactions
+                .filter(t => t.type === 'expense')
+                .reduce((acc, t) => acc + t.amount, 0);
+
+            const totalBalance = totalIncome - totalExpense;
+
+            stickyTotalBalanceEl.innerText = `฿${formatMoney(totalBalance)}`;
+
+            if (totalBalance < 0) {
+                stickyTotalBalanceEl.classList.remove('text-green-400');
+                stickyTotalBalanceEl.classList.add('text-red-400');
+            } else {
+                stickyTotalBalanceEl.classList.remove('text-red-400');
+                stickyTotalBalanceEl.classList.add('text-green-400');
+            }
+            
+            // Ensure badge is visible when there are transactions
+            stickyBalanceBadge.classList.add('visible');
         }
         
         // --- UI Rendering and Filtering ---
@@ -1063,6 +1113,7 @@
             } finally {
                 // Re-render the UI based on the final 'transactions' state (either fresh or cached)
                 updateUI();
+                updateStickyBalance(); // Update the sticky balance on every full init
             }
         }
 
@@ -1081,3 +1132,4 @@
     </script>
 </body>
 </html>
+
