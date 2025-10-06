@@ -9,7 +9,6 @@
     <style>
         body {
             font-family: 'Sarabun', sans-serif;
-            /* Removed padding-bottom as the sticky bar is now a badge */
         }
         .summary-card {
             transition: transform 0.2s, box-shadow 0.2s;
@@ -29,7 +28,7 @@
             width: 100%;
             height: 100%;
             background-color: rgba(255, 255, 255, 0.8);
-            display: none; /* ซ่อนโดยค่าเริ่มต้น ตามคำขอ */
+            display: none; /* Controlled by JS */
             justify-content: center;
             align-items: center;
             z-index: 9999;
@@ -43,20 +42,19 @@
         .modal {
              transition: opacity 0.3s ease-in-out;
         }
-        /* Ensure inputs take full width of their grid cell on all screens */
         .input-full-width {
             width: 100%;
         }
-        /* Style for the sticky badge visibility */
-        #sticky-balance-badge.visible {
-            transform: scale(1);
+        /* CSS for showing/hiding the new sticky panel */
+        #sticky-summary-panel.visible {
+            transform: translateX(0); /* Slides the panel into view */
         }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
 
     <div id="loading-overlay">
-        <span>กำลังโหลดข้อมูลจาก Google Sheet...</span>
+        <span>กำลังโหลดข้อมูล...</span>
     </div>
 
     <div class="container mx-auto p-4 md:p-8 max-w-4xl">
@@ -66,53 +64,41 @@
             <p class="text-md text-gray-500 mt-2">บันทึกรายรับ-รายจ่ายสำหรับ Shopee, Lazada และอื่นๆ</p>
         </header>
 
-        <!-- POSITION 1: Transaction List (ประวัติรายการ) -->
+        <!-- Transaction List -->
         <section class="bg-white p-6 rounded-xl shadow-md mb-8">
              <div class="flex flex-col md:flex-row justify-between items-center mb-4 border-b pb-4">
-                <h2 class="text-2xl font-bold mb-4 md:mb-0">ประวัติรายการ</h2>
-                <div class="flex flex-wrap items-center gap-2 md:gap-4">
-                    <!-- SWAPPED ORDER: MONTH FIRST -->
-                    <div class="flex items-center gap-2">
-                        <label for="filter-month" class="text-base font-medium text-gray-700">เดือน:</label>
-                        <select id="filter-month" class="border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base p-3 input-full-width"></select>
-                    </div>
-                    <!-- SWAPPED ORDER: YEAR SECOND -->
-                    <div class="flex items-center gap-2">
-                        <label for="filter-year" class="text-base font-medium text-gray-700">ปี:</label>
-                        <select id="filter-year" class="border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base p-3 input-full-width"></select>
-                    </div>
-                </div>
-            </div>
-            <ul id="transaction-list" class="space-y-3">
-                 <li class="text-center text-gray-500 py-4">ยังไม่มีรายการ...</li>
-            </ul>
+                 <h2 class="text-2xl font-bold mb-4 md:mb-0">ประวัติรายการ</h2>
+                 <div class="flex flex-wrap items-center gap-2 md:gap-4">
+                     <div class="flex items-center gap-2">
+                         <label for="filter-month" class="text-base font-medium text-gray-700">เดือน:</label>
+                         <select id="filter-month" class="border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base p-3 input-full-width"></select>
+                     </div>
+                     <div class="flex items-center gap-2">
+                         <label for="filter-year" class="text-base font-medium text-gray-700">ปี:</label>
+                         <select id="filter-year" class="border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base p-3 input-full-width"></select>
+                     </div>
+                 </div>
+             </div>
+             <ul id="transaction-list" class="space-y-3">
+                  <li class="text-center text-gray-500 py-4">ยังไม่มีรายการ...</li>
+             </ul>
         </section>
 
-        <!-- POSITION 2: Transaction Form (เพิ่มรายการใหม่) -->
+        <!-- Transaction Form -->
         <section class="bg-white p-6 rounded-xl shadow-md mb-8">
             <div class="flex justify-between items-center mb-4 border-b pb-2">
                  <h2 class="text-2xl font-bold">เพิ่มรายการใหม่</h2>
                  <span id="saving-indicator" class="text-sm text-gray-500 opacity-0">กำลังบันทึก...</span>
             </div>
-            <!-- Responsive Form Grid: 1 col (mobile), 2 cols (tablet), 5 cols (desktop) -->
             <form id="transaction-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
-                
-                <!-- ROW 1 (Cols 1-3) -->
-                
-                <!-- 1. วันที่ (3 selects, spanning 2 cols on LG) -->
                 <div class="col-span-1 lg:col-span-2">
                     <label class="block text-sm font-medium text-gray-700">วันที่</label>
                     <div class="flex space-x-2 mt-1">
-                        <!-- Day: w-1/4 (25%) -->
                         <select id="dayInput" class="block w-1/4 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base p-3" required></select>
-                        <!-- Month: w-1/3 (~33.3%) -->
                         <select id="monthInput" class="block w-1/3 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base p-3" required></select>
-                        <!-- Year: w-1/3 (~33.3%) -->
                         <select id="yearInput" class="block w-1/3 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base p-3" required></select>
                     </div>
                 </div>
-                
-                <!-- 2. ประเภท (1 col) -->
                 <div>
                     <label for="type" class="block text-sm font-medium text-gray-700">ประเภท</label>
                     <select id="type" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required>
@@ -121,82 +107,57 @@
                         <option value="expense">รายจ่าย</option>
                     </select>
                 </div>
-                 
-                <!-- 3. ตัวเลือก (1 col) -->
                  <div>
                     <label for="platform" class="block text-sm font-medium text-gray-700">ตัวเลือก</label>
                     <select id="platform" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" disabled>
-                        <option value="" disabled selected>-- เลือกธุรกรรม --</option> <!-- NEW PLACEHOLDER -->
+                        <option value="" disabled selected>-- เลือกธุรกรรม --</option>
                         <option value="Shopee">Shopee</option>
                         <option value="Lazada(Auy)">Lazada(Auy)</option>
                         <option value="Lazada(Aom)">Lazada(Aom)</option>
                         <option value="สั่งซื้อสินค้า">สั่งซื้อสินค้า</option>
-                        <option value="เงินเดือนพนักงาน" class="expense-only">เงินเดือนพนักงาน</option> <!-- NEW OPTION -->
+                        <option value="เงินเดือนพนักงาน" class="expense-only">เงินเดือนพนักงาน</option>
                     </select>
                 </div>
-                
-                <!-- 4. SPACER (Takes 1 column on lg, forces next item to row 2) -->
                 <div class="hidden lg:block lg:col-span-1"></div> 
-                
-                <!-- ROW 2 (Cols 1-5) -->
-                
-                <!-- 5. รายการ (Now on Row 2, spanning 2 cols on lg) -->
                 <div class="lg:col-span-2">
                     <label for="description" class="block text-sm font-medium text-gray-700">รายการ</label>
-                    <!-- REMOVED PLACEHOLDER: placeholder="เช่น ค่าสต๊อค, โอนเงินจาก Shopee" -->
                     <input type="text" id="description" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2">
                 </div>
-                
-                <!-- 6. จำนวนเงิน (Now on Row 2, 1 col) -->
                 <div class="lg:col-span-1">
                     <label for="amount" class="block text-sm font-medium text-gray-700">จำนวนเงิน</label>
                     <input type="number" step="0.01" id="amount" placeholder="0.00" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required>
                 </div>
-                
-                <!-- 7. ปุ่มเพิ่มรายการ (Repositioned to start at Col 4 and span 2 cols) -->
                 <button id="add-transaction-btn" type="submit" class="w-full md:w-auto lg:col-start-4 lg:col-span-2 bg-indigo-600 text-white py-2 px-4 rounded-lg shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     เพิ่มรายการ
                 </button>
             </form>
         </section>
 
-        <!-- POSITION 3: Summary Cards (Stacks on mobile, 3 columns on tablet/desktop) -->
+        <!-- Summary Cards -->
         <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <div class="summary-card bg-green-100 p-6 rounded-xl shadow-md text-center">
-                <!-- ADDED ID for dynamic update -->
                 <h2 id="income-title" class="text-lg font-semibold text-green-800">รายรับ</h2>
                 <p id="total-income" class="text-2xl font-bold text-green-600 mt-2">฿0.00</p>
             </div>
             <div class="summary-card bg-red-100 p-6 rounded-xl shadow-md text-center">
-                <!-- ADDED ID for dynamic update -->
                 <h2 id="expense-title" class="text-lg font-semibold text-red-800">รายจ่าย</h2>
                 <p id="total-expense" class="text-2xl font-bold text-red-600 mt-2">฿0.00</p>
             </div>
             <div class="summary-card bg-blue-100 p-6 rounded-xl shadow-md text-center">
-                <!-- ADDED ID for dynamic update -->
                 <h2 id="balance-title" class="text-lg font-semibold text-blue-800">คงเหลือ</h2>
                 <p id="balance" class="text-2xl font-bold text-blue-600 mt-2">฿0.00</p>
             </div>
         </section>
         
-        <!-- POSITION 4: Monthly Summary - NOW HIDDEN -->
-        <section id="monthly-summary-section" class="bg-white p-6 rounded-xl shadow-md mb-8 hidden">
-            <h2 class="text-2xl font-bold mb-4 border-b pb-2">สรุปภาพรวมรายเดือน</h2>
-            <ul id="monthly-summary-list" class="space-y-4">
-                 <li class="text-center text-gray-500 py-4">ยังไม่มีข้อมูลสรุป...</li>
-            </ul>
-        </section>
-        
-        <!-- POSITION 5: Platform Income Summary -->
+        <!-- Platform Income Summary -->
         <section id="platform-summary-section" class="bg-white p-6 rounded-xl shadow-md mb-8">
-            <!-- ADDED ID to this H2 for dynamic month display -->
             <h2 id="platform-summary-title" class="text-2xl font-bold mb-4 border-b pb-2 text-green-700">สรุปรายรับ</h2> 
             <ul id="platform-summary-list" class="space-y-4">
                  <li class="text-center text-gray-500 py-4">ยังไม่มีข้อมูลรายรับ...</li>
             </ul>
         </section>
 
-        <!-- POSITION 6: Platform Expense Summary (NEW) -->
+        <!-- Platform Expense Summary -->
         <section id="platform-expense-summary-section" class="bg-white p-6 rounded-xl shadow-md">
             <h2 id="platform-expense-summary-title" class="text-2xl font-bold mb-4 border-b pb-2 text-red-700">สรุปรายจ่าย</h2> 
             <ul id="platform-expense-summary-list" class="space-y-4">
@@ -206,87 +167,80 @@
 
     </div>
 
-    <!-- Custom Message Modal (Alert replacement) -->
+    <!-- Modals -->
     <div id="custom-modal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full transform transition-all duration-300 scale-100">
             <div class="p-6">
                 <h3 class="text-xl font-bold text-gray-800 mb-4">แจ้งเตือน</h3>
                 <p id="modal-message" class="text-gray-700 mb-6"></p>
                 <div class="flex justify-end">
-                    <button id="modal-close-btn" class="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-150">
-                        ตกลง
-                    </button>
+                    <button id="modal-close-btn" class="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-150">ตกลง</button>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Custom Confirmation Modal (Confirm replacement) -->
     <div id="confirm-modal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full transform transition-all duration-300 scale-100">
             <div class="p-6">
                 <h3 class="text-xl font-bold text-red-700 mb-4">ยืนยันการดำเนินการ</h3>
                 <p id="confirm-message" class="text-gray-700 mb-6"></p>
                 <div class="flex justify-end space-x-3">
-                    <button id="confirm-cancel-btn" class="bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition duration-150">
-                        ยกเลิก
-                    </button>
-                    <button id="confirm-ok-btn" class="bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 transition duration-150">
-                        ยืนยัน
-                    </button>
+                    <button id="confirm-cancel-btn" class="bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition duration-150">ยกเลิก</button>
+                    <button id="confirm-ok-btn" class="bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 transition duration-150">ยืนยัน</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Sticky Total Balance Badge -->
-    <div id="sticky-balance-badge" class="fixed top-4 right-4 bg-gray-800 text-white p-2 px-4 rounded-full shadow-lg z-40 transform scale-0 transition-transform duration-300 ease-in-out">
-        <span id="sticky-total-balance" class="font-bold text-lg">฿0.00</span>
+    <!-- NEW: Sticky Summary Panel (Replaces old badge) -->
+    <div id="sticky-summary-panel" class="fixed top-4 right-4 bg-gray-800 text-white shadow-lg z-40 rounded-xl p-3 w-auto transform translate-x-full transition-transform duration-300 ease-in-out">
+        <div class="space-y-1 text-right">
+            <div>
+                <span class="block text-xs text-gray-400">ยอดเงินคงเหลือ</span>
+                <span id="sticky-total-balance" class="font-bold text-xl">฿0.00</span>
+            </div>
+            <hr class="border-gray-600 my-1">
+            <div>
+                <span id="sticky-monthly-profit-label" class="block text-xs text-gray-400">กำไร (เดือนปัจจุบัน)</span>
+                <span id="sticky-monthly-profit" class="font-semibold text-base">0.00%</span>
+            </div>
+            <div>
+                <span id="sticky-overall-profit-label" class="block text-xs text-gray-400">กำไร (ทั้งหมด)</span>
+                <span id="sticky-overall-profit" class="font-semibold text-base">0.00%</span>
+            </div>
+        </div>
     </div>
 
     <script>
-        // **IMPORTANT: Replace this with your deployed Google Apps Script URL**
+        // Configuration
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw9ImlQQ860LcJNjojx6XCJB7ohJz0SC13ZeE_UblzoAdeRNRqk7tLVD71DazRgCaA6vg/exec";
         const SHEET_ID = "1PHtLUtMEYmOLzLYPGxjesMPDtTj3l4DRpsUZUGtHdqg";
 
-        // --- DOM Elements ---
+        // DOM Elements
         const balanceEl = document.getElementById('balance');
         const totalIncomeEl = document.getElementById('total-income');
         const totalExpenseEl = document.getElementById('total-expense');
         const transactionListEl = document.getElementById('transaction-list');
         const form = document.getElementById('transaction-form');
-        
-        // NEW DATE INPUTS (3 Dropdowns)
         const dayInput = document.getElementById('dayInput');
         const monthInput = document.getElementById('monthInput');
         const yearInput = document.getElementById('yearInput');
-        
         const typeInput = document.getElementById('type');
         const platformInput = document.getElementById('platform');
-        const descriptionInput = document.getElementById('description'); // Now a Text Input
+        const descriptionInput = document.getElementById('description');
         const amountInput = document.getElementById('amount');
-        
-        // RE-ADDED SEPARATE FILTERS
         const filterYearInput = document.getElementById('filter-year'); 
         const filterMonthInput = document.getElementById('filter-month');
-        
-        const monthlySummaryListEl = document.getElementById('monthly-summary-list');
-        const platformSummaryListEl = document.getElementById('platform-summary-list'); // NEW ELEMENT
-        const platformSummaryTitleEl = document.getElementById('platform-summary-title'); // NEW TITLE ELEMENT
-        // NEW EXPENSE SUMMARY ELEMENTS
+        const platformSummaryListEl = document.getElementById('platform-summary-list');
+        const platformSummaryTitleEl = document.getElementById('platform-summary-title');
         const platformExpenseSummaryListEl = document.getElementById('platform-expense-summary-list');
         const platformExpenseSummaryTitleEl = document.getElementById('platform-expense-summary-title');
-
         const savingIndicator = document.getElementById('saving-indicator');
         const loadingOverlay = document.getElementById('loading-overlay');
         const addTransactionBtn = document.getElementById('add-transaction-btn');
-        
-        // NEW TITLE ELEMENTS
         const incomeTitleEl = document.getElementById('income-title');
         const expenseTitleEl = document.getElementById('expense-title');
         const balanceTitleEl = document.getElementById('balance-title');
-        
-        // Custom Modal Elements
         const customModal = document.getElementById('custom-modal');
         const modalMessageEl = document.getElementById('modal-message');
         const modalCloseBtn = document.getElementById('modal-close-btn');
@@ -295,15 +249,18 @@
         const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
         let confirmOkBtn = document.getElementById('confirm-ok-btn'); 
 
-        // Sticky Badge Elements
-        const stickyBalanceBadge = document.getElementById('sticky-balance-badge');
+        // NEW Sticky Panel Elements
+        const stickySummaryPanel = document.getElementById('sticky-summary-panel');
         const stickyTotalBalanceEl = document.getElementById('sticky-total-balance');
+        const stickyMonthlyProfitLabelEl = document.getElementById('sticky-monthly-profit-label');
+        const stickyMonthlyProfitEl = document.getElementById('sticky-monthly-profit');
+        const stickyOverallProfitLabelEl = document.getElementById('sticky-overall-profit-label');
+        const stickyOverallProfitEl = document.getElementById('sticky-overall-profit');
 
-        // --- State and Init ---
+        // State
         let transactions = [];
 
-        // --- Custom Modal Logic (Replaces alert/confirm) ---
-        
+        // --- Custom Modals ---
         function showMessage(message) {
             modalMessageEl.textContent = message;
             customModal.classList.remove('hidden');
@@ -312,329 +269,147 @@
         function showConfirm(message, onConfirm) {
             confirmMessageEl.textContent = message;
             confirmModal.classList.remove('hidden');
-
-            // Clone and replace buttons to ensure fresh event listeners (Critical for proper confirmation flow)
             confirmOkBtn.replaceWith(confirmOkBtn.cloneNode(true));
             confirmCancelBtn.replaceWith(confirmCancelBtn.cloneNode(true));
-            
             let newConfirmOkBtn = document.getElementById('confirm-ok-btn');
             let newConfirmCancelBtn = document.getElementById('confirm-cancel-btn');
-
-            const closeConfirm = () => {
-                confirmModal.classList.add('hidden');
-            };
-
-            newConfirmOkBtn.addEventListener('click', () => {
-                closeConfirm();
-                onConfirm(true);
-            }, { once: true });
-
-            newConfirmCancelBtn.addEventListener('click', () => {
-                closeConfirm();
-                onConfirm(false);
-            }, { once: true });
-
+            const closeConfirm = () => confirmModal.classList.add('hidden');
+            newConfirmOkBtn.addEventListener('click', () => { closeConfirm(); onConfirm(true); }, { once: true });
+            newConfirmCancelBtn.addEventListener('click', () => { closeConfirm(); onConfirm(false); }, { once: true });
             confirmOkBtn = newConfirmOkBtn;
         }
-        
-        modalCloseBtn.addEventListener('click', () => {
-            customModal.classList.add('hidden');
-        });
+        modalCloseBtn.addEventListener('click', () => customModal.classList.add('hidden'));
 
-        // --- Google Apps Script Connector (JSONP) ---
-
-        /**
-         * ใช้สำหรับเรียก Google Apps Script (GS) โดยใช้เทคนิค JSONP
-         */
+        // --- Google Apps Script Connector ---
         function callGoogleScript(action, payload = {}) {
-            const callbackName = 'jsonpCallback_' + new Date().getTime() + Math.random().toString(36).substr(2, 5);
-            
+            const callbackName = 'jsonpCallback_' + Date.now() + Math.random().toString(36).substr(2, 5);
             return new Promise((resolve, reject) => {
                 window[callbackName] = function(response) {
                     delete window[callbackName];
                     document.body.removeChild(script);
-                    if (response && response.status === 'success') {
-                        resolve(response);
-                    } else if (response) {
-                        console.error('Google Script Error:', response.message);
-                        reject(new Error(response.message));
-                    } else {
-                         reject(new Error('Received empty or invalid response from Google Script.'));
-                    }
+                    if (response && response.status === 'success') resolve(response);
+                    else reject(new Error(response?.message || 'Invalid response from Google Script.'));
                 };
-
-                const params = new URLSearchParams({
-                    sheetId: SHEET_ID,
-                    action: action,
-                    ...payload,
-                    callback: callbackName
-                });
-
+                const params = new URLSearchParams({ sheetId: SHEET_ID, action, ...payload, callback: callbackName });
                 const script = document.createElement('script');
                 script.src = `${SCRIPT_URL}?${params.toString()}`;
-                script.onerror = () => reject(new Error('Failed to load Google Script. Check SCRIPT_URL deployment.'));
+                script.onerror = () => reject(new Error('Failed to load Google Script.'));
                 document.body.appendChild(script);
             });
         }
         
-        // --- Date Dropdown Logic ---
-        
-        // Thai month names (0-indexed array for JS Date Month)
+        // --- Date Logic ---
         const THAI_MONTHS = [
-            { value: '01', name: 'มกราคม' }, { value: '02', name: 'กุมภาพันธ์' },
-            { value: '03', name: 'มีนาคม' }, { value: '04', name: 'เมษายน' },
-            { value: '05', name: 'พฤษภาคม' }, { value: '06', name: 'มิถุนายน' },
-            { value: '07', name: 'กรกฎาคม' }, { value: '08', name: 'สิงหาคม' },
-            { value: '09', name: 'กันยายน' }, { value: '10', name: 'ตุลาคม' },
-            { value: '11', name: 'พฤศจิกายน' }, { value: '12', name: 'ธันวาคม' }
+            { value: '01', name: 'มกราคม' }, { value: '02', name: 'กุมภาพันธ์' }, { value: '03', name: 'มีนาคม' },
+            { value: '04', name: 'เมษายน' }, { value: '05', name: 'พฤษภาคม' }, { value: '06', name: 'มิถุนายน' },
+            { value: '07', name: 'กรกฎาคม' }, { value: '08', name: 'สิงหาคม' }, { value: '09', name: 'กันยายน' },
+            { value: '10', name: 'ตุลาคม' }, { value: '11', name: 'พฤศจิกายน' }, { value: '12', name: 'ธันวาคม' }
         ];
 
-        function isLeapYear(year) {
-            return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
-        }
+        function isLeapYear(year) { return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0; }
 
-        /**
-         * Dynamically populates the day dropdown based on selected month and year.
-         */
         function updateDayOptions(selectedYear, selectedMonth) {
             const currentSelectedDay = dayInput.value;
             dayInput.innerHTML = '';
-            
-            const month = parseInt(selectedMonth, 10);
-            const year = parseInt(selectedYear, 10);
-
-            if (isNaN(month) || isNaN(year)) {
-                return; // Cannot determine days
-            }
-            
-            let daysInMonth;
-            if (month === 2) { // February
-                daysInMonth = isLeapYear(year) ? 29 : 28;
-            } else if ([4, 6, 9, 11].includes(month)) { // April, June, Sept, Nov
-                daysInMonth = 30;
-            } else { // Jan, Mar, May, Jul, Aug, Oct, Dec
-                daysInMonth = 31;
-            }
-
+            const month = parseInt(selectedMonth, 10), year = parseInt(selectedYear, 10);
+            if (isNaN(month) || isNaN(year)) return;
+            let daysInMonth = 31;
+            if (month === 2) daysInMonth = isLeapYear(year) ? 29 : 28;
+            else if ([4, 6, 9, 11].includes(month)) daysInMonth = 30;
             for (let i = 1; i <= daysInMonth; i++) {
                 const option = document.createElement('option');
-                const dayStr = String(i).padStart(2, '0');
-                option.value = dayStr;
+                option.value = String(i).padStart(2, '0');
                 option.textContent = i;
                 dayInput.appendChild(option);
             }
-            
-            // Attempt to restore selected day, or default to 01 if the current day is out of range
-            if (currentSelectedDay && parseInt(currentSelectedDay) <= daysInMonth) {
-                 dayInput.value = currentSelectedDay;
-            } else {
-                 dayInput.value = '01';
-            }
+            dayInput.value = (currentSelectedDay && parseInt(currentSelectedDay) <= daysInMonth) ? currentSelectedDay : '01';
         }
 
-        /**
-         * Populates the year dropdown (B.E. for display, A.D. for value).
-         */
-        function populateYearOptions() {
-            yearInput.innerHTML = '';
+        function populateYearOptions(selectEl) {
+            selectEl.innerHTML = '';
             const currentADYear = new Date().getFullYear();
-            
-            // Generate years B.E. (Show current year and 9 previous years)
-            for (let i = 0; i < 10; i++) { 
+            for (let i = 0; i < 10; i++) {
                 const adYear = currentADYear - i;
                 const beYear = adYear + 543;
-                
                 const option = document.createElement('option');
-                option.value = String(adYear); // Value must be AD year for JS Date() compatibility
-                option.textContent = String(beYear); // Text is BE year for display
-                yearInput.appendChild(option);
+                option.value = String(adYear);
+                option.textContent = String(beYear);
+                selectEl.appendChild(option);
             }
         }
 
-        /**
-         * Populates the month dropdown (Thai names).
-         */
-        function populateMonthOptions() {
-            monthInput.innerHTML = '';
-            THAI_MONTHS.forEach(month => {
+        function populateMonthOptions(selectEl, options) {
+            selectEl.innerHTML = '';
+            options.forEach(opt => {
                 const option = document.createElement('option');
-                option.value = month.value;
-                option.textContent = month.name;
-                monthInput.appendChild(option);
+                option.value = opt.value;
+                option.textContent = opt.name;
+                selectEl.appendChild(option);
             });
         }
         
-        /**
-         * Set initial date to today and configure event listeners.
-         */
         function initializeDateDropdowns() {
-            populateYearOptions();
-            populateMonthOptions();
-            
+            populateYearOptions(yearInput);
+            populateMonthOptions(monthInput, THAI_MONTHS.map(m => ({ value: m.value, name: m.name })));
             const today = new Date();
-            const currentDay = String(today.getDate()).padStart(2, '0');
-            const currentMonth = String(today.getMonth() + 1).padStart(2, '0');
-            const currentADYear = String(today.getFullYear());
-            
-            // Set initial values
-            monthInput.value = currentMonth;
-            yearInput.value = currentADYear;
-            
-            // Populate days based on initial month/year
-            updateDayOptions(currentADYear, currentMonth);
-            dayInput.value = currentDay;
-            
-            // Add event listeners for dynamic day updates
-            monthInput.addEventListener('change', () => {
-                updateDayOptions(yearInput.value, monthInput.value);
-            });
-            yearInput.addEventListener('change', () => {
-                updateDayOptions(yearInput.value, monthInput.value);
-            });
+            monthInput.value = String(today.getMonth() + 1).padStart(2, '0');
+            yearInput.value = String(today.getFullYear());
+            updateDayOptions(yearInput.value, monthInput.value);
+            dayInput.value = String(today.getDate()).padStart(2, '0');
+            monthInput.addEventListener('change', () => updateDayOptions(yearInput.value, monthInput.value));
+            yearInput.addEventListener('change', () => updateDayOptions(yearInput.value, monthInput.value));
         }
         
-        /**
-         * Retrieves selected date and returns in YYYY-MM-DD format for the backend.
-         */
         function getDateFromDropdowns() {
-            const day = dayInput.value;
-            const month = monthInput.value;
-            const year = yearInput.value; // This is the AD year
-            
-            if (!day || !month || !year) {
-                return null;
-            }
-            
-            // Simple validation: check if the date actually exists (e.g., prevents selecting Feb 30)
-            // We can trust updateDayOptions keeps the list correct, but this is a final check.
-            const dateCheck = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-            
-            if (dateCheck.getFullYear() === parseInt(year) && 
-                dateCheck.getMonth() + 1 === parseInt(month) && 
-                dateCheck.getDate() === parseInt(day)) {
-                
-                return `${year}-${month}-${day}`; // Return YYYY-MM-DD for backend
-            }
-            
-            return null; // Invalid date combination
+            const [day, month, year] = [dayInput.value, monthInput.value, yearInput.value];
+            if (!day || !month || !year) return null;
+            return `${year}-${month}-${day}`;
         }
         
         // --- Transaction Logic ---
-        
         async function addTransaction(e) {
             e.preventDefault();
-            
-            // --- Type Validation (Ensure a type is selected) ---
-            if (typeInput.value === "") {
-                showMessage('กรุณาเลือกประเภท (รายรับ/รายจ่าย) ก่อน');
-                return;
-            }
-            
-            // --- Date Validation and Conversion ---
-            const dateString = getDateFromDropdowns(); // Retrieve YYYY-MM-DD
-            
-            if (!dateString) {
-                showMessage('รูปแบบวันที่ไม่ถูกต้อง กรุณาเลือก วันที่ เดือน และ ปี ให้ครบถ้วน');
-                return;
-            }
-            // --- End Date Validation ---
-
-            if (amountInput.value.trim() === '') {
-                showMessage('กรุณากรอกจำนวนเงินให้ครบถ้วน');
-                return;
-            }
-            // Ensure amount is float before sending
+            if (typeInput.value === "") { showMessage('กรุณาเลือกประเภท (รายรับ/รายจ่าย) ก่อน'); return; }
+            const dateString = getDateFromDropdowns();
+            if (!dateString) { showMessage('รูปแบบวันที่ไม่ถูกต้อง'); return; }
             const amountValue = parseFloat(amountInput.value);
-            if (isNaN(amountValue) || amountValue <= 0) {
-                 showMessage('จำนวนเงินไม่ถูกต้อง กรุณาใส่ตัวเลขที่มากกว่า 0');
-                 return;
-            }
-            
-            const typeValue = typeInput.value;
-            // Get the user-entered description value (trim whitespace)
-            let descriptionForTransaction = descriptionInput.value.trim(); 
-
-            // --- Implement Auto Description Logic (Overwrite for Income/Specific Expense) ---
-            if (typeValue === 'income') {
-                // If it's income, force the description value to "ยอดโอนเข้าบัญชี"
-                descriptionForTransaction = "ยอดโอนเข้าบัญชี";
-            } else if (typeValue === 'expense' && platformInput.value === 'เงินเดือนพนักงาน') {
-                // If it's a specific expense type, force the description
-                descriptionForTransaction = "เงินเดือน(Aom)";
-            }
-            // --- End Auto Description Logic ---
-
-            // Check if user selected an item from the description dropdown (if not set by auto logic)
-            // NOTE: Since this is a text input now, it is optional unless autofilled.
-            
-            const transaction = {
-                id: generateID(),
-                date: dateString, // Use the YYYY-MM-DD string
-                type: typeValue,
-                platform: platformInput.value,
-                description: descriptionForTransaction || '', // Use the determined description value, allow empty string if not autofilled
-                amount: amountValue
-            };
-
-            // 1. Optimistic Update: Add to local array and update UI immediately
+            if (isNaN(amountValue) || amountValue <= 0) { showMessage('จำนวนเงินไม่ถูกต้อง'); return; }
+            let descriptionForTransaction = descriptionInput.value.trim();
+            if (typeInput.value === 'income') descriptionForTransaction = "ยอดโอนเข้าบัญชี";
+            else if (typeInput.value === 'expense' && platformInput.value === 'เงินเดือนพนักงาน') descriptionForTransaction = "เงินเดือน(Aom)";
+            const transaction = { id: 'id' + Date.now(), date: dateString, type: typeInput.value, platform: platformInput.value, description: descriptionForTransaction, amount: amountValue };
             transactions.push(transaction);
             updateLocalStorage();
-            updateStickyBalance(); // Update the total balance immediately
-            updateUI(); // Quick render for immediate feedback
-            
-            // Show saving indicator while background saving is happening
-            savingIndicator.style.display = 'inline';
-            savingIndicator.style.opacity = '1';
-            addTransactionBtn.disabled = true;
-            
+            updateUI();
+            savingIndicator.style.display = 'inline'; savingIndicator.style.opacity = '1'; addTransactionBtn.disabled = true;
             try {
-                // 2. Background Saving to Google Sheet
                 await callGoogleScript('addData', transaction);
             } catch (error) {
-                // 3. Handle failure (inform user and initiate full reload to sync)
-                showMessage('ไม่สามารถบันทึกข้อมูลไปยัง Google Sheet ได้: ' + error.message + ' รายการจะถูกดึงกลับมาในหน้าจอเมื่อรีโหลด');
-                await init(false); // Force reload to revert failed transaction
+                showMessage('ไม่สามารถบันทึกข้อมูลไปยัง Google Sheet ได้: ' + error.message);
+                await init(false);
             } finally {
                 savingIndicator.style.opacity = '0';
                 setTimeout(() => { savingIndicator.style.display = 'none'; }, 300);
-                // Clear form inputs (leave date unchanged)
-                descriptionInput.value = ''; 
-                amountInput.value = '';
-                addTransactionBtn.disabled = false;
+                descriptionInput.value = ''; amountInput.value = ''; addTransactionBtn.disabled = false;
             }
         }
         
-        /**
-         * รับ parameter date เพื่อส่งไปยัง GS ให้รู้ว่าจะลบจากชีทเดือนใด
-         * (Optimistic Delete)
-         */
         function removeTransaction(id, date) { 
-            showConfirm('คุณต้องการลบรายการนี้ใช่หรือไม่? การดำเนินการนี้ไม่สามารถย้อนกลับได้', async (confirmed) => {
+            showConfirm('คุณต้องการลบรายการนี้ใช่หรือไม่?', async (confirmed) => {
                 if (!confirmed) return;
-                
-                // --- 1. Optimistic Update (Immediate) ---
                 const originalTransactions = [...transactions];
                 transactions = transactions.filter(t => t.id.toString() !== id.toString());
                 updateLocalStorage();
-                updateStickyBalance(); // Update the total balance immediately
                 updateUI();
-                
-                // Show saving indicator for background process (Non-blocking indicator)
-                savingIndicator.style.display = 'inline';
-                savingIndicator.style.opacity = '1';
-                
+                savingIndicator.style.display = 'inline'; savingIndicator.style.opacity = '1';
                 try {
-                    // 2. Background Deleting from Google Sheet (Awaited for rollback logic, but UI is already updated)
-                    await callGoogleScript('deleteData', { id: id, date: date }); 
+                    await callGoogleScript('deleteData', { id, date });
                 } catch (error) {
-                    // 3. Handle failure (revert local state and inform user)
-                    showMessage('เกิดข้อผิดพลาดในการลบรายการใน Google Sheet: ' + error.message + ' รายการจะถูกดึงกลับมาในหน้าจอ');
-                    transactions = originalTransactions; // Revert local state
+                    showMessage('เกิดข้อผิดพลาดในการลบรายการ: ' + error.message);
+                    transactions = originalTransactions;
                     updateLocalStorage();
-                    updateStickyBalance(); // Revert the sticky balance too
                     updateUI();
                 } finally {
-                    // Hide saving indicator
                     savingIndicator.style.opacity = '0';
                     setTimeout(() => { savingIndicator.style.display = 'none'; }, 300);
                 }
@@ -642,494 +417,223 @@
         }
 
         // --- Utility Functions ---
-
-        function generateID() {
-            return new Date().getTime().toString(36) + Math.random().toString(36).substr(2, 9);
-        }
-
-        function formatMoney(number) {
-            if (typeof number !== 'number' || isNaN(number)) return '0.00'; 
-            return number.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-        }
-        
-        function formatMonth(dateString) {
-            const [year, month] = dateString.split('-');
-            const date = new Date(year, parseInt(month) - 1); 
-            return date.toLocaleDateString('th-TH', { year: 'numeric', month: 'long' });
-        }
-
-        /**
-         * Formats selected year/month from filters into Thai string.
-         * Accepts YYYY and MM as separate strings for backward compatibility with existing utility calls
-         * @param {string} year - Selected year (e.g., "2024")
-         * @param {string} month - Selected month (e.g., "07")
-         * @returns {string} - Formatted string (e.g., "(กรกฎาคม 2567)")
-         */
+        function formatMoney(number) { return (typeof number === 'number' ? number : 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'); }
         function getFormattedMonthAndYear(year, month) {
-            if (!year || !month) return '(กำลังโหลด...)';
-            
-            // Create a date object using the selected year and month (day doesn't matter)
-            const date = new Date(parseInt(year), parseInt(month) - 1, 1);
-            
-            // Get Thai month name and Thai year (P.E. = year + 543 is handled by toLocaleDateString('th-TH'))
-            const monthYearString = date.toLocaleDateString('th-TH', { year: 'numeric', month: 'long' });
-
-            return `(${monthYearString})`;
+            if (!year) return '(กำลังโหลด...)';
+            if (month === 'all') return `(ทั้งปี ${parseInt(year) + 543})`;
+            if (!month) return '(กำลังโหลด...)';
+            return `(${new Date(parseInt(year), parseInt(month) - 1, 1).toLocaleDateString('th-TH', { year: 'numeric', month: 'long' })})`;
         }
-
-
-        function updateLocalStorage() {
-            localStorage.setItem('transactions_cache', JSON.stringify(transactions));
+        function updateLocalStorage() { localStorage.setItem('transactions_cache', JSON.stringify(transactions)); }
+        function getFilteredTransactions() {
+            const year = filterYearInput.value, month = filterMonthInput.value;
+            if (!year || !month) return [];
+            return transactions.filter(t => t.date && (month === 'all' ? t.date.startsWith(year) : t.date.startsWith(`${year}-${month}`)));
         }
-
-        /**
-         * Updates the sticky balance badge with the total balance from ALL transactions.
-         */
-        function updateStickyBalance() {
-            if (!transactions || transactions.length === 0) {
-                stickyBalanceBadge.classList.remove('visible');
-                return;
-            }
-
-            const totalIncome = transactions
-                .filter(t => t.type === 'income')
-                .reduce((acc, t) => acc + t.amount, 0);
-
-            const totalExpense = transactions
-                .filter(t => t.type === 'expense')
-                .reduce((acc, t) => acc + t.amount, 0);
-
-            const totalBalance = totalIncome - totalExpense;
-
-            stickyTotalBalanceEl.innerText = `฿${formatMoney(totalBalance)}`;
-
-            if (totalBalance < 0) {
-                stickyTotalBalanceEl.classList.remove('text-green-400');
-                stickyTotalBalanceEl.classList.add('text-red-400');
-            } else {
-                stickyTotalBalanceEl.classList.remove('text-red-400');
-                stickyTotalBalanceEl.classList.add('text-green-400');
-            }
-            
-            // Ensure badge is visible when there are transactions
-            stickyBalanceBadge.classList.add('visible');
-        }
-        
-        // --- UI Rendering and Filtering ---
-
         function getPlatformColor(platform) {
-            // Updated case name
-            switch(platform) {
-                case 'Shopee': return 'text-orange-500';
-                case 'Lazada(Auy)': return 'text-blue-500';
-                case 'Lazada(Aom)': return 'text-sky-600';
-                case 'สั่งสินค้า': // Check for old stored value
-                case 'สั่งซื้อสินค้า': return 'text-red-600'; // New value
-                case 'เงินเดือนพนักงาน': return 'text-purple-600'; // New color for employee salary
-                default: return 'text-gray-600';
-            }
+            const colors = { 'Shopee': 'text-orange-500', 'Lazada(Auy)': 'text-blue-500', 'Lazada(Aom)': 'text-sky-600', 'สั่งซื้อสินค้า': 'text-red-600', 'เงินเดือนพนักงาน': 'text-purple-600' };
+            return colors[platform] || 'text-gray-600';
         }
         
-        /**
-         * This function is updated to match the mobile layout (Description stacked, then Date/Platform/Amount/Delete side-by-side)
-         */
+        // --- UI Rendering ---
         function addTransactionDOM(transaction) {
             const item = document.createElement('li');
             const isIncome = transaction.type === 'income';
-            const sign = isIncome ? '+' : '-';
-            const amountColor = isIncome ? 'text-green-600' : 'text-red-600';
-            const platformColor = getPlatformColor(transaction.platform);
-            const rowColor = isIncome ? 'bg-green-50 hover:bg-green-100' : 'bg-red-50 hover:bg-red-100';
-            
-            // Format Date to Thai locale (e.g., 1 ต.ค. 2568)
-            const formattedDate = new Date(transaction.date).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
-
-            // Use flex flex-col to stack main content on mobile, and justify-between for the sub-row
-            item.classList.add('transaction-item', ...rowColor.split(' '), 'p-4', 'border', 'rounded-xl', 'flex', 'flex-col', 'transition', 'duration-200', 'space-y-1');
-
+            item.className = `transaction-item ${isIncome ? 'bg-green-50 hover:bg-green-100' : 'bg-red-50 hover:bg-red-100'} p-4 border rounded-xl flex flex-col transition duration-200 space-y-1`;
             item.innerHTML = `
-                <!-- Row 1: Description (Full Width) -->
                 <div class="font-bold text-gray-800 text-base mb-1">${transaction.description}</div>
-                
-                <!-- Row 2: Date/Platform and Amount/Delete on the same row (justify-between) -->
                 <div class="flex justify-between items-center w-full">
-                    
-                    <!-- Left Side: Date and Platform -->
                     <div class="text-sm text-gray-500 flex-grow pr-4">
-                        <span>${formattedDate}</span> | 
-                        <span class="${platformColor} font-semibold">${transaction.platform}</span>
+                        <span>${new Date(transaction.date).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' })}</span> | 
+                        <span class="${getPlatformColor(transaction.platform)} font-semibold">${transaction.platform}</span>
                     </div>
-
-                    <!-- Right Side: Amount and Delete Button -->
                     <div class="flex items-center space-x-2 flex-shrink-0">
-                        <!-- Amount -->
-                        <span class="font-bold text-lg ${amountColor}">${sign}฿${formatMoney(transaction.amount)}</span>
-                        
-                        <!-- Delete Button -->
-                        <button class="bg-red-500 hover:bg-red-600 text-white text-xs py-1 px-2 rounded-full shadow-md w-8 h-8 flex items-center justify-center" onclick="removeTransaction('${transaction.id}', '${transaction.date}')">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                               <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 10-2 0v6a1 1 0 102 0V8z" clip-rule="evenodd" />
-                            </svg>
+                        <span class="font-bold text-lg ${isIncome ? 'text-green-600' : 'text-red-600'}">${isIncome ? '+' : '-'}฿${formatMoney(transaction.amount)}</span>
+                        <button class="bg-red-500 hover:bg-red-600 text-white text-xs p-0 rounded-full shadow-md w-8 h-8 flex items-center justify-center" onclick="removeTransaction('${transaction.id}', '${transaction.date}')">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 10-2 0v6a1 1 0 102 0V8z" clip-rule="evenodd" /></svg>
                         </button>
                     </div>
-                </div>
-            `;
+                </div>`;
             transactionListEl.appendChild(item);
         }
 
-        /**
-         * Calculates and updates the total income, expense, and balance in the summary cards.
-         */
-        function updateValues(filteredTransactions) {
-            const income = filteredTransactions
-                .filter(t => t.type === 'income')
-                .reduce((acc, t) => acc + t.amount, 0);
-            const expense = filteredTransactions
-                .filter(t => t.type === 'expense')
-                .reduce((acc, t) => acc + t.amount, 0);
-            
+        function updateValues(filtered) {
+            const income = filtered.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
+            const expense = filtered.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
             const balance = income - expense;
-            
-            // Get current filter selection
-            const selectedYear = filterYearInput.value;
-            const selectedMonth = filterMonthInput.value;
-            
-            if (!selectedYear || !selectedMonth) { // Handle empty filter case gracefully
-                incomeTitleEl.innerText = `รายรับ`;
-                expenseTitleEl.innerText = `รายจ่าย`;
-                balanceTitleEl.innerText = `คงเหลือ`;
-                return;
-            }
-            
-            // Format the month/year string
-            const monthYearText = getFormattedMonthAndYear(selectedYear, selectedMonth);
-
-            // Update Titles to show the selected month/year
+            const monthYearText = getFormattedMonthAndYear(filterYearInput.value, filterMonthInput.value);
             incomeTitleEl.innerText = `รายรับ ${monthYearText}`;
             expenseTitleEl.innerText = `รายจ่าย ${monthYearText}`;
             balanceTitleEl.innerText = `คงเหลือ ${monthYearText}`;
-
-
-            balanceEl.innerText = `฿${formatMoney(balance)}`;
             totalIncomeEl.innerText = `฿${formatMoney(income)}`;
             totalExpenseEl.innerText = `฿${formatMoney(expense)}`;
-            
-            // Update balance card color based on result
-            if (balance < 0) {
-                balanceEl.parentElement.classList.replace('bg-blue-100', 'bg-red-100');
-                balanceEl.classList.replace('text-blue-600', 'text-red-600');
-            } else {
-                balanceEl.parentElement.classList.replace('bg-red-100', 'bg-blue-100');
-                balanceEl.classList.replace('text-red-600', 'text-blue-600');
-            }
+            balanceEl.innerText = `฿${formatMoney(balance)}`;
+            const balanceCard = balanceEl.parentElement;
+            balanceCard.className = `summary-card p-6 rounded-xl shadow-md text-center ${balance < 0 ? 'bg-red-100' : 'bg-blue-100'}`;
+            balanceEl.className = `text-2xl font-bold mt-2 ${balance < 0 ? 'text-red-600' : 'text-blue-600'}`;
         }
 
-        /**
-         * Handles enabling/disabling the platform select and filtering options.
-         * NOTE: Description is now a text input, so description-related filtering is removed.
-         */
         function updatePlatformOptions() {
-            const selectedType = typeInput.value;
-            const allPlatforms = platformInput.options;
-            const placeholderPlatformOption = allPlatforms[0];
-            
-            if (selectedType === 'income' || selectedType === 'expense') {
-                platformInput.disabled = false; 
-                placeholderPlatformOption.hidden = true;
-                
-                if (selectedType === 'expense') {
-                    // Filter Platform options for Expense
-                    Array.from(allPlatforms).forEach((opt, index) => {
-                        const isExpenseItem = opt.value === 'สั่งซื้อสินค้า' || opt.value === 'เงินเดือนพนักงาน';
-                        opt.hidden = !isExpenseItem && index !== 0;
-                    });
-                    
-                    if (['Shopee', 'Lazada(Auy)', 'Lazada(Aom)'].includes(platformInput.value)) {
-                         platformInput.value = 'สั่งซื้อสินค้า';
-                    }
-                    
-                } else { // Income
-                    // Filter Platform options for Income
-                    Array.from(allPlatforms).forEach((opt, index) => {
-                        const isIncomeItem = opt.value !== 'สั่งซื้อสินค้า' && opt.value !== 'เงินเดือนพนักงาน';
-                        opt.hidden = !isIncomeItem && index !== 0;
-                    });
-                    
-                    if (['สั่งซื้อสินค้า', 'เงินเดือนพนักงาน'].includes(platformInput.value) || platformInput.value === "") {
-                        platformInput.value = 'Shopee';
-                    }
-                }
-            } else {
-                // Initial/Default state
-                platformInput.disabled = true;
-                placeholderPlatformOption.hidden = false;
-                platformInput.value = "";
-                Array.from(allPlatforms).forEach(opt => { if (opt !== placeholderPlatformOption) opt.hidden = false; }); 
-                
-                // Since Description is a text input, it remains enabled but is cleared upon success.
-            }
+            const type = typeInput.value;
+            platformInput.disabled = !type;
+            Array.from(platformInput.options).forEach(opt => {
+                const isExpenseOnly = ['สั่งซื้อสินค้า', 'เงินเดือนพนักงาน'].includes(opt.value);
+                if (type === 'income') opt.hidden = isExpenseOnly;
+                else if (type === 'expense') opt.hidden = !isExpenseOnly && opt.value !== '';
+                else opt.hidden = false;
+            });
+            if (type === 'income' && (platformInput.selectedIndex === -1 || platformInput.options[platformInput.selectedIndex].hidden)) platformInput.value = 'Shopee';
+            else if (type === 'expense' && (platformInput.selectedIndex === -1 || platformInput.options[platformInput.selectedIndex].hidden)) platformInput.value = 'สั่งซื้อสินค้า';
         }
 
-        function populateYearFilter() {
-            const selectedValue = filterYearInput.value;
-            filterYearInput.innerHTML = '';
+        function populateFilters() {
+            const selectedY = filterYearInput.value;
+            const selectedM = filterMonthInput.value;
             const years = [...new Set(transactions.map(t => t.date.substring(0, 4)))];
             const currentYear = new Date().getFullYear().toString();
-            if (!years.includes(currentYear)) {
-                years.push(currentYear);
-            }
-            years.sort((a, b) => b.localeCompare(a));
-
-            years.forEach(year => {
-                const option = document.createElement('option');
-                option.value = year;
-                option.textContent = parseInt(year) + 543; // พ.ศ.
-                filterYearInput.appendChild(option);
-            });
-            
-            // Restore selection or default to latest year
-            if (selectedValue && years.includes(selectedValue)) {
-                filterYearInput.value = selectedValue;
-            } else if (years.length > 0) {
-                filterYearInput.value = years[0];
-            }
+            if (!years.includes(currentYear)) years.push(currentYear);
+            filterYearInput.innerHTML = '';
+            years.sort((a,b) => b-a).forEach(y => filterYearInput.add(new Option(parseInt(y) + 543, y)));
+            if (selectedY && years.includes(selectedY)) filterYearInput.value = selectedY;
+            const monthOptions = [{ value: 'all', name: '-- ทุกเดือน --' }, ...THAI_MONTHS];
+            populateMonthOptions(filterMonthInput, monthOptions.map(m => ({ value: m.val || m.value, name: m.name })));
+            filterMonthInput.value = selectedM || String(new Date().getMonth() + 1).padStart(2, '0');
         }
 
-        function populateMonthFilter() {
-            const selectedValue = filterMonthInput.value;
-            filterMonthInput.innerHTML = '';
-            const months = [
-                { val: '01', name: 'มกราคม' }, { val: '02', name: 'กุมภาพันธ์' },
-                { val: '03', name: 'มีนาคม' }, { val: '04', name: 'เมษายน' },
-                { val: '05', name: 'พฤษภาคม' }, { val: '06', name: 'มิถุนายน' },
-                { val: '07', name: 'กรกฎาคม' }, { val: '08', name: 'สิงหาคม' },
-                { val: '09', name: 'กันยายน' }, { val: '10', name: 'ตุลาคม' },
-                { val: '11', name: 'พฤศจิกายน' }, { val: '12', name: 'ธันวาคม' }
-            ];
-            months.forEach(month => {
-                const option = document.createElement('option');
-                option.value = month.val;
-                option.textContent = month.name;
-                filterMonthInput.appendChild(option);
-            });
-
-            // Restore selection or default to current month
-            if (selectedValue) {
-                 filterMonthInput.value = selectedValue;
-            } else {
-                 filterMonthInput.value = (new Date().getMonth() + 1).toString().padStart(2, '0');
-            }
-        }
-
-
-        function renderPlatformSummary() {
-            platformSummaryListEl.innerHTML = ''; // Clear previous summary
-
-            const selectedYear = filterYearInput.value;
-            const selectedMonth = filterMonthInput.value;
-            const selectedMonthYear = `${selectedYear}-${selectedMonth}`;
-
-            // --- START: Dynamic Title Update for Platform Summary ---
-            if (selectedYear && selectedMonth) {
-                const monthYearText = getFormattedMonthAndYear(selectedYear, selectedMonth); 
-                platformSummaryTitleEl.innerText = `สรุปรายรับ ${monthYearText}`;
-            } else {
-                platformSummaryTitleEl.innerText = `สรุปรายรับ (กำลังโหลด...)`;
-            }
-            // --- END: Dynamic Title Update for Platform Summary ---
-
-            if (!selectedMonthYear || transactions.length === 0) {
-                platformSummaryListEl.innerHTML = '<li class="text-center text-gray-500 py-4">ยังไม่มีข้อมูลรายรับ...</li>';
-                return;
-            }
-
-            const filteredTransactions = transactions.filter(t => 
-                t.date.startsWith(selectedMonthYear) && t.type === 'income'
-            );
-            
-            if (filteredTransactions.length === 0) {
-                platformSummaryListEl.innerHTML = '<li class="text-center text-gray-500 py-4">ไม่พบรายการรายรับในเดือนที่เลือก...</li>';
-                return;
-            }
-
-            const platformSummary = filteredTransactions.reduce((acc, t) => {
-                const platform = t.platform || 'ไม่ระบุ';
-                acc[platform] = (acc[platform] || 0) + t.amount;
-                return acc;
-            }, {});
-            
-            // Sort summary by amount descending
-            const sortedPlatforms = Object.entries(platformSummary).sort(([, a], [, b]) => b - a);
-
-            sortedPlatforms.forEach(([platform, amount]) => {
-                const platformColor = getPlatformColor(platform); // Reuse existing color logic
-                const item = document.createElement('li');
-                item.classList.add('p-3', 'border', 'rounded-xl', 'flex', 'justify-between', 'items-center', 'shadow-sm', 'bg-white', 'hover:bg-green-50', 'transition');
-                item.innerHTML = `
-                    <div class="font-semibold ${platformColor}">${platform}</div>
-                    <div class="font-bold text-lg text-green-600">฿${formatMoney(amount)}</div>
-                `;
-                platformSummaryListEl.appendChild(item);
+        function renderSummaries(filtered) {
+            ['income', 'expense'].forEach(type => {
+                const listEl = type === 'income' ? platformSummaryListEl : platformExpenseSummaryListEl;
+                const titleEl = type === 'income' ? platformSummaryTitleEl : platformExpenseSummaryTitleEl;
+                const monthYearText = getFormattedMonthAndYear(filterYearInput.value, filterMonthInput.value);
+                titleEl.innerText = `สรุปราย${type === 'income' ? 'รับ' : 'จ่าย'} ${monthYearText}`;
+                listEl.innerHTML = '';
+                const data = filtered.filter(t => t.type === type);
+                if (data.length === 0) {
+                    listEl.innerHTML = `<li class="text-center text-gray-500 py-4">ไม่พบรายการในเดือนที่เลือก...</li>`;
+                    return;
+                }
+                const summary = data.reduce((acc, t) => {
+                    acc[t.platform] = (acc[t.platform] || 0) + t.amount;
+                    return acc;
+                }, {});
+                Object.entries(summary).sort(([,a],[,b]) => b-a).forEach(([p, a]) => {
+                    const item = document.createElement('li');
+                    item.className = `p-3 border rounded-xl flex justify-between items-center shadow-sm bg-white hover:bg-${type === 'income' ? 'green' : 'red'}-50 transition`;
+                    item.innerHTML = `<div class="font-semibold ${getPlatformColor(p)}">${p}</div><div class="font-bold text-lg text-${type === 'income' ? 'green' : 'red'}-600">฿${formatMoney(a)}</div>`;
+                    listEl.appendChild(item);
+                });
             });
         }
         
-        /**
-         * Renders the Platform Expense Summary section.
-         */
-        function renderPlatformExpenseSummary() {
-            platformExpenseSummaryListEl.innerHTML = ''; // Clear previous summary
-
-            const selectedYear = filterYearInput.value;
-            const selectedMonth = filterMonthInput.value;
-            const selectedMonthYear = `${selectedYear}-${selectedMonth}`;
-
-            // --- START: Dynamic Title Update for Platform Expense Summary ---
-            if (selectedYear && selectedMonth) {
-                const monthYearText = getFormattedMonthAndYear(selectedYear, selectedMonth); 
-                platformExpenseSummaryTitleEl.innerText = `สรุปรายจ่าย ${monthYearText}`;
-            } else {
-                platformExpenseSummaryTitleEl.innerText = `สรุปรายจ่าย (กำลังโหลด...)`;
-            }
-            // --- END: Dynamic Title Update for Platform Expense Summary ---
-
-            if (!selectedMonthYear || transactions.length === 0) {
-                platformExpenseSummaryListEl.innerHTML = '<li class="text-center text-gray-500 py-4">ยังไม่มีข้อมูลรายจ่าย...</li>';
+        function updateStickyPanel() {
+            if (!transactions || transactions.length === 0) {
+                stickySummaryPanel.classList.remove('visible');
                 return;
             }
 
-            const filteredTransactions = transactions.filter(t => 
-                t.date.startsWith(selectedMonthYear) && t.type === 'expense'
-            );
+            // --- Calculations ---
+
+            // 1. Balance Calculation (includes ALL income and expenses)
+            const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
+            const totalExpense = transactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
+            const totalBalance = totalIncome - totalExpense;
+
+            // 2. Profit Calculation (excludes 'Employee Salary' from expenses)
+            const filtered = getFilteredTransactions();
             
-            if (filteredTransactions.length === 0) {
-                platformExpenseSummaryListEl.innerHTML = '<li class="text-center text-gray-500 py-4">ไม่พบรายการรายจ่ายในเดือนที่เลือก...</li>';
-                return;
+            // Income for the filtered period
+            const monthlyIncome = filtered.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
+            
+            // Expenses for the filtered period (excluding salary)
+            const monthlyExpenseForProfit = filtered
+                .filter(t => t.type === 'expense' && t.platform !== 'เงินเดือนพนักงาน')
+                .reduce((acc, t) => acc + t.amount, 0);
+
+            // Total expenses of all time (excluding salary)
+            const totalExpenseForProfit = transactions
+                .filter(t => t.type === 'expense' && t.platform !== 'เงินเดือนพนักงาน')
+                .reduce((acc, t) => acc + t.amount, 0);
+            
+            let monthlyProfit = 0;
+            if (monthlyExpenseForProfit > 0) {
+                monthlyProfit = ((monthlyIncome - monthlyExpenseForProfit) / monthlyExpenseForProfit) * 100;
+            } else if (monthlyIncome > 0) {
+                monthlyProfit = 100; // Or Infinity, 100 is more readable
             }
 
-            const platformSummary = filteredTransactions.reduce((acc, t) => {
-                const platform = t.platform || 'ไม่ระบุ';
-                acc[platform] = (acc[platform] || 0) + t.amount;
-                return acc;
-            }, {});
-            
-            // Sort summary by amount descending
-            const sortedPlatforms = Object.entries(platformSummary).sort(([, a], [, b]) => b - a);
+            let overallProfit = 0;
+            if (totalExpenseForProfit > 0) {
+                overallProfit = ((totalIncome - totalExpenseForProfit) / totalExpenseForProfit) * 100;
+            } else if (totalIncome > 0) {
+                overallProfit = 100;
+            }
 
-            sortedPlatforms.forEach(([platform, amount]) => {
-                const platformColor = getPlatformColor(platform); // Reuse existing color logic
-                const item = document.createElement('li');
-                item.classList.add('p-3', 'border', 'rounded-xl', 'flex', 'justify-between', 'items-center', 'shadow-sm', 'bg-white', 'hover:bg-red-50', 'transition'); // Use hover-red for expense
-                item.innerHTML = `
-                    <div class="font-semibold ${platformColor}">${platform}</div>
-                    <div class="font-bold text-lg text-red-600">฿${formatMoney(amount)}</div>
-                `;
-                platformExpenseSummaryListEl.appendChild(item);
-            });
+            // --- DOM Updates ---
+            stickyTotalBalanceEl.textContent = `฿${formatMoney(totalBalance)}`;
+            stickyTotalBalanceEl.classList.toggle('text-green-400', totalBalance >= 0);
+            stickyTotalBalanceEl.classList.toggle('text-red-400', totalBalance < 0);
+
+            const monthYearText = getFormattedMonthAndYear(filterYearInput.value, filterMonthInput.value);
+            stickyMonthlyProfitLabelEl.textContent = `กำไร ${monthYearText}`;
+            stickyMonthlyProfitEl.textContent = `${monthlyProfit.toFixed(2)}%`;
+            stickyMonthlyProfitEl.classList.toggle('text-green-400', monthlyProfit >= 0);
+            stickyMonthlyProfitEl.classList.toggle('text-red-400', monthlyProfit < 0);
+
+            stickyOverallProfitEl.textContent = `${overallProfit.toFixed(2)}%`;
+            stickyOverallProfitEl.classList.toggle('text-green-400', overallProfit >= 0);
+            stickyOverallProfitEl.classList.toggle('text-red-400', overallProfit < 0);
+
+            stickySummaryPanel.classList.add('visible');
         }
-        
+
         function updateUI() {
-            // Re-populate filters (now separate) and render based on the current (newly loaded) transactions state
-            populateYearFilter(); 
-            populateMonthFilter();
-            render();
-            renderPlatformSummary(); // Call platform income summary render
-            renderPlatformExpenseSummary(); // NEW: Call platform expense summary render
-            updatePlatformOptions(); // Ensure form inputs are in the correct initial state
-        }
-
-        function render() {
-            const selectedYear = filterYearInput.value;
-            const selectedMonth = filterMonthInput.value;
-            const selectedMonthYear = `${selectedYear}-${selectedMonth}`;
-
-            if (!selectedMonthYear) {
-                 transactionListEl.innerHTML = '<li class="text-center text-gray-500 py-4">ยังไม่มีรายการ...</li>';
-                 updateValues([]); 
-                 return;
-            }
-
-            // Filter using the YYYY-MM string
-            const filteredTransactions = transactions.filter(t => t.date.startsWith(selectedMonthYear));
-            
-            // Sort by date ascending (Oldest first/FIFO)
-            filteredTransactions.sort((a, b) => new Date(a.date) - new Date(b.date));
-            
+            populateFilters();
+            const filtered = getFilteredTransactions();
+            filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
             transactionListEl.innerHTML = '';
-            if (filteredTransactions.length === 0) {
+            if (filtered.length === 0) {
                  transactionListEl.innerHTML = '<li class="text-center text-gray-500 py-4">ไม่พบรายการในเดือนที่เลือก...</li>';
             } else {
-                 filteredTransactions.forEach(addTransactionDOM);
+                 filtered.forEach(addTransactionDOM);
             }
-            updateValues(filteredTransactions);
+            updateValues(filtered);
+            renderSummaries(filtered);
+            updatePlatformOptions();
+            updateStickyPanel(); // Main call to update the panel
         }
 
-        function renderMonthlySummary() {
-            // ฟังก์ชันนี้ถูกคอมเมนต์ใน updateUI() แล้ว และส่วน HTML ถูกซ่อนไว้
-        }
-
-        /**
-         * Initial load function: Always tries to sync with Google Sheet.
-         * Falls back to Local Storage if sheet sync fails.
-         * @param {boolean} isInitialLoad - Flag to determine if this is the very first load.
-         */
+        // --- Initial Load ---
         async function init(isInitialLoad = true) {
-            
-            // 1. Initialize Date Input Dropdowns
+            if (isInitialLoad) loadingOverlay.style.display = 'flex';
             initializeDateDropdowns();
-
-            // 2. Load cached data and render UI instantly (non-blocking)
-            const cachedTransactions = JSON.parse(localStorage.getItem('transactions_cache'));
-            if (cachedTransactions) {
-                transactions = cachedTransactions.map(t => ({
-                    ...t, 
-                    amount: parseFloat(t.amount) || 0
-                })); 
+            const cached = JSON.parse(localStorage.getItem('transactions_cache'));
+            if (cached) {
+                transactions = cached.map(t => ({...t, amount: parseFloat(t.amount) || 0})); 
                 updateUI();
             }
-            
             try {
-                // Try to get fresh data from Google Sheet
                 const response = await callGoogleScript('getData');
-                
-                // Process data from sheet: ensure amount is float and set as source of truth
-                const sheetData = (response.data || []).map(t => ({
-                    ...t, 
-                    amount: parseFloat(t.amount) || 0 
-                }));
-
-                transactions = sheetData; 
-                updateLocalStorage(); // Update cache with fresh data
-
+                transactions = (response.data || []).map(t => ({...t, amount: parseFloat(t.amount) || 0 })); 
+                updateLocalStorage();
             } catch (error) {
-                console.error("Could not sync with Google Sheet on initial load. Using cached data.", error);
-                // แก้ไขข้อความแจ้งเตือนให้ชัดเจนขึ้นเมื่อเกิดข้อผิดพลาดในการโหลดชีท
-                const errorMessage = error.message || "Unknown error occurred.";
-                if (transactions.length === 0) {
-                    showMessage(`ไม่สามารถโหลดข้อมูลล่าสุดจาก Google Sheet ได้ (Error: ${errorMessage}) โปรดตรวจสอบว่าคุณได้ Deploy โค้ด Google Apps Script ล่าสุดแล้ว`);
-                } else if (isInitialLoad) {
-                    // Show error but don't force immediate action if cached data is present
-                    console.warn(`แสดงข้อมูลสำรองล่าสุดในเครื่อง เนื่องจากเกิดข้อผิดพลาดในการเชื่อมต่อ Google Sheet (Error: ${errorMessage})`);
-                }
+                console.error("Could not sync with Google Sheet.", error);
+                if (isInitialLoad && !cached) showMessage(`ไม่สามารถโหลดข้อมูลได้: ${error.message}`);
             } finally {
-                // Re-render the UI based on the final 'transactions' state (either fresh or cached)
                 updateUI();
-                updateStickyBalance(); // Update the sticky balance on every full init
+                if (isInitialLoad) loadingOverlay.style.display = 'none';
             }
         }
 
         // --- Event Listeners ---
         form.addEventListener('submit', addTransaction);
-        // Change filter events call updateUI to ensure all elements (list + summary) refresh correctly
         filterYearInput.addEventListener('change', updateUI); 
         filterMonthInput.addEventListener('change', updateUI); 
-        typeInput.addEventListener('change', updatePlatformOptions); // This now handles enabling/disabling platform
-        
-        // Export removeTransaction to global scope for use in inline onclick (DOM)
+        typeInput.addEventListener('change', updatePlatformOptions);
         window.removeTransaction = removeTransaction;
 
-        // Start App
         init();
     </script>
 </body>
 </html>
+
 
