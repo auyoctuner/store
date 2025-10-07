@@ -46,6 +46,10 @@
             width: 100%;
         }
         /* CSS for showing/hiding the new sticky panel */
+        #sticky-summary-panel {
+            transform: translateX(calc(100% - 0.75px)); /* Show an extremely tiny 0.75px handle */
+            cursor: pointer;
+        }
         #sticky-summary-panel.visible {
             transform: translateX(0); /* Slides the panel into view */
         }
@@ -193,7 +197,7 @@
     </div>
 
     <!-- NEW: Sticky Summary Panel (Replaces old badge) -->
-    <div id="sticky-summary-panel" class="fixed top-4 right-4 bg-gray-800 text-white shadow-lg z-40 rounded-xl p-3 w-auto transform translate-x-full transition-transform duration-300 ease-in-out">
+    <div id="sticky-summary-panel" class="fixed top-4 right-4 bg-gray-800 text-white shadow-lg z-40 rounded-xl p-3 w-auto transform transition-transform duration-300 ease-in-out">
         <div class="space-y-1 text-right">
             <div>
                 <span class="block text-xs text-gray-400">ยอดเงินคงเหลือ</span>
@@ -532,35 +536,19 @@
             }
 
             // --- Calculations ---
-
-            // 1. Balance Calculation (includes ALL income and expenses)
             const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
             const totalExpense = transactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
             const totalBalance = totalIncome - totalExpense;
-
-            // 2. Profit Calculation (excludes 'Employee Salary' from expenses)
             const filtered = getFilteredTransactions();
-            
-            // Income for the filtered period
             const monthlyIncome = filtered.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
-            
-            // Expenses for the filtered period (excluding salary)
-            const monthlyExpenseForProfit = filtered
-                .filter(t => t.type === 'expense' && t.platform !== 'เงินเดือนพนักงาน')
-                .reduce((acc, t) => acc + t.amount, 0);
-
-            // Total expenses of all time (excluding salary)
-            const totalExpenseForProfit = transactions
-                .filter(t => t.type === 'expense' && t.platform !== 'เงินเดือนพนักงาน')
-                .reduce((acc, t) => acc + t.amount, 0);
-            
+            const monthlyExpenseForProfit = filtered.filter(t => t.type === 'expense' && t.platform !== 'เงินเดือนพนักงาน').reduce((acc, t) => acc + t.amount, 0);
+            const totalExpenseForProfit = transactions.filter(t => t.type === 'expense' && t.platform !== 'เงินเดือนพนักงาน').reduce((acc, t) => acc + t.amount, 0);
             let monthlyProfit = 0;
             if (monthlyExpenseForProfit > 0) {
                 monthlyProfit = ((monthlyIncome - monthlyExpenseForProfit) / monthlyExpenseForProfit) * 100;
             } else if (monthlyIncome > 0) {
-                monthlyProfit = 100; // Or Infinity, 100 is more readable
+                monthlyProfit = 100;
             }
-
             let overallProfit = 0;
             if (totalExpenseForProfit > 0) {
                 overallProfit = ((totalIncome - totalExpenseForProfit) / totalExpenseForProfit) * 100;
@@ -572,18 +560,14 @@
             stickyTotalBalanceEl.textContent = `฿${formatMoney(totalBalance)}`;
             stickyTotalBalanceEl.classList.toggle('text-green-400', totalBalance >= 0);
             stickyTotalBalanceEl.classList.toggle('text-red-400', totalBalance < 0);
-
             const monthYearText = getFormattedMonthAndYear(filterYearInput.value, filterMonthInput.value);
             stickyMonthlyProfitLabelEl.textContent = `กำไร ${monthYearText}`;
             stickyMonthlyProfitEl.textContent = `${monthlyProfit.toFixed(2)}%`;
             stickyMonthlyProfitEl.classList.toggle('text-green-400', monthlyProfit >= 0);
             stickyMonthlyProfitEl.classList.toggle('text-red-400', monthlyProfit < 0);
-
             stickyOverallProfitEl.textContent = `${overallProfit.toFixed(2)}%`;
             stickyOverallProfitEl.classList.toggle('text-green-400', overallProfit >= 0);
             stickyOverallProfitEl.classList.toggle('text-red-400', overallProfit < 0);
-
-            stickySummaryPanel.classList.add('visible');
         }
 
         function updateUI() {
@@ -631,9 +615,17 @@
         typeInput.addEventListener('change', updatePlatformOptions);
         window.removeTransaction = removeTransaction;
 
+        stickySummaryPanel.addEventListener('click', () => {
+            stickySummaryPanel.classList.toggle('visible');
+        });
+
         init();
     </script>
 </body>
 </html>
+
+
+
+
 
 
