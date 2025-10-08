@@ -666,7 +666,6 @@
 
         // --- Initial Load ---
         async function init(isInitialLoad = true) {
-            if (isInitialLoad) loadingOverlay.style.display = 'flex';
             initializeDateDropdowns();
             const cached = JSON.parse(localStorage.getItem('transactions_cache'));
             if (cached) {
@@ -720,5 +719,4 @@
     </script>
 </body>
 </html>
-
 
