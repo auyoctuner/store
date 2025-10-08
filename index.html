@@ -277,7 +277,8 @@
         const modalCloseBtn = document.getElementById('modal-close-btn');
         const confirmModal = document.getElementById('confirm-modal');
         const confirmMessageEl = document.getElementById('confirm-message');
-        const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+        // FIX: Changed confirmCancelBtn from const to let for consistency
+        let confirmCancelBtn = document.getElementById('confirm-cancel-btn');
         let confirmOkBtn = document.getElementById('confirm-ok-btn');
 
         // Search Modal Elements
@@ -316,20 +317,25 @@
             customModal.classList.remove('hidden');
         }
 
+        // FIX: Rewrote showConfirm to prevent event listener issues and errors.
         function showConfirm(message, onConfirm) {
             confirmMessageEl.textContent = message;
             confirmModal.classList.remove('hidden');
+
+            // By cloning and replacing the buttons, we remove any previously attached event listeners.
+            // This is a robust way to prevent listeners from stacking up and causing errors.
             const newConfirmOkBtn = confirmOkBtn.cloneNode(true);
             confirmOkBtn.parentNode.replaceChild(newConfirmOkBtn, confirmOkBtn);
-            confirmOkBtn = newConfirmOkBtn;
+            confirmOkBtn = newConfirmOkBtn; // Update the global reference to the new button.
 
             const newConfirmCancelBtn = confirmCancelBtn.cloneNode(true);
             confirmCancelBtn.parentNode.replaceChild(newConfirmCancelBtn, confirmCancelBtn);
+            confirmCancelBtn = newConfirmCancelBtn; // Update the global reference to the new button.
 
             const closeConfirm = () => confirmModal.classList.add('hidden');
 
             confirmOkBtn.onclick = () => { closeConfirm(); onConfirm(true); };
-            newConfirmCancelBtn.onclick = () => { closeConfirm(); onConfirm(false); };
+            confirmCancelBtn.onclick = () => { closeConfirm(); onConfirm(false); };
         }
         modalCloseBtn.addEventListener('click', () => customModal.classList.add('hidden'));
 
@@ -472,30 +478,28 @@
             });
         }
 
-        // --- NEW: Function to handle checkbox state change ---
+        // --- REVISED: Function to handle checkbox state change without confirmation ---
         function toggleReceivedStatus(checkbox, id) {
-            const receivedDate = checkbox.checked ? new Date().toISOString().split('T')[0] : '';
+            const isReceiving = checkbox.checked;
+            const receivedDate = isReceiving ? new Date().toISOString().split('T')[0] : '';
 
-            const originalTransaction = transactions.find(t => t.id === id);
-            const originalReceivedDate = originalTransaction ? originalTransaction.receiveddate : '';
+            const transactionToUpdate = transactions.find(t => t.id === id);
+            if (!transactionToUpdate) return;
+            const originalReceivedDate = transactionToUpdate.receiveddate;
 
-            // Optimistic UI Update
-            if (originalTransaction) {
-                originalTransaction.receiveddate = receivedDate;
-            }
-            updateLocalStorage(); // Save change to local cache
+            // Optimistic UI Update: Apply the change immediately for a responsive feel
+            transactionToUpdate.receiveddate = receivedDate;
+            updateLocalStorage();
             updateUI();
 
             // Call backend to save the change
             callGoogleScript('updateReceivedStatus', { id, receivedDate })
                 .catch(error => {
-                    // If the backend call fails, show an error and revert the UI.
+                    // If backend fails, revert the change and show an error message
                     showMessage('ไม่สามารถอัปเดตสถานะได้: ' + error.message);
-                    if (originalTransaction) {
-                        originalTransaction.receiveddate = originalReceivedDate; // Revert to original state
-                    }
+                    transactionToUpdate.receiveddate = originalReceivedDate; // Revert to original value
                     updateLocalStorage();
-                    updateUI(); // Re-render again to show the reverted state
+                    updateUI(); // Re-render to show the reverted state
                 });
         }
 
@@ -541,11 +545,29 @@
             const receivedDateStr = transaction.receiveddate ? parseLocalDate(transaction.receiveddate).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
             const isChecked = transaction.receiveddate ? 'checked' : '';
 
+            // --- NEW: Shipping duration logic ---
+            let shippingDurationText = '';
+            if (transaction.receiveddate) {
+                const orderDate = parseLocalDate(transaction.date);
+                const receivedDate = parseLocalDate(transaction.receiveddate);
+                const timeDiff = receivedDate.getTime() - orderDate.getTime();
+                const dayDiff = Math.round(timeDiff / (1000 * 3600 * 24));
+                
+                if (dayDiff < 0) {
+                  // In case of bad data, don't show anything
+                } else if (dayDiff === 0) {
+                    shippingDurationText = ' (ใช้เวลาจัดส่งภายในวันเดียว)';
+                } else {
+                    shippingDurationText = ` (ใช้เวลาจัดส่ง ${dayDiff} วัน)`;
+                }
+            }
+            // --- End of new logic ---
+
             const checkboxHTML = isOrder ? `
                 <div class="mt-3 pt-3 border-t border-gray-200">
                     <label class="inline-flex items-center space-x-2 cursor-pointer">
                         <input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" onchange="toggleReceivedStatus(this, '${transaction.id}')" ${isChecked}>
-                        <span class="text-sm text-gray-700">ได้รับสินค้าแล้ว ${receivedDateStr ? `<span class="font-semibold text-green-600">(${receivedDateStr})</span>` : ''}</span>
+                        <span class="text-sm text-gray-700">ได้รับสินค้าแล้ว ${receivedDateStr ? `<span class="font-semibold text-green-600">(${receivedDateStr})</span><span class="text-gray-500">${shippingDurationText}</span>` : ''}</span>
                     </label>
                 </div>
             ` : '';
@@ -578,36 +600,58 @@
             const localDate = parseLocalDate(transaction.date);
             const displayDate = localDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
 
-            // --- NEW: Status logic for search results ---
+            // --- REVISED: Replicate checkbox logic from the main list for search results ---
             const isOrder = transaction.platform === 'สั่งซื้อสินค้า';
-            let statusHTML = '';
-            if (isOrder) {
-                if (transaction.receiveddate) {
-                    const receivedDateStr = parseLocalDate(transaction.receiveddate).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
-                    statusHTML = `<span class="text-xs font-semibold text-green-600 bg-green-100 px-2 py-1 rounded-full">ได้รับสินค้าแล้ว (${receivedDateStr})</span>`;
+            const receivedDateStr = transaction.receiveddate ? parseLocalDate(transaction.receiveddate).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
+            const isChecked = transaction.receiveddate ? 'checked' : '';
+
+            // --- NEW: Shipping duration logic ---
+            let shippingDurationText = '';
+            if (transaction.receiveddate) {
+                const orderDate = parseLocalDate(transaction.date);
+                const receivedDate = parseLocalDate(transaction.receiveddate);
+                const timeDiff = receivedDate.getTime() - orderDate.getTime();
+                const dayDiff = Math.round(timeDiff / (1000 * 3600 * 24));
+                
+                if (dayDiff < 0) {
+                  // In case of bad data, don't show anything
+                } else if (dayDiff === 0) {
+                    shippingDurationText = ' (ใช้เวลาจัดส่งภายในวันเดียว)';
                 } else {
-                    statusHTML = `<span class="text-xs font-semibold text-gray-700 bg-gray-200 px-2 py-1 rounded-full">ยังไม่ได้รับสินค้า</span>`;
+                    shippingDurationText = ` (ใช้เวลาจัดส่ง ${dayDiff} วัน)`;
                 }
             }
             // --- End of new logic ---
 
-            item.className = `p-3 border rounded-lg flex flex-col transition duration-200 space-y-1 bg-gray-50`;
+            const statusCheckboxHTML = isOrder ? `
+                <div class="mt-3 pt-3 border-t border-gray-200">
+                    <label class="inline-flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" onchange="toggleReceivedStatus(this, '${transaction.id}')" ${isChecked}>
+                        <span class="text-sm text-gray-700">ได้รับสินค้าแล้ว ${receivedDateStr ? `<span class="font-semibold text-green-600">(${receivedDateStr})</span><span class="text-gray-500">${shippingDurationText}</span>` : ''}</span>
+                    </label>
+                </div>
+            ` : '';
+            // --- End of revised logic ---
+
+            item.className = `p-3 border rounded-lg flex flex-col transition duration-200 bg-gray-50`;
             item.innerHTML = `
-                <div class="flex justify-between items-start w-full">
-                    <div class="flex-grow">
-                        <div class="font-bold text-gray-800 text-base">${transaction.description}</div>
-                        <div class="text-sm text-gray-500 mt-1">
-                            <span>${displayDate}</span> |
-                            <span class="${getPlatformColor(transaction.platform)} font-semibold">${transaction.platform}</span>
+                <div>
+                    <div class="flex justify-between items-start w-full">
+                        <div class="flex-grow">
+                            <div class="font-bold text-gray-800 text-base">${transaction.description}</div>
+                            <div class="text-sm text-gray-500 mt-1">
+                                <span>${displayDate}</span> |
+                                <span class="${getPlatformColor(transaction.platform)} font-semibold">${transaction.platform}</span>
+                            </div>
+                        </div>
+                        <div class="text-right flex-shrink-0 ml-4">
+                            <div class="font-bold text-lg ${isIncome ? 'text-green-600' : 'text-red-600'}">
+                                ${isIncome ? '+' : '-'}฿${formatMoney(transaction.amount)}
+                            </div>
                         </div>
                     </div>
-                    <div class="text-right flex-shrink-0 ml-4">
-                         <div class="font-bold text-lg ${isIncome ? 'text-green-600' : 'text-red-600'}">
-                            ${isIncome ? '+' : '-'}฿${formatMoney(transaction.amount)}
-                        </div>
-                        <div class="mt-1">${statusHTML}</div>
-                    </div>
-                </div>`;
+                </div>
+                ${statusCheckboxHTML}`; // Append the interactive checkbox HTML here
             searchResultsList.appendChild(item);
         }
 
@@ -791,7 +835,6 @@
     </script>
 </body>
 </html>
-
 
 
 
