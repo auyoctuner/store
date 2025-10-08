@@ -1,183 +1,837 @@
-/**
- * @license
- * Copyright 2024 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แอปรายรับ-รายจ่าย Shopee & Lazada</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+        }
+        .summary-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        #saving-indicator {
+            display: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: none; /* Controlled by JS */
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            font-size: 1.2rem;
+            color: #4a5568;
+        }
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .modal {
+             transition: opacity 0.3s ease-in-out;
+        }
+        .input-full-width {
+            width: 100%;
+        }
+        #sticky-summary-panel {
+            transform: translateX(calc(100% - 0.75px));
+            cursor: pointer;
+        }
+        #sticky-summary-panel.visible {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
 
-// ================================= CONFIGURATION =================================
-const SHEET_ID = "1PHtLUtMEYmOLzLYPGxjesMPDtTj3l4DRpsUZUGtHdqg";
-const SHEET_NAME = "Transactions";
-// =================================================================================
+    <div id="loading-overlay">
+        <span>กำลังโหลดข้อมูล...</span>
+    </div>
 
-/**
- * Main entry point for all GET requests.
- */
-function doGet(e) {
-  const params = e.parameter;
-  const action = params.action;
-  const callback = params.callback;
-  let result = {};
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-700">รายรับ-รายจ่าย</h1>
+            <p class="text-md text-gray-500 mt-2">บันทึกรายรับ-รายจ่ายสำหรับ Shopee, Lazada และอื่นๆ</p>
+        </header>
 
-  try {
-    const lock = LockService.getScriptLock();
-    lock.waitLock(30000);
+        <!-- Transaction List -->
+        <section class="bg-white p-6 rounded-xl shadow-md mb-8">
+             <div class="flex flex-col md:flex-row justify-between items-center mb-4 border-b pb-4">
+                 <h2 class="text-2xl font-bold mb-4 md:mb-0">ประวัติรายการ</h2>
+                 <div class="flex flex-wrap items-center gap-2 md:gap-4">
+                     <div class="flex items-center gap-2">
+                         <label for="filter-month" class="text-base font-medium text-gray-700">เดือน:</label>
+                         <select id="filter-month" class="border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base p-3 input-full-width"></select>
+                     </div>
+                     <div class="flex items-center gap-2">
+                         <label for="filter-year" class="text-base font-medium text-gray-700">ปี:</label>
+                         <select id="filter-year" class="border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base p-3 input-full-width"></select>
+                     </div>
+                 </div>
+             </div>
+             <ul id="transaction-list" class="space-y-3">
+                  <li class="text-center text-gray-500 py-4">ยังไม่มีรายการ...</li>
+             </ul>
+        </section>
 
-    try {
-      switch (action) {
-        case 'addData':
-          result = addData(params);
-          break;
-        case 'getData':
-          result = getData();
-          break;
-        case 'deleteData':
-          result = deleteData(params);
-          break;
-        case 'updateReceivedStatus':
-          result = updateReceivedStatus(params);
-          break;
-        default:
-          throw new Error("Invalid action specified.");
-      }
-      result.status = 'success';
-    } finally {
-      lock.releaseLock();
-    }
-  } catch (err) {
-    result.status = 'error';
-    result.message = err.message;
-  }
+        <!-- Transaction Form -->
+        <section class="bg-white p-6 rounded-xl shadow-md mb-8">
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                 <h2 class="text-2xl font-bold">เพิ่มรายการใหม่</h2>
+                 <span id="saving-indicator" class="text-sm text-gray-500 opacity-0">กำลังบันทึก...</span>
+            </div>
+            <form id="transaction-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+                <div class="col-span-1 lg:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700">วันที่</label>
+                    <div class="flex space-x-2 mt-1">
+                        <select id="dayInput" class="block w-1/4 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base p-3" required></select>
+                        <select id="monthInput" class="block w-1/3 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base p-3" required></select>
+                        <select id="yearInput" class="block w-1/3 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base p-3" required></select>
+                    </div>
+                </div>
+                <div>
+                    <label for="type" class="block text-sm font-medium text-gray-700">ประเภท</label>
+                    <select id="type" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required>
+                        <option value="" disabled selected>-- เลือกประเภท --</option>
+                        <option value="income">รายรับ</option>
+                        <option value="expense">รายจ่าย</option>
+                    </select>
+                </div>
+                 <div>
+                    <label for="platform" class="block text-sm font-medium text-gray-700">ตัวเลือก</label>
+                    <select id="platform" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" disabled>
+                        <option value="" disabled selected>-- เลือกธุรกรรม --</option>
+                        <option value="Shopee">Shopee</option>
+                        <option value="Lazada(Auy)">Lazada(Auy)</option>
+                        <option value="Lazada(Aom)">Lazada(Aom)</option>
+                        <option value="สั่งซื้อสินค้า">สั่งซื้อสินค้า</option>
+                        <option value="เงินเดือนพนักงาน" class="expense-only">เงินเดือนพนักงาน</option>
+                    </select>
+                </div>
+                <div class="hidden lg:block lg:col-span-1"></div>
+                <div class="lg:col-span-2">
+                    <label for="description" class="block text-sm font-medium text-gray-700">รายการ</label>
+                    <input type="text" id="description" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2">
+                </div>
+                <div class="lg:col-span-1">
+                    <label for="amount" class="block text-sm font-medium text-gray-700">จำนวนเงิน</label>
+                    <input type="number" step="0.01" id="amount" placeholder="0.00" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2" required>
+                </div>
+                <button id="add-transaction-btn" type="submit" class="w-full md:w-auto lg:col-start-4 lg:col-span-2 bg-indigo-600 text-white py-2 px-4 rounded-lg shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    เพิ่มรายการ
+                </button>
+            </form>
+        </section>
 
-  return ContentService.createTextOutput(`${callback}(${JSON.stringify(result)})`)
-    .setMimeType(ContentService.MimeType.JAVASCRIPT);
-}
+        <!-- Summary Cards -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="summary-card bg-green-100 p-6 rounded-xl shadow-md text-center">
+                <h2 id="income-title" class="text-lg font-semibold text-green-800">รายรับ</h2>
+                <p id="total-income" class="text-2xl font-bold text-green-600 mt-2">฿0.00</p>
+            </div>
+            <div class="summary-card bg-red-100 p-6 rounded-xl shadow-md text-center">
+                <h2 id="expense-title" class="text-lg font-semibold text-red-800">รายจ่าย</h2>
+                <p id="total-expense" class="text-2xl font-bold text-red-600 mt-2">฿0.00</p>
+            </div>
+            <div class="summary-card bg-blue-100 p-6 rounded-xl shadow-md text-center">
+                <h2 id="balance-title" class="text-lg font-semibold text-blue-800">คงเหลือ</h2>
+                <p id="balance" class="text-2xl font-bold text-blue-600 mt-2">฿0.00</p>
+            </div>
+        </section>
 
-function getSheet() {
-  try {
-    const ss = SpreadsheetApp.openById(SHEET_ID);
-    return ss.getSheetByName(SHEET_NAME) || ss.getSheets()[0];
-  } catch (e) {
-    throw new Error("Could not open the spreadsheet. Please check SHEET_ID.");
-  }
-}
+        <!-- Platform Income Summary -->
+        <section id="platform-summary-section" class="bg-white p-6 rounded-xl shadow-md mb-8">
+            <h2 id="platform-summary-title" class="text-2xl font-bold mb-4 border-b pb-2 text-green-700">สรุปรายรับ</h2>
+            <ul id="platform-summary-list" class="space-y-4">
+                 <li class="text-center text-gray-500 py-4">ยังไม่มีข้อมูลรายรับ...</li>
+            </ul>
+        </section>
 
-/**
- * Adds a new row and sorts the sheet.
- */
-function addData(params) {
-  const sheet = getSheet();
-  const newRow = [
-    params.id,
-    new Date(params.date),
-    params.type,
-    params.platform,
-    params.description,
-    parseFloat(params.amount),
-    '' // Placeholder for ReceivedDate
-  ];
-  sheet.appendRow(newRow);
+        <!-- Platform Expense Summary -->
+        <section id="platform-expense-summary-section" class="bg-white p-6 rounded-xl shadow-md">
+            <h2 id="platform-expense-summary-title" class="text-2xl font-bold mb-4 border-b pb-2 text-red-700">สรุปรายจ่าย</h2>
+            <ul id="platform-expense-summary-list" class="space-y-4">
+                 <li class="text-center text-gray-500 py-4">ยังไม่มีข้อมูลรายจ่าย...</li>
+            </ul>
+        </section>
 
-  if (sheet.getLastRow() > 1) {
-    const range = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn());
-    range.sort({ column: 2, ascending: true });
-  }
+    </div>
 
-  SpreadsheetApp.flush();
-  return { message: 'Data added and sorted.' };
-}
+    <!-- Modals -->
+    <div id="custom-modal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full transform transition-all duration-300 scale-100">
+            <div class="p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">แจ้งเตือน</h3>
+                <p id="modal-message" class="text-gray-700 mb-6"></p>
+                <div class="flex justify-end">
+                    <button id="modal-close-btn" class="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-150">ตกลง</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="confirm-modal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full transform transition-all duration-300 scale-100">
+            <div class="p-6">
+                <h3 class="text-xl font-bold text-red-700 mb-4">ยืนยันการดำเนินการ</h3>
+                <p id="confirm-message" class="text-gray-700 mb-6"></p>
+                <div class="flex justify-end space-x-3">
+                    <button id="confirm-cancel-btn" class="bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition duration-150">ยกเลิก</button>
+                    <button id="confirm-ok-btn" class="bg-red-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-700 transition duration-150">ยืนยัน</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-/**
- * Retrieves all data from the sheet.
- */
-function getData() {
-  const sheet = getSheet();
-  const allData = sheet.getDataRange().getValues();
+    <!-- Search Modal -->
+    <div id="search-modal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-start justify-center z-50 p-4 pt-16">
+        <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full transform transition-all duration-300 scale-100">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">ค้นหาประวัติรายการ</h3>
+                    <button id="search-modal-close-btn" class="text-gray-400 hover:text-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <input type="text" id="search-input" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3 mb-4">
+                <ul id="search-results-list" class="space-y-3 max-h-96 overflow-y-auto">
+                    <!-- Search results will be injected here -->
+                </ul>
+            </div>
+        </div>
+    </div>
 
-  if (allData.length < 2) {
-    return { data: [] };
-  }
-
-  const headers = allData.shift().map(h => String(h).toLowerCase().trim());
-  const dateColumnIndex = headers.indexOf('date');
-  const receivedDateColumnIndex = headers.indexOf('receiveddate');
-
-  const jsonData = allData.map(row => {
-    let obj = {};
-    headers.forEach((header, i) => {
-      let value = row[i];
-      if ((i === dateColumnIndex || i === receivedDateColumnIndex) && value instanceof Date) {
-        value = `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(value.getDate()).padStart(2, '0')}`;
-      }
-      obj[header] = (header === 'amount') ? parseFloat(value) : value;
-    });
-    return obj;
-  });
-
-  return { data: jsonData };
-}
+    <!-- Floating Search Button -->
+    <button id="search-fab" class="fixed bottom-6 right-6 bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition z-40">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+    </button>
 
 
-/**
- * Deletes a row by its unique ID.
- */
-function deleteData(params) {
-  const sheet = getSheet();
-  const idToDelete = params.id;
+    <!-- Sticky Summary Panel -->
+    <div id="sticky-summary-panel" class="fixed top-4 right-4 bg-gray-800 text-white shadow-lg z-40 rounded-xl p-3 w-auto transform transition-transform duration-300 ease-in-out">
+        <div class="space-y-1 text-right">
+            <div>
+                <span class="block text-xs text-gray-400">ยอดเงินคงเหลือ</span>
+                <span id="sticky-total-balance" class="font-bold text-xl">฿0.00</span>
+            </div>
+            <hr class="border-gray-600 my-1">
+            <div>
+                <span id="sticky-monthly-profit-label" class="block text-xs text-gray-400">กำไร (เดือนปัจจุบัน)</span>
+                <span id="sticky-monthly-profit" class="font-semibold text-base">0.00%</span>
+            </div>
+            <div>
+                <span id="sticky-overall-profit-label" class="block text-xs text-gray-400">กำไร (ทั้งหมด)</span>
+                <span id="sticky-overall-profit" class="font-semibold text-base">0.00%</span>
+            </div>
+        </div>
+    </div>
 
-  if (!idToDelete) throw new Error('No ID provided for deletion.');
+    <script>
+        // Configuration
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw9ImlQQ860LcJNjojx6XCJB7ohJz0SC13ZeE_UblzoAdeRNRqk7tLVD71DazRgCaA6vg/exec";
+        const SHEET_ID = "1PHtLUtMEYmOLzLYPGxjesMPDtTj3l4DRpsUZUGtHdqg";
 
-  const idColumnValues = sheet.getRange(1, 1, sheet.getLastRow(), 1).getValues();
-  const rowIndexToDelete = idColumnValues.findIndex(row => row[0] && row[0].toString() === idToDelete.toString());
+        // DOM Elements
+        const balanceEl = document.getElementById('balance');
+        const totalIncomeEl = document.getElementById('total-income');
+        const totalExpenseEl = document.getElementById('total-expense');
+        const transactionListEl = document.getElementById('transaction-list');
+        const form = document.getElementById('transaction-form');
+        const dayInput = document.getElementById('dayInput');
+        const monthInput = document.getElementById('monthInput');
+        const yearInput = document.getElementById('yearInput');
+        const typeInput = document.getElementById('type');
+        const platformInput = document.getElementById('platform');
+        const descriptionInput = document.getElementById('description');
+        const amountInput = document.getElementById('amount');
+        const filterYearInput = document.getElementById('filter-year');
+        const filterMonthInput = document.getElementById('filter-month');
+        const platformSummaryListEl = document.getElementById('platform-summary-list');
+        const platformSummaryTitleEl = document.getElementById('platform-summary-title');
+        const platformExpenseSummaryListEl = document.getElementById('platform-expense-summary-list');
+        const platformExpenseSummaryTitleEl = document.getElementById('platform-expense-summary-title');
+        const savingIndicator = document.getElementById('saving-indicator');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const addTransactionBtn = document.getElementById('add-transaction-btn');
+        const incomeTitleEl = document.getElementById('income-title');
+        const expenseTitleEl = document.getElementById('expense-title');
+        const balanceTitleEl = document.getElementById('balance-title');
+        const customModal = document.getElementById('custom-modal');
+        const modalMessageEl = document.getElementById('modal-message');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+        const confirmModal = document.getElementById('confirm-modal');
+        const confirmMessageEl = document.getElementById('confirm-message');
+        // FIX: Changed confirmCancelBtn from const to let for consistency
+        let confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+        let confirmOkBtn = document.getElementById('confirm-ok-btn');
 
-  if (rowIndexToDelete > -1) {
-    sheet.deleteRow(rowIndexToDelete + 1);
-    return { message: 'Data deleted.' };
-  } else {
-    return { message: 'Data not found.' };
-  }
-}
+        // Search Modal Elements
+        const searchFab = document.getElementById('search-fab');
+        const searchModal = document.getElementById('search-modal');
+        const searchModalCloseBtn = document.getElementById('search-modal-close-btn');
+        const searchInput = document.getElementById('search-input');
+        const searchResultsList = document.getElementById('search-results-list');
 
-/**
- * Updates the received date for a specific transaction ID.
- */
-function updateReceivedStatus(params) {
-  const sheet = getSheet();
-  const idToUpdate = params.id;
-  const receivedDateStr = params.receivedDate;
+        // Sticky Panel Elements
+        const stickySummaryPanel = document.getElementById('sticky-summary-panel');
+        const stickyTotalBalanceEl = document.getElementById('sticky-total-balance');
+        const stickyMonthlyProfitLabelEl = document.getElementById('sticky-monthly-profit-label');
+        const stickyMonthlyProfitEl = document.getElementById('sticky-monthly-profit');
+        const stickyOverallProfitLabelEl = document.getElementById('sticky-overall-profit-label');
+        const stickyOverallProfitEl = document.getElementById('sticky-overall-profit');
 
-  if (!idToUpdate) throw new Error('No ID provided for updating.');
-  
-  const idColumnValues = sheet.getRange(1, 1, sheet.getLastRow(), 1).getValues();
-  const rowToUpdate = idColumnValues.findIndex(row => row[0] && row[0].toString() === idToUpdate.toString()) + 1;
+        // State
+        let transactions = [];
 
-  if (rowToUpdate > 0) {
-    // Assuming 'ReceivedDate' is the 7th column (G)
-    const cell = sheet.getRange(rowToUpdate, 7);
-    
-    // FIX: Use clearContent() for empty dates to prevent Sheets from defaulting to FALSE.
-    if (receivedDateStr && receivedDateStr.length > 0) {
-      // If a date is provided, set the value.
-      cell.setValue(new Date(receivedDateStr));
-    } else {
-      // If the date is empty (un-checked), explicitly clear the cell content.
-      cell.clearContent();
-    }
-    
-    SpreadsheetApp.flush();
-    return { message: 'Status updated successfully.' };
-  } else {
-    throw new Error('Could not find the transaction to update.');
-  }
-}
+        /**
+         * A robust function to parse date strings correctly, handling both 'YYYY-MM-DD' and full ISO strings.
+         */
+        function parseLocalDate(dateString) {
+            if (!dateString) return new Date();
+            if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+                const parts = dateString.split('-');
+                return new Date(parts[0], parts[1] - 1, parts[2]);
+            }
+            return new Date(dateString);
+        }
 
+        // --- Custom Modals ---
+        function showMessage(message) {
+            modalMessageEl.textContent = message;
+            customModal.classList.remove('hidden');
+        }
+
+        // FIX: Rewrote showConfirm to prevent event listener issues and errors.
+        function showConfirm(message, onConfirm) {
+            confirmMessageEl.textContent = message;
+            confirmModal.classList.remove('hidden');
+
+            // By cloning and replacing the buttons, we remove any previously attached event listeners.
+            // This is a robust way to prevent listeners from stacking up and causing errors.
+            const newConfirmOkBtn = confirmOkBtn.cloneNode(true);
+            confirmOkBtn.parentNode.replaceChild(newConfirmOkBtn, confirmOkBtn);
+            confirmOkBtn = newConfirmOkBtn; // Update the global reference to the new button.
+
+            const newConfirmCancelBtn = confirmCancelBtn.cloneNode(true);
+            confirmCancelBtn.parentNode.replaceChild(newConfirmCancelBtn, confirmCancelBtn);
+            confirmCancelBtn = newConfirmCancelBtn; // Update the global reference to the new button.
+
+            const closeConfirm = () => confirmModal.classList.add('hidden');
+
+            confirmOkBtn.onclick = () => { closeConfirm(); onConfirm(true); };
+            confirmCancelBtn.onclick = () => { closeConfirm(); onConfirm(false); };
+        }
+        modalCloseBtn.addEventListener('click', () => customModal.classList.add('hidden'));
+
+        // --- Google Apps Script Connector ---
+        function callGoogleScript(action, payload = {}) {
+            const callbackName = 'jsonpCallback_' + Date.now() + Math.random().toString(36).substr(2, 5);
+            return new Promise((resolve, reject) => {
+                window[callbackName] = function(response) {
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    if (response && response.status === 'success') resolve(response);
+                    else reject(new Error(response?.message || 'Invalid response from Google Script.'));
+                };
+                const params = new URLSearchParams({ sheetId: SHEET_ID, action, ...payload, callback: callbackName });
+                const script = document.createElement('script');
+                script.src = `${SCRIPT_URL}?${params.toString()}`;
+                script.onerror = () => reject(new Error('Failed to load Google Script.'));
+                document.body.appendChild(script);
+            });
+        }
+
+        // --- Date Logic ---
+        const THAI_MONTHS = [
+            { value: '01', name: 'มกราคม' }, { value: '02', name: 'กุมภาพันธ์' }, { value: '03', name: 'มีนาคม' },
+            { value: '04', name: 'เมษายน' }, { value: '05', name: 'พฤษภาคม' }, { value: '06', name: 'มิถุนายน' },
+            { value: '07', name: 'กรกฎาคม' }, { value: '08', name: 'สิงหาคม' }, { value: '09', name: 'กันยายน' },
+            { value: '10', name: 'ตุลาคม' }, { value: '11', name: 'พฤศจิกายน' }, { value: '12', name: 'ธันวาคม' }
+        ];
+
+        function isLeapYear(year) { return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0; }
+
+        function updateDayOptions(selectedYear, selectedMonth) {
+            const currentSelectedDay = dayInput.value;
+            dayInput.innerHTML = '';
+            const month = parseInt(selectedMonth, 10), year = parseInt(selectedYear, 10);
+            if (isNaN(month) || isNaN(year)) return;
+            let daysInMonth = 31;
+            if (month === 2) daysInMonth = isLeapYear(year) ? 29 : 28;
+            else if ([4, 6, 9, 11].includes(month)) daysInMonth = 30;
+            for (let i = 1; i <= daysInMonth; i++) {
+                const option = document.createElement('option');
+                option.value = String(i).padStart(2, '0');
+                option.textContent = i;
+                dayInput.appendChild(option);
+            }
+            dayInput.value = (currentSelectedDay && parseInt(currentSelectedDay) <= daysInMonth) ? currentSelectedDay : '01';
+        }
+
+        function populateYearOptions(selectEl) {
+            selectEl.innerHTML = '';
+            const currentADYear = new Date().getFullYear();
+            for (let i = 0; i < 10; i++) {
+                const adYear = currentADYear - i;
+                const beYear = adYear + 543;
+                const option = document.createElement('option');
+                option.value = String(adYear);
+                option.textContent = String(beYear);
+                selectEl.appendChild(option);
+            }
+        }
+
+        function populateMonthOptions(selectEl, options) {
+            selectEl.innerHTML = '';
+            options.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt.value;
+                option.textContent = opt.name;
+                selectEl.appendChild(option);
+            });
+        }
+
+        function initializeDateDropdowns() {
+            populateYearOptions(yearInput);
+            populateMonthOptions(monthInput, THAI_MONTHS.map(m => ({ value: m.value, name: m.name })));
+            const today = new Date();
+            monthInput.value = String(today.getMonth() + 1).padStart(2, '0');
+            yearInput.value = String(today.getFullYear());
+            updateDayOptions(yearInput.value, monthInput.value);
+            dayInput.value = String(today.getDate()).padStart(2, '0');
+            monthInput.addEventListener('change', () => updateDayOptions(yearInput.value, monthInput.value));
+            yearInput.addEventListener('change', () => updateDayOptions(yearInput.value, monthInput.value));
+        }
+
+        function getDateFromDropdowns() {
+            const [day, month, year] = [dayInput.value, monthInput.value, yearInput.value];
+            if (!day || !month || !year) return null;
+            return `${year}-${month}-${day}`;
+        }
+
+        // --- Transaction Logic ---
+        async function addTransaction(e) {
+            e.preventDefault();
+            if (typeInput.value === "") { showMessage('กรุณาเลือกประเภท (รายรับ/รายจ่าย) ก่อน'); return; }
+            const dateString = getDateFromDropdowns();
+            if (!dateString) { showMessage('รูปแบบวันที่ไม่ถูกต้อง'); return; }
+            const amountValue = parseFloat(amountInput.value);
+            if (isNaN(amountValue) || amountValue <= 0) { showMessage('จำนวนเงินไม่ถูกต้อง'); return; }
+            let descriptionForTransaction = descriptionInput.value.trim();
+            if (typeInput.value === 'income') descriptionForTransaction = "ยอดโอนเข้าบัญชี";
+            else if (typeInput.value === 'expense' && platformInput.value === 'เงินเดือนพนักงาน') descriptionForTransaction = "เงินเดือน(Aom)";
+            const transaction = { id: 'id' + Date.now(), date: dateString, type: typeInput.value, platform: platformInput.value, description: descriptionForTransaction, amount: amountValue };
+
+            transactions.push(transaction);
+            transactions.sort((a, b) => parseLocalDate(a.date) - parseLocalDate(b.date));
+            updateLocalStorage();
+            updateUI();
+
+            savingIndicator.style.display = 'inline'; savingIndicator.style.opacity = '1'; addTransactionBtn.disabled = true;
+            try {
+                await callGoogleScript('addData', transaction);
+            } catch (error) {
+                showMessage('ไม่สามารถบันทึกข้อมูลไปยัง Google Sheet ได้: ' + error.message);
+                await init(false); // Re-sync on failure
+            } finally {
+                savingIndicator.style.opacity = '0';
+                setTimeout(() => { savingIndicator.style.display = 'none'; }, 300);
+                descriptionInput.value = ''; amountInput.value = ''; addTransactionBtn.disabled = false;
+            }
+        }
+
+        function removeTransaction(id) {
+            showConfirm('คุณต้องการลบรายการนี้ใช่หรือไม่?', async (confirmed) => {
+                if (!confirmed) return;
+                const originalTransactions = [...transactions];
+                transactions = transactions.filter(t => t.id.toString() !== id.toString());
+                updateLocalStorage();
+                updateUI();
+                savingIndicator.style.display = 'inline'; savingIndicator.style.opacity = '1';
+                try {
+                    await callGoogleScript('deleteData', { id });
+                } catch (error) {
+                    showMessage('เกิดข้อผิดพลาดในการลบรายการ: ' + error.message);
+                    transactions = originalTransactions; // Revert on failure
+                    updateLocalStorage();
+                    updateUI();
+                } finally {
+                    savingIndicator.style.opacity = '0';
+                    setTimeout(() => { savingIndicator.style.display = 'none'; }, 300);
+                }
+            });
+        }
+
+        // --- REVISED: Function to handle checkbox state change without confirmation ---
+        function toggleReceivedStatus(checkbox, id) {
+            const isReceiving = checkbox.checked;
+            const receivedDate = isReceiving ? new Date().toISOString().split('T')[0] : '';
+
+            const transactionToUpdate = transactions.find(t => t.id === id);
+            if (!transactionToUpdate) return;
+            const originalReceivedDate = transactionToUpdate.receiveddate;
+
+            // Optimistic UI Update: Apply the change immediately for a responsive feel
+            transactionToUpdate.receiveddate = receivedDate;
+            updateLocalStorage();
+            updateUI();
+
+            // Call backend to save the change
+            callGoogleScript('updateReceivedStatus', { id, receivedDate })
+                .catch(error => {
+                    // If backend fails, revert the change and show an error message
+                    showMessage('ไม่สามารถอัปเดตสถานะได้: ' + error.message);
+                    transactionToUpdate.receiveddate = originalReceivedDate; // Revert to original value
+                    updateLocalStorage();
+                    updateUI(); // Re-render to show the reverted state
+                });
+        }
+
+        // --- Utility Functions ---
+        function formatMoney(number) { return (typeof number === 'number' ? number : 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'); }
+        function getFormattedMonthAndYear(year, month) {
+            if (!year) return '(กำลังโหลด...)';
+            if (month === 'all') return `(ทั้งปี ${parseInt(year) + 543})`;
+            if (!month) return '(กำลังโหลด...)';
+            const date = new Date(parseInt(year), parseInt(month) - 1, 1);
+            return `(${date.toLocaleDateString('th-TH', { year: 'numeric', month: 'long' })})`;
+        }
+        function updateLocalStorage() { localStorage.setItem('transactions_cache', JSON.stringify(transactions)); }
+        function getFilteredTransactions() {
+            const year = filterYearInput.value, month = filterMonthInput.value;
+            if (!year || !month) return [];
+            return transactions.filter(t => {
+                if (!t.date) return false;
+                const transactionDate = parseLocalDate(t.date);
+                const transactionYear = transactionDate.getFullYear();
+                const transactionMonth = transactionDate.getMonth() + 1;
+                if (month === 'all') {
+                    return transactionYear === parseInt(year);
+                } else {
+                    return transactionYear === parseInt(year) && transactionMonth === parseInt(month);
+                }
+            });
+        }
+        function getPlatformColor(platform) {
+            const colors = { 'Shopee': 'text-orange-500', 'Lazada(Auy)': 'text-blue-500', 'Lazada(Aom)': 'text-sky-600', 'สั่งซื้อสินค้า': 'text-red-600', 'เงินเดือนพนักงาน': 'text-purple-600' };
+            return colors[platform] || 'text-gray-600';
+        }
+
+        // --- UI Rendering ---
+        function addTransactionDOM(transaction) {
+            const item = document.createElement('li');
+            const isIncome = transaction.type === 'income';
+            const localDate = parseLocalDate(transaction.date);
+            const displayDate = localDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+
+            // --- Checkbox logic ---
+            const isOrder = transaction.platform === 'สั่งซื้อสินค้า';
+            const receivedDateStr = transaction.receiveddate ? parseLocalDate(transaction.receiveddate).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
+            const isChecked = transaction.receiveddate ? 'checked' : '';
+
+            // --- NEW: Shipping duration logic ---
+            let shippingDurationText = '';
+            if (transaction.receiveddate) {
+                const orderDate = parseLocalDate(transaction.date);
+                const receivedDate = parseLocalDate(transaction.receiveddate);
+                const timeDiff = receivedDate.getTime() - orderDate.getTime();
+                const dayDiff = Math.round(timeDiff / (1000 * 3600 * 24));
+                
+                if (dayDiff < 0) {
+                  // In case of bad data, don't show anything
+                } else if (dayDiff === 0) {
+                    shippingDurationText = ' (ใช้เวลาจัดส่งภายในวันเดียว)';
+                } else {
+                    shippingDurationText = ` (ใช้เวลาจัดส่ง ${dayDiff} วัน)`;
+                }
+            }
+            // --- End of new logic ---
+
+            const checkboxHTML = isOrder ? `
+                <div class="mt-3 pt-3 border-t border-gray-200">
+                    <label class="inline-flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" onchange="toggleReceivedStatus(this, '${transaction.id}')" ${isChecked}>
+                        <span class="text-sm text-gray-700">ได้รับสินค้าแล้ว ${receivedDateStr ? `<span class="font-semibold text-green-600">(${receivedDateStr})</span><span class="text-gray-500">${shippingDurationText}</span>` : ''}</span>
+                    </label>
+                </div>
+            ` : '';
+            // --- End of logic ---
+
+            item.className = `transaction-item ${isIncome ? 'bg-green-50 hover:bg-green-100' : 'bg-red-50 hover:bg-red-100'} p-4 border rounded-xl flex flex-col transition duration-200`;
+            item.innerHTML = `
+                <div>
+                    <div class="font-bold text-gray-800 text-base mb-1">${transaction.description}</div>
+                    <div class="flex justify-between items-center w-full">
+                        <div class="text-sm text-gray-500 flex-grow pr-4">
+                            <span>${displayDate}</span> |
+                            <span class="${getPlatformColor(transaction.platform)} font-semibold">${transaction.platform}</span>
+                        </div>
+                        <div class="flex items-center space-x-2 flex-shrink-0">
+                            <span class="font-bold text-lg ${isIncome ? 'text-green-600' : 'text-red-600'}">${isIncome ? '+' : '-'}฿${formatMoney(transaction.amount)}</span>
+                            <button class="bg-red-500 hover:bg-red-600 text-white text-xs p-0 rounded-full shadow-md w-8 h-8 flex items-center justify-center" onclick="removeTransaction('${transaction.id}')">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 10-2 0v6a1 1 0 102 0V8z" clip-rule="evenodd" /></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                ${checkboxHTML}`; // Append the checkbox HTML
+            transactionListEl.appendChild(item);
+        }
+
+        function addSearchResultDOM(transaction) {
+            const item = document.createElement('li');
+            const isIncome = transaction.type === 'income';
+            const localDate = parseLocalDate(transaction.date);
+            const displayDate = localDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            // --- REVISED: Replicate checkbox logic from the main list for search results ---
+            const isOrder = transaction.platform === 'สั่งซื้อสินค้า';
+            const receivedDateStr = transaction.receiveddate ? parseLocalDate(transaction.receiveddate).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
+            const isChecked = transaction.receiveddate ? 'checked' : '';
+
+            // --- NEW: Shipping duration logic ---
+            let shippingDurationText = '';
+            if (transaction.receiveddate) {
+                const orderDate = parseLocalDate(transaction.date);
+                const receivedDate = parseLocalDate(transaction.receiveddate);
+                const timeDiff = receivedDate.getTime() - orderDate.getTime();
+                const dayDiff = Math.round(timeDiff / (1000 * 3600 * 24));
+                
+                if (dayDiff < 0) {
+                  // In case of bad data, don't show anything
+                } else if (dayDiff === 0) {
+                    shippingDurationText = ' (ใช้เวลาจัดส่งภายในวันเดียว)';
+                } else {
+                    shippingDurationText = ` (ใช้เวลาจัดส่ง ${dayDiff} วัน)`;
+                }
+            }
+            // --- End of new logic ---
+
+            const statusCheckboxHTML = isOrder ? `
+                <div class="mt-3 pt-3 border-t border-gray-200">
+                    <label class="inline-flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" onchange="toggleReceivedStatus(this, '${transaction.id}')" ${isChecked}>
+                        <span class="text-sm text-gray-700">ได้รับสินค้าแล้ว ${receivedDateStr ? `<span class="font-semibold text-green-600">(${receivedDateStr})</span><span class="text-gray-500">${shippingDurationText}</span>` : ''}</span>
+                    </label>
+                </div>
+            ` : '';
+            // --- End of revised logic ---
+
+            item.className = `p-3 border rounded-lg flex flex-col transition duration-200 bg-gray-50`;
+            item.innerHTML = `
+                <div>
+                    <div class="flex justify-between items-start w-full">
+                        <div class="flex-grow">
+                            <div class="font-bold text-gray-800 text-base">${transaction.description}</div>
+                            <div class="text-sm text-gray-500 mt-1">
+                                <span>${displayDate}</span> |
+                                <span class="${getPlatformColor(transaction.platform)} font-semibold">${transaction.platform}</span>
+                            </div>
+                        </div>
+                        <div class="text-right flex-shrink-0 ml-4">
+                            <div class="font-bold text-lg ${isIncome ? 'text-green-600' : 'text-red-600'}">
+                                ${isIncome ? '+' : '-'}฿${formatMoney(transaction.amount)}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                ${statusCheckboxHTML}`; // Append the interactive checkbox HTML here
+            searchResultsList.appendChild(item);
+        }
+
+        function updateValues(filtered) {
+            const income = filtered.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
+            const expense = filtered.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
+            const balance = income - expense;
+            const monthYearText = getFormattedMonthAndYear(filterYearInput.value, filterMonthInput.value);
+            incomeTitleEl.innerText = `รายรับ ${monthYearText}`;
+            expenseTitleEl.innerText = `รายจ่าย ${monthYearText}`;
+            balanceTitleEl.innerText = `คงเหลือ ${monthYearText}`;
+            totalIncomeEl.innerText = `฿${formatMoney(income)}`;
+            totalExpenseEl.innerText = `฿${formatMoney(expense)}`;
+            balanceEl.innerText = `฿${formatMoney(balance)}`;
+            const balanceCard = balanceEl.parentElement;
+            balanceCard.className = `summary-card p-6 rounded-xl shadow-md text-center ${balance < 0 ? 'bg-red-100' : 'bg-blue-100'}`;
+            balanceEl.className = `text-2xl font-bold mt-2 ${balance < 0 ? 'text-red-600' : 'text-blue-600'}`;
+        }
+
+        function updatePlatformOptions() {
+            const type = typeInput.value;
+            platformInput.disabled = !type;
+            Array.from(platformInput.options).forEach(opt => {
+                const isExpenseOnly = ['สั่งซื้อสินค้า', 'เงินเดือนพนักงาน'].includes(opt.value);
+                opt.hidden = (type === 'income' && isExpenseOnly) || (type === 'expense' && !isExpenseOnly && opt.value !== '');
+            });
+            if (type === 'income' && (platformInput.selectedIndex === -1 || platformInput.options[platformInput.selectedIndex].hidden)) platformInput.value = 'Shopee';
+            else if (type === 'expense' && (platformInput.selectedIndex === -1 || platformInput.options[platformInput.selectedIndex].hidden)) platformInput.value = 'สั่งซื้อสินค้า';
+        }
+
+        function populateFilters() {
+            const selectedY = filterYearInput.value;
+            const selectedM = filterMonthInput.value;
+            const years = [...new Set(transactions.map(t => t.date ? t.date.substring(0, 4) : new Date().getFullYear().toString()))];
+            const currentYear = new Date().getFullYear().toString();
+            if (!years.includes(currentYear)) years.push(currentYear);
+            filterYearInput.innerHTML = '';
+            years.sort((a,b) => b-a).forEach(y => filterYearInput.add(new Option(parseInt(y) + 543, y)));
+            if (selectedY && years.includes(selectedY)) filterYearInput.value = selectedY;
+            const monthOptions = [{ value: 'all', name: '-- ทุกเดือน --' }, ...THAI_MONTHS];
+            populateMonthOptions(filterMonthInput, monthOptions.map(m => ({ value: m.val || m.value, name: m.name })));
+            filterMonthInput.value = selectedM || String(new Date().getMonth() + 1).padStart(2, '0');
+        }
+
+        function renderSummaries(filtered) {
+            ['income', 'expense'].forEach(type => {
+                const listEl = type === 'income' ? platformSummaryListEl : platformExpenseSummaryListEl;
+                const titleEl = type === 'income' ? platformSummaryTitleEl : platformExpenseSummaryTitleEl;
+                const monthYearText = getFormattedMonthAndYear(filterYearInput.value, filterMonthInput.value);
+                titleEl.innerText = `สรุปราย${type === 'income' ? 'รับ' : 'จ่าย'} ${monthYearText}`;
+                listEl.innerHTML = '';
+                const data = filtered.filter(t => t.type === type);
+                if (data.length === 0) {
+                    listEl.innerHTML = `<li class="text-center text-gray-500 py-4">ไม่พบรายการในเดือนที่เลือก...</li>`;
+                    return;
+                }
+                const summary = data.reduce((acc, t) => {
+                    acc[t.platform] = (acc[t.platform] || 0) + t.amount;
+                    return acc;
+                }, {});
+                Object.entries(summary).sort(([,a],[,b]) => b-a).forEach(([p, a]) => {
+                    const item = document.createElement('li');
+                    item.className = `p-3 border rounded-xl flex justify-between items-center shadow-sm bg-white hover:bg-${type === 'income' ? 'green' : 'red'}-50 transition`;
+                    item.innerHTML = `<div class="font-semibold ${getPlatformColor(p)}">${p}</div><div class="font-bold text-lg text-${type === 'income' ? 'green' : 'red'}-600">฿${formatMoney(a)}</div>`;
+                    listEl.appendChild(item);
+                });
+            });
+        }
+
+        function updateStickyPanel() {
+            if (!transactions || transactions.length === 0) {
+                stickySummaryPanel.classList.remove('visible');
+                return;
+            }
+
+            const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
+            const totalExpense = transactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
+            const totalBalance = totalIncome - totalExpense;
+            const filtered = getFilteredTransactions();
+            const monthlyIncome = filtered.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
+            const monthlyExpenseForProfit = filtered.filter(t => t.type === 'expense' && t.platform !== 'เงินเดือนพนักงาน').reduce((acc, t) => acc + t.amount, 0);
+            const totalExpenseForProfit = transactions.filter(t => t.type === 'expense' && t.platform !== 'เงินเดือนพนักงาน').reduce((acc, t) => acc + t.amount, 0);
+            let monthlyProfit = (monthlyExpenseForProfit > 0) ? ((monthlyIncome - monthlyExpenseForProfit) / monthlyExpenseForProfit) * 100 : (monthlyIncome > 0 ? 100 : 0);
+            let overallProfit = (totalExpenseForProfit > 0) ? ((totalIncome - totalExpenseForProfit) / totalExpenseForProfit) * 100 : (totalIncome > 0 ? 100 : 0);
+
+            stickyTotalBalanceEl.textContent = `฿${formatMoney(totalBalance)}`;
+            stickyTotalBalanceEl.classList.toggle('text-green-400', totalBalance >= 0);
+            stickyTotalBalanceEl.classList.toggle('text-red-400', totalBalance < 0);
+            const monthYearText = getFormattedMonthAndYear(filterYearInput.value, filterMonthInput.value);
+            stickyMonthlyProfitLabelEl.textContent = `กำไร ${monthYearText}`;
+            stickyMonthlyProfitEl.textContent = `${monthlyProfit.toFixed(2)}%`;
+            stickyMonthlyProfitEl.classList.toggle('text-green-400', monthlyProfit >= 0);
+            stickyMonthlyProfitEl.classList.toggle('text-red-400', monthlyProfit < 0);
+            stickyOverallProfitEl.textContent = `${overallProfit.toFixed(2)}%`;
+            stickyOverallProfitEl.classList.toggle('text-green-400', overallProfit >= 0);
+            stickyOverallProfitEl.classList.toggle('text-red-400', overallProfit < 0);
+        }
+
+        function updateUI() {
+            populateFilters();
+            const filtered = getFilteredTransactions();
+            filtered.sort((a, b) => parseLocalDate(a.date) - parseLocalDate(b.date));
+            transactionListEl.innerHTML = '';
+            if (filtered.length === 0) {
+                 transactionListEl.innerHTML = '<li class="text-center text-gray-500 py-4">ไม่พบรายการในเดือนที่เลือก...</li>';
+            } else {
+                 filtered.forEach(addTransactionDOM);
+            }
+            updateValues(filtered);
+            renderSummaries(filtered);
+            updatePlatformOptions();
+            updateStickyPanel();
+        }
+
+        // --- Search Logic ---
+        function handleSearch() {
+            const query = searchInput.value.toLowerCase().trim();
+            searchResultsList.innerHTML = '';
+
+            if (query.length === 0) return;
+
+            const results = transactions.filter(t =>
+                t.description.toLowerCase().includes(query) ||
+                t.platform.toLowerCase().includes(query)
+            );
+
+            if (results.length === 0) {
+                searchResultsList.innerHTML = '<li class="text-center text-gray-500 py-4">ไม่พบรายการที่ตรงกัน</li>';
+            } else {
+                results.sort((a, b) => parseLocalDate(a.date) - parseLocalDate(b.date));
+                results.forEach(addSearchResultDOM);
+            }
+        }
+
+        // --- Initial Load ---
+        async function init(isInitialLoad = true) {
+            if (isInitialLoad) loadingOverlay.style.display = 'flex';
+            initializeDateDropdowns();
+            const cached = JSON.parse(localStorage.getItem('transactions_cache'));
+            if (cached) {
+                transactions = cached.map(t => ({...t, amount: parseFloat(t.amount) || 0}));
+                updateUI();
+            }
+            try {
+                const response = await callGoogleScript('getData');
+                transactions = (response.data || []).map(t => ({...t, amount: parseFloat(t.amount) || 0 }));
+                transactions.sort((a, b) => parseLocalDate(a.date) - parseLocalDate(b.date));
+                updateLocalStorage();
+            } catch (error) {
+                console.error("Could not sync with Google Sheet.", error);
+                if (isInitialLoad && !cached) showMessage(`ไม่สามารถโหลดข้อมูลได้: ${error.message}`);
+            } finally {
+                updateUI();
+                if (isInitialLoad) loadingOverlay.style.display = 'none';
+            }
+        }
+
+        // --- Event Listeners ---
+        form.addEventListener('submit', addTransaction);
+        filterYearInput.addEventListener('change', updateUI);
+        filterMonthInput.addEventListener('change', updateUI);
+        typeInput.addEventListener('change', updatePlatformOptions);
+
+        // Make functions globally accessible for inline event handlers
+        window.removeTransaction = removeTransaction;
+        window.toggleReceivedStatus = toggleReceivedStatus;
+
+        searchFab.addEventListener('click', () => {
+            searchModal.classList.remove('hidden');
+            searchInput.value = '';
+            handleSearch();
+            searchInput.focus();
+        });
+
+        searchModalCloseBtn.addEventListener('click', () => searchModal.classList.add('hidden'));
+        searchModal.addEventListener('click', (e) => { if (e.target === searchModal) searchModal.classList.add('hidden'); });
+        searchInput.addEventListener('input', handleSearch);
+        stickySummaryPanel.addEventListener('click', () => stickySummaryPanel.classList.toggle('visible'));
+
+        init();
+    </script>
+</body>
+</html>
