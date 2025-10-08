@@ -61,11 +61,13 @@
     </div>
 
     <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+        <!-- Header -->
         <header class="text-center mb-8">
             <h1 class="text-3xl md:text-4xl font-bold text-gray-700">รายรับ-รายจ่าย</h1>
             <p class="text-md text-gray-500 mt-2">บันทึกรายรับ-รายจ่ายสำหรับ Shopee, Lazada และอื่นๆ</p>
         </header>
 
+        <!-- Transaction List -->
         <section class="bg-white p-6 rounded-xl shadow-md mb-8">
              <div class="flex flex-col md:flex-row justify-between items-center mb-4 border-b pb-4">
                  <h2 class="text-2xl font-bold mb-4 md:mb-0">ประวัติรายการ</h2>
@@ -85,6 +87,7 @@
              </ul>
         </section>
 
+        <!-- Transaction Form -->
         <section class="bg-white p-6 rounded-xl shadow-md mb-8">
             <div class="flex justify-between items-center mb-4 border-b pb-2">
                  <h2 class="text-2xl font-bold">เพิ่มรายการใหม่</h2>
@@ -118,7 +121,7 @@
                         <option value="เงินเดือนพนักงาน" class="expense-only">เงินเดือนพนักงาน</option>
                     </select>
                 </div>
-                <div class="hidden lg:block lg:col-span-1"></div> 
+                <div class="hidden lg:block lg:col-span-1"></div>
                 <div class="lg:col-span-2">
                     <label for="description" class="block text-sm font-medium text-gray-700">รายการ</label>
                     <input type="text" id="description" class="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2">
@@ -133,6 +136,7 @@
             </form>
         </section>
 
+        <!-- Summary Cards -->
         <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <div class="summary-card bg-green-100 p-6 rounded-xl shadow-md text-center">
                 <h2 id="income-title" class="text-lg font-semibold text-green-800">รายรับ</h2>
@@ -147,22 +151,26 @@
                 <p id="balance" class="text-2xl font-bold text-blue-600 mt-2">฿0.00</p>
             </div>
         </section>
-        
+
+        <!-- Platform Income Summary -->
         <section id="platform-summary-section" class="bg-white p-6 rounded-xl shadow-md mb-8">
-            <h2 id="platform-summary-title" class="text-2xl font-bold mb-4 border-b pb-2 text-green-700">สรุปรายรับ</h2> 
+            <h2 id="platform-summary-title" class="text-2xl font-bold mb-4 border-b pb-2 text-green-700">สรุปรายรับ</h2>
             <ul id="platform-summary-list" class="space-y-4">
                  <li class="text-center text-gray-500 py-4">ยังไม่มีข้อมูลรายรับ...</li>
             </ul>
         </section>
 
+        <!-- Platform Expense Summary -->
         <section id="platform-expense-summary-section" class="bg-white p-6 rounded-xl shadow-md">
-            <h2 id="platform-expense-summary-title" class="text-2xl font-bold mb-4 border-b pb-2 text-red-700">สรุปรายจ่าย</h2> 
+            <h2 id="platform-expense-summary-title" class="text-2xl font-bold mb-4 border-b pb-2 text-red-700">สรุปรายจ่าย</h2>
             <ul id="platform-expense-summary-list" class="space-y-4">
                  <li class="text-center text-gray-500 py-4">ยังไม่มีข้อมูลรายจ่าย...</li>
             </ul>
         </section>
+
     </div>
 
+    <!-- Modals -->
     <div id="custom-modal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full transform transition-all duration-300 scale-100">
             <div class="p-6">
@@ -187,6 +195,7 @@
         </div>
     </div>
 
+    <!-- Search Modal -->
     <div id="search-modal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-start justify-center z-50 p-4 pt-16">
         <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full transform transition-all duration-300 scale-100">
             <div class="p-6">
@@ -200,17 +209,21 @@
                 </div>
                 <input type="text" id="search-input" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3 mb-4">
                 <ul id="search-results-list" class="space-y-3 max-h-96 overflow-y-auto">
+                    <!-- Search results will be injected here -->
                 </ul>
             </div>
         </div>
     </div>
 
+    <!-- Floating Search Button -->
     <button id="search-fab" class="fixed bottom-6 right-6 bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition z-40">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
     </button>
 
+
+    <!-- Sticky Summary Panel -->
     <div id="sticky-summary-panel" class="fixed top-4 right-4 bg-gray-800 text-white shadow-lg z-40 rounded-xl p-3 w-auto transform transition-transform duration-300 ease-in-out">
         <div class="space-y-1 text-right">
             <div>
@@ -230,9 +243,11 @@
     </div>
 
     <script>
+        // Configuration
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw9ImlQQ860LcJNjojx6XCJB7ohJz0SC13ZeE_UblzoAdeRNRqk7tLVD71DazRgCaA6vg/exec";
         const SHEET_ID = "1PHtLUtMEYmOLzLYPGxjesMPDtTj3l4DRpsUZUGtHdqg";
 
+        // DOM Elements
         const balanceEl = document.getElementById('balance');
         const totalIncomeEl = document.getElementById('total-income');
         const totalExpenseEl = document.getElementById('total-expense');
@@ -245,7 +260,7 @@
         const platformInput = document.getElementById('platform');
         const descriptionInput = document.getElementById('description');
         const amountInput = document.getElementById('amount');
-        const filterYearInput = document.getElementById('filter-year'); 
+        const filterYearInput = document.getElementById('filter-year');
         const filterMonthInput = document.getElementById('filter-month');
         const platformSummaryListEl = document.getElementById('platform-summary-list');
         const platformSummaryTitleEl = document.getElementById('platform-summary-title');
@@ -263,12 +278,16 @@
         const confirmModal = document.getElementById('confirm-modal');
         const confirmMessageEl = document.getElementById('confirm-message');
         const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
-        let confirmOkBtn = document.getElementById('confirm-ok-btn'); 
+        let confirmOkBtn = document.getElementById('confirm-ok-btn');
+
+        // Search Modal Elements
         const searchFab = document.getElementById('search-fab');
         const searchModal = document.getElementById('search-modal');
         const searchModalCloseBtn = document.getElementById('search-modal-close-btn');
         const searchInput = document.getElementById('search-input');
         const searchResultsList = document.getElementById('search-results-list');
+
+        // Sticky Panel Elements
         const stickySummaryPanel = document.getElementById('sticky-summary-panel');
         const stickyTotalBalanceEl = document.getElementById('sticky-total-balance');
         const stickyMonthlyProfitLabelEl = document.getElementById('sticky-monthly-profit-label');
@@ -276,30 +295,22 @@
         const stickyOverallProfitLabelEl = document.getElementById('sticky-overall-profit-label');
         const stickyOverallProfitEl = document.getElementById('sticky-overall-profit');
 
+        // State
         let transactions = [];
 
         /**
-         * FIX: A fully robust function to parse date strings correctly, handling both 'YYYY-MM-DD' and full ISO strings.
-         * @param {string} dateString The date string which could be in various formats.
-         * @returns {Date} A local Date object.
+         * A robust function to parse date strings correctly, handling both 'YYYY-MM-DD' and full ISO strings.
          */
         function parseLocalDate(dateString) {
             if (!dateString) return new Date();
-
-            // Check if the string is in the simple 'YYYY-MM-DD' format (with no time component).
-            // This format is notoriously problematic as browsers interpret it as UTC midnight.
             if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-                // To fix this, we parse it by its parts. This forces JavaScript to treat it as a local date.
                 const parts = dateString.split('-');
-                // new Date(year, monthIndex, day)
                 return new Date(parts[0], parts[1] - 1, parts[2]);
             }
-            
-            // For any other format (like a full ISO string '...T...Z' from Google Sheets),
-            // the default Date constructor is generally more reliable and will handle the timezone conversion correctly.
             return new Date(dateString);
         }
 
+        // --- Custom Modals ---
         function showMessage(message) {
             modalMessageEl.textContent = message;
             customModal.classList.remove('hidden');
@@ -308,17 +319,21 @@
         function showConfirm(message, onConfirm) {
             confirmMessageEl.textContent = message;
             confirmModal.classList.remove('hidden');
-            confirmOkBtn.replaceWith(confirmOkBtn.cloneNode(true));
-            confirmCancelBtn.replaceWith(confirmCancelBtn.cloneNode(true));
-            let newConfirmOkBtn = document.getElementById('confirm-ok-btn');
-            let newConfirmCancelBtn = document.getElementById('confirm-cancel-btn');
-            const closeConfirm = () => confirmModal.classList.add('hidden');
-            newConfirmOkBtn.addEventListener('click', () => { closeConfirm(); onConfirm(true); }, { once: true });
-            newConfirmCancelBtn.addEventListener('click', () => { closeConfirm(); onConfirm(false); }, { once: true });
+            const newConfirmOkBtn = confirmOkBtn.cloneNode(true);
+            confirmOkBtn.parentNode.replaceChild(newConfirmOkBtn, confirmOkBtn);
             confirmOkBtn = newConfirmOkBtn;
+
+            const newConfirmCancelBtn = confirmCancelBtn.cloneNode(true);
+            confirmCancelBtn.parentNode.replaceChild(newConfirmCancelBtn, confirmCancelBtn);
+
+            const closeConfirm = () => confirmModal.classList.add('hidden');
+
+            confirmOkBtn.onclick = () => { closeConfirm(); onConfirm(true); };
+            newConfirmCancelBtn.onclick = () => { closeConfirm(); onConfirm(false); };
         }
         modalCloseBtn.addEventListener('click', () => customModal.classList.add('hidden'));
 
+        // --- Google Apps Script Connector ---
         function callGoogleScript(action, payload = {}) {
             const callbackName = 'jsonpCallback_' + Date.now() + Math.random().toString(36).substr(2, 5);
             return new Promise((resolve, reject) => {
@@ -335,7 +350,8 @@
                 document.body.appendChild(script);
             });
         }
-        
+
+        // --- Date Logic ---
         const THAI_MONTHS = [
             { value: '01', name: 'มกราคม' }, { value: '02', name: 'กุมภาพันธ์' }, { value: '03', name: 'มีนาคม' },
             { value: '04', name: 'เมษายน' }, { value: '05', name: 'พฤษภาคม' }, { value: '06', name: 'มิถุนายน' },
@@ -384,7 +400,7 @@
                 selectEl.appendChild(option);
             });
         }
-        
+
         function initializeDateDropdowns() {
             populateYearOptions(yearInput);
             populateMonthOptions(monthInput, THAI_MONTHS.map(m => ({ value: m.value, name: m.name })));
@@ -396,13 +412,14 @@
             monthInput.addEventListener('change', () => updateDayOptions(yearInput.value, monthInput.value));
             yearInput.addEventListener('change', () => updateDayOptions(yearInput.value, monthInput.value));
         }
-        
+
         function getDateFromDropdowns() {
             const [day, month, year] = [dayInput.value, monthInput.value, yearInput.value];
             if (!day || !month || !year) return null;
             return `${year}-${month}-${day}`;
         }
-        
+
+        // --- Transaction Logic ---
         async function addTransaction(e) {
             e.preventDefault();
             if (typeInput.value === "") { showMessage('กรุณาเลือกประเภท (รายรับ/รายจ่าย) ก่อน'); return; }
@@ -414,9 +431,8 @@
             if (typeInput.value === 'income') descriptionForTransaction = "ยอดโอนเข้าบัญชี";
             else if (typeInput.value === 'expense' && platformInput.value === 'เงินเดือนพนักงาน') descriptionForTransaction = "เงินเดือน(Aom)";
             const transaction = { id: 'id' + Date.now(), date: dateString, type: typeInput.value, platform: platformInput.value, description: descriptionForTransaction, amount: amountValue };
-            
+
             transactions.push(transaction);
-            // เปลี่ยนการเรียงข้อมูลเป็นจากน้อยไปมาก (วันที่เก่าสุดไปใหม่สุด)
             transactions.sort((a, b) => parseLocalDate(a.date) - parseLocalDate(b.date));
             updateLocalStorage();
             updateUI();
@@ -426,18 +442,15 @@
                 await callGoogleScript('addData', transaction);
             } catch (error) {
                 showMessage('ไม่สามารถบันทึกข้อมูลไปยัง Google Sheet ได้: ' + error.message);
-                await init(false); 
+                await init(false); // Re-sync on failure
             } finally {
                 savingIndicator.style.opacity = '0';
                 setTimeout(() => { savingIndicator.style.display = 'none'; }, 300);
                 descriptionInput.value = ''; amountInput.value = ''; addTransactionBtn.disabled = false;
-                form.reset();
-                initializeDateDropdowns();
-                updatePlatformOptions();
             }
         }
-        
-        function removeTransaction(id, date) { 
+
+        function removeTransaction(id) {
             showConfirm('คุณต้องการลบรายการนี้ใช่หรือไม่?', async (confirmed) => {
                 if (!confirmed) return;
                 const originalTransactions = [...transactions];
@@ -446,10 +459,10 @@
                 updateUI();
                 savingIndicator.style.display = 'inline'; savingIndicator.style.opacity = '1';
                 try {
-                    await callGoogleScript('deleteData', { id, date });
+                    await callGoogleScript('deleteData', { id });
                 } catch (error) {
                     showMessage('เกิดข้อผิดพลาดในการลบรายการ: ' + error.message);
-                    transactions = originalTransactions;
+                    transactions = originalTransactions; // Revert on failure
                     updateLocalStorage();
                     updateUI();
                 } finally {
@@ -459,28 +472,51 @@
             });
         }
 
+        // --- NEW: Function to handle checkbox state change ---
+        function toggleReceivedStatus(checkbox, id) {
+            const receivedDate = checkbox.checked ? new Date().toISOString().split('T')[0] : '';
+
+            const originalTransaction = transactions.find(t => t.id === id);
+            const originalReceivedDate = originalTransaction ? originalTransaction.receiveddate : '';
+
+            // Optimistic UI Update
+            if (originalTransaction) {
+                originalTransaction.receiveddate = receivedDate;
+            }
+            updateLocalStorage(); // Save change to local cache
+            updateUI();
+
+            // Call backend to save the change
+            callGoogleScript('updateReceivedStatus', { id, receivedDate })
+                .catch(error => {
+                    // If the backend call fails, show an error and revert the UI.
+                    showMessage('ไม่สามารถอัปเดตสถานะได้: ' + error.message);
+                    if (originalTransaction) {
+                        originalTransaction.receiveddate = originalReceivedDate; // Revert to original state
+                    }
+                    updateLocalStorage();
+                    updateUI(); // Re-render again to show the reverted state
+                });
+        }
+
+        // --- Utility Functions ---
         function formatMoney(number) { return (typeof number === 'number' ? number : 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'); }
         function getFormattedMonthAndYear(year, month) {
             if (!year) return '(กำลังโหลด...)';
             if (month === 'all') return `(ทั้งปี ${parseInt(year) + 543})`;
             if (!month) return '(กำลังโหลด...)';
             const date = new Date(parseInt(year), parseInt(month) - 1, 1);
-            // FIX: Use local timezone for display to correct for UTC conversion issues from the backend.
             return `(${date.toLocaleDateString('th-TH', { year: 'numeric', month: 'long' })})`;
         }
         function updateLocalStorage() { localStorage.setItem('transactions_cache', JSON.stringify(transactions)); }
         function getFilteredTransactions() {
             const year = filterYearInput.value, month = filterMonthInput.value;
             if (!year || !month) return [];
-
-            // FIX: Filter using parsed local date objects instead of string comparison.
-            // This makes the filtering logic robust and consistent with sorting/display logic.
             return transactions.filter(t => {
                 if (!t.date) return false;
                 const transactionDate = parseLocalDate(t.date);
                 const transactionYear = transactionDate.getFullYear();
-                const transactionMonth = transactionDate.getMonth() + 1; // getMonth is 0-indexed
-
+                const transactionMonth = transactionDate.getMonth() + 1;
                 if (month === 'all') {
                     return transactionYear === parseInt(year);
                 } else {
@@ -492,63 +528,84 @@
             const colors = { 'Shopee': 'text-orange-500', 'Lazada(Auy)': 'text-blue-500', 'Lazada(Aom)': 'text-sky-600', 'สั่งซื้อสินค้า': 'text-red-600', 'เงินเดือนพนักงาน': 'text-purple-600' };
             return colors[platform] || 'text-gray-600';
         }
-        
+
+        // --- UI Rendering ---
         function addTransactionDOM(transaction) {
             const item = document.createElement('li');
             const isIncome = transaction.type === 'income';
-            
-            // FIX: Use the centralized function for consistent date parsing.
             const localDate = parseLocalDate(transaction.date);
+            const displayDate = localDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
 
-            const displayDate = localDate.toLocaleDateString('th-TH', { 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric' 
-            });
+            // --- Checkbox logic ---
+            const isOrder = transaction.platform === 'สั่งซื้อสินค้า';
+            const receivedDateStr = transaction.receiveddate ? parseLocalDate(transaction.receiveddate).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
+            const isChecked = transaction.receiveddate ? 'checked' : '';
 
-            item.className = `transaction-item ${isIncome ? 'bg-green-50 hover:bg-green-100' : 'bg-red-50 hover:bg-red-100'} p-4 border rounded-xl flex flex-col transition duration-200 space-y-1`;
+            const checkboxHTML = isOrder ? `
+                <div class="mt-3 pt-3 border-t border-gray-200">
+                    <label class="inline-flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" onchange="toggleReceivedStatus(this, '${transaction.id}')" ${isChecked}>
+                        <span class="text-sm text-gray-700">ได้รับสินค้าแล้ว ${receivedDateStr ? `<span class="font-semibold text-green-600">(${receivedDateStr})</span>` : ''}</span>
+                    </label>
+                </div>
+            ` : '';
+            // --- End of logic ---
+
+            item.className = `transaction-item ${isIncome ? 'bg-green-50 hover:bg-green-100' : 'bg-red-50 hover:bg-red-100'} p-4 border rounded-xl flex flex-col transition duration-200`;
             item.innerHTML = `
-                <div class="font-bold text-gray-800 text-base mb-1">${transaction.description}</div>
-                <div class="flex justify-between items-center w-full">
-                    <div class="text-sm text-gray-500 flex-grow pr-4">
-                        <span>${displayDate}</span> | 
-                        <span class="${getPlatformColor(transaction.platform)} font-semibold">${transaction.platform}</span>
+                <div>
+                    <div class="font-bold text-gray-800 text-base mb-1">${transaction.description}</div>
+                    <div class="flex justify-between items-center w-full">
+                        <div class="text-sm text-gray-500 flex-grow pr-4">
+                            <span>${displayDate}</span> |
+                            <span class="${getPlatformColor(transaction.platform)} font-semibold">${transaction.platform}</span>
+                        </div>
+                        <div class="flex items-center space-x-2 flex-shrink-0">
+                            <span class="font-bold text-lg ${isIncome ? 'text-green-600' : 'text-red-600'}">${isIncome ? '+' : '-'}฿${formatMoney(transaction.amount)}</span>
+                            <button class="bg-red-500 hover:bg-red-600 text-white text-xs p-0 rounded-full shadow-md w-8 h-8 flex items-center justify-center" onclick="removeTransaction('${transaction.id}')">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 10-2 0v6a1 1 0 102 0V8z" clip-rule="evenodd" /></svg>
+                            </button>
+                        </div>
                     </div>
-                    <div class="flex items-center space-x-2 flex-shrink-0">
-                        <span class="font-bold text-lg ${isIncome ? 'text-green-600' : 'text-red-600'}">${isIncome ? '+' : '-'}฿${formatMoney(transaction.amount)}</span>
-                        <button class="bg-red-500 hover:bg-red-600 text-white text-xs p-0 rounded-full shadow-md w-8 h-8 flex items-center justify-center" onclick="removeTransaction('${transaction.id}', '${transaction.date}')">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 10-2 0v6a1 1 0 102 0V8z" clip-rule="evenodd" /></svg>
-                        </button>
-                    </div>
-                </div>`;
+                </div>
+                ${checkboxHTML}`; // Append the checkbox HTML
             transactionListEl.appendChild(item);
         }
 
         function addSearchResultDOM(transaction) {
             const item = document.createElement('li');
             const isIncome = transaction.type === 'income';
-            
-            // FIX: Use the centralized function for consistent date parsing.
             const localDate = parseLocalDate(transaction.date);
+            const displayDate = localDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
 
-            const displayDate = localDate.toLocaleDateString('th-TH', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            });
+            // --- NEW: Status logic for search results ---
+            const isOrder = transaction.platform === 'สั่งซื้อสินค้า';
+            let statusHTML = '';
+            if (isOrder) {
+                if (transaction.receiveddate) {
+                    const receivedDateStr = parseLocalDate(transaction.receiveddate).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+                    statusHTML = `<span class="text-xs font-semibold text-green-600 bg-green-100 px-2 py-1 rounded-full">ได้รับสินค้าแล้ว (${receivedDateStr})</span>`;
+                } else {
+                    statusHTML = `<span class="text-xs font-semibold text-gray-700 bg-gray-200 px-2 py-1 rounded-full">ยังไม่ได้รับสินค้า</span>`;
+                }
+            }
+            // --- End of new logic ---
 
             item.className = `p-3 border rounded-lg flex flex-col transition duration-200 space-y-1 bg-gray-50`;
             item.innerHTML = `
-                <div class="flex justify-between items-center w-full">
-                    <div>
+                <div class="flex justify-between items-start w-full">
+                    <div class="flex-grow">
                         <div class="font-bold text-gray-800 text-base">${transaction.description}</div>
-                        <div class="text-sm text-gray-500">
+                        <div class="text-sm text-gray-500 mt-1">
                             <span>${displayDate}</span> |
                             <span class="${getPlatformColor(transaction.platform)} font-semibold">${transaction.platform}</span>
                         </div>
                     </div>
-                    <div class="font-bold text-lg ${isIncome ? 'text-green-600' : 'text-red-600'}">
-                        ${isIncome ? '+' : '-'}฿${formatMoney(transaction.amount)}
+                    <div class="text-right flex-shrink-0 ml-4">
+                         <div class="font-bold text-lg ${isIncome ? 'text-green-600' : 'text-red-600'}">
+                            ${isIncome ? '+' : '-'}฿${formatMoney(transaction.amount)}
+                        </div>
+                        <div class="mt-1">${statusHTML}</div>
                     </div>
                 </div>`;
             searchResultsList.appendChild(item);
@@ -575,9 +632,7 @@
             platformInput.disabled = !type;
             Array.from(platformInput.options).forEach(opt => {
                 const isExpenseOnly = ['สั่งซื้อสินค้า', 'เงินเดือนพนักงาน'].includes(opt.value);
-                if (type === 'income') opt.hidden = isExpenseOnly;
-                else if (type === 'expense') opt.hidden = !isExpenseOnly && opt.value !== '';
-                else opt.hidden = false;
+                opt.hidden = (type === 'income' && isExpenseOnly) || (type === 'expense' && !isExpenseOnly && opt.value !== '');
             });
             if (type === 'income' && (platformInput.selectedIndex === -1 || platformInput.options[platformInput.selectedIndex].hidden)) platformInput.value = 'Shopee';
             else if (type === 'expense' && (platformInput.selectedIndex === -1 || platformInput.options[platformInput.selectedIndex].hidden)) platformInput.value = 'สั่งซื้อสินค้า';
@@ -586,7 +641,7 @@
         function populateFilters() {
             const selectedY = filterYearInput.value;
             const selectedM = filterMonthInput.value;
-            const years = [...new Set(transactions.map(t => t.date.substring(0, 4)))];
+            const years = [...new Set(transactions.map(t => t.date ? t.date.substring(0, 4) : new Date().getFullYear().toString()))];
             const currentYear = new Date().getFullYear().toString();
             if (!years.includes(currentYear)) years.push(currentYear);
             filterYearInput.innerHTML = '';
@@ -621,7 +676,7 @@
                 });
             });
         }
-        
+
         function updateStickyPanel() {
             if (!transactions || transactions.length === 0) {
                 stickySummaryPanel.classList.remove('visible');
@@ -635,18 +690,8 @@
             const monthlyIncome = filtered.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
             const monthlyExpenseForProfit = filtered.filter(t => t.type === 'expense' && t.platform !== 'เงินเดือนพนักงาน').reduce((acc, t) => acc + t.amount, 0);
             const totalExpenseForProfit = transactions.filter(t => t.type === 'expense' && t.platform !== 'เงินเดือนพนักงาน').reduce((acc, t) => acc + t.amount, 0);
-            let monthlyProfit = 0;
-            if (monthlyExpenseForProfit > 0) {
-                monthlyProfit = ((monthlyIncome - monthlyExpenseForProfit) / monthlyExpenseForProfit) * 100;
-            } else if (monthlyIncome > 0) {
-                monthlyProfit = 100;
-            }
-            let overallProfit = 0;
-            if (totalExpenseForProfit > 0) {
-                overallProfit = ((totalIncome - totalExpenseForProfit) / totalExpenseForProfit) * 100;
-            } else if (totalIncome > 0) {
-                overallProfit = 100;
-            }
+            let monthlyProfit = (monthlyExpenseForProfit > 0) ? ((monthlyIncome - monthlyExpenseForProfit) / monthlyExpenseForProfit) * 100 : (monthlyIncome > 0 ? 100 : 0);
+            let overallProfit = (totalExpenseForProfit > 0) ? ((totalIncome - totalExpenseForProfit) / totalExpenseForProfit) * 100 : (totalIncome > 0 ? 100 : 0);
 
             stickyTotalBalanceEl.textContent = `฿${formatMoney(totalBalance)}`;
             stickyTotalBalanceEl.classList.toggle('text-green-400', totalBalance >= 0);
@@ -664,7 +709,6 @@
         function updateUI() {
             populateFilters();
             const filtered = getFilteredTransactions();
-            // เปลี่ยนการเรียงข้อมูลเป็นจากน้อยไปมาก (วันที่เก่าสุดไปใหม่สุด)
             filtered.sort((a, b) => parseLocalDate(a.date) - parseLocalDate(b.date));
             transactionListEl.innerHTML = '';
             if (filtered.length === 0) {
@@ -678,13 +722,12 @@
             updateStickyPanel();
         }
 
+        // --- Search Logic ---
         function handleSearch() {
             const query = searchInput.value.toLowerCase().trim();
             searchResultsList.innerHTML = '';
 
-            if (query.length === 0) {
-                return;
-            }
+            if (query.length === 0) return;
 
             const results = transactions.filter(t =>
                 t.description.toLowerCase().includes(query) ||
@@ -694,24 +737,23 @@
             if (results.length === 0) {
                 searchResultsList.innerHTML = '<li class="text-center text-gray-500 py-4">ไม่พบรายการที่ตรงกัน</li>';
             } else {
-                // เปลี่ยนการเรียงข้อมูลเป็นจากน้อยไปมาก (วันที่เก่าสุดไปใหม่สุด)
                 results.sort((a, b) => parseLocalDate(a.date) - parseLocalDate(b.date));
                 results.forEach(addSearchResultDOM);
             }
         }
 
+        // --- Initial Load ---
         async function init(isInitialLoad = true) {
             if (isInitialLoad) loadingOverlay.style.display = 'flex';
             initializeDateDropdowns();
             const cached = JSON.parse(localStorage.getItem('transactions_cache'));
             if (cached) {
-                transactions = cached.map(t => ({...t, amount: parseFloat(t.amount) || 0})); 
+                transactions = cached.map(t => ({...t, amount: parseFloat(t.amount) || 0}));
                 updateUI();
             }
             try {
                 const response = await callGoogleScript('getData');
-                transactions = (response.data || []).map(t => ({...t, amount: parseFloat(t.amount) || 0 })); 
-                // เปลี่ยนการเรียงข้อมูลเป็นจากน้อยไปมาก (วันที่เก่าสุดไปใหม่สุด)
+                transactions = (response.data || []).map(t => ({...t, amount: parseFloat(t.amount) || 0 }));
                 transactions.sort((a, b) => parseLocalDate(a.date) - parseLocalDate(b.date));
                 updateLocalStorage();
             } catch (error) {
@@ -723,11 +765,15 @@
             }
         }
 
+        // --- Event Listeners ---
         form.addEventListener('submit', addTransaction);
-        filterYearInput.addEventListener('change', updateUI); 
-        filterMonthInput.addEventListener('change', updateUI); 
+        filterYearInput.addEventListener('change', updateUI);
+        filterMonthInput.addEventListener('change', updateUI);
         typeInput.addEventListener('change', updatePlatformOptions);
+
+        // Make functions globally accessible for inline event handlers
         window.removeTransaction = removeTransaction;
+        window.toggleReceivedStatus = toggleReceivedStatus;
 
         searchFab.addEventListener('click', () => {
             searchModal.classList.remove('hidden');
@@ -736,29 +782,15 @@
             searchInput.focus();
         });
 
-        searchModalCloseBtn.addEventListener('click', () => {
-            searchModal.classList.add('hidden');
-        });
-
-        searchModal.addEventListener('click', (e) => {
-            if (e.target === searchModal) {
-                searchModal.classList.add('hidden');
-            }
-        });
-
+        searchModalCloseBtn.addEventListener('click', () => searchModal.classList.add('hidden'));
+        searchModal.addEventListener('click', (e) => { if (e.target === searchModal) searchModal.classList.add('hidden'); });
         searchInput.addEventListener('input', handleSearch);
-
-        stickySummaryPanel.addEventListener('click', () => {
-            stickySummaryPanel.classList.toggle('visible');
-        });
+        stickySummaryPanel.addEventListener('click', () => stickySummaryPanel.classList.toggle('visible'));
 
         init();
     </script>
 </body>
 </html>
-
-
-
 
 
 
