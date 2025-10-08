@@ -196,6 +196,34 @@
         </div>
     </div>
 
+    <!-- Search Modal -->
+    <div id="search-modal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-start justify-center z-50 p-4 pt-16">
+        <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full transform transition-all duration-300 scale-100">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">ค้นหาประวัติรายการ</h3>
+                    <button id="search-modal-close-btn" class="text-gray-400 hover:text-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <input type="text" id="search-input" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3 mb-4">
+                <ul id="search-results-list" class="space-y-3 max-h-96 overflow-y-auto">
+                    <!-- Search results will be injected here -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Search Button -->
+    <button id="search-fab" class="fixed bottom-6 right-6 bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition z-40">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+    </button>
+
+
     <!-- NEW: Sticky Summary Panel (Replaces old badge) -->
     <div id="sticky-summary-panel" class="fixed top-4 right-4 bg-gray-800 text-white shadow-lg z-40 rounded-xl p-3 w-auto transform transition-transform duration-300 ease-in-out">
         <div class="space-y-1 text-right">
@@ -252,6 +280,13 @@
         const confirmMessageEl = document.getElementById('confirm-message');
         const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
         let confirmOkBtn = document.getElementById('confirm-ok-btn'); 
+        
+        // Search Modal Elements
+        const searchFab = document.getElementById('search-fab');
+        const searchModal = document.getElementById('search-modal');
+        const searchModalCloseBtn = document.getElementById('search-modal-close-btn');
+        const searchInput = document.getElementById('search-input');
+        const searchResultsList = document.getElementById('search-results-list');
 
         // NEW Sticky Panel Elements
         const stickySummaryPanel = document.getElementById('sticky-summary-panel');
@@ -461,6 +496,26 @@
             transactionListEl.appendChild(item);
         }
 
+        function addSearchResultDOM(transaction) {
+            const item = document.createElement('li');
+            const isIncome = transaction.type === 'income';
+            item.className = `p-3 border rounded-lg flex flex-col transition duration-200 space-y-1 bg-gray-50`;
+            item.innerHTML = `
+                <div class="flex justify-between items-center w-full">
+                    <div>
+                        <div class="font-bold text-gray-800 text-base">${transaction.description}</div>
+                        <div class="text-sm text-gray-500">
+                            <span>${new Date(transaction.date).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</span> |
+                            <span class="${getPlatformColor(transaction.platform)} font-semibold">${transaction.platform}</span>
+                        </div>
+                    </div>
+                    <div class="font-bold text-lg ${isIncome ? 'text-green-600' : 'text-red-600'}">
+                        ${isIncome ? '+' : '-'}฿${formatMoney(transaction.amount)}
+                    </div>
+                </div>`;
+            searchResultsList.appendChild(item);
+        }
+
         function updateValues(filtered) {
             const income = filtered.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
             const expense = filtered.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
@@ -586,6 +641,29 @@
             updateStickyPanel(); // Main call to update the panel
         }
 
+        // --- Search Logic ---
+        function handleSearch() {
+            const query = searchInput.value.toLowerCase().trim();
+            searchResultsList.innerHTML = '';
+
+            if (query.length === 0) {
+                return; // Just show an empty list if there's no query
+            }
+
+            const results = transactions.filter(t =>
+                t.description.toLowerCase().includes(query) ||
+                t.platform.toLowerCase().includes(query)
+            );
+
+            if (results.length === 0) {
+                searchResultsList.innerHTML = '<li class="text-center text-gray-500 py-4">ไม่พบรายการที่ตรงกัน</li>';
+            } else {
+                results.sort((a, b) => new Date(b.date) - new Date(a.date)); // Newest first
+                results.forEach(addSearchResultDOM);
+            }
+        }
+
+
         // --- Initial Load ---
         async function init(isInitialLoad = true) {
             if (isInitialLoad) loadingOverlay.style.display = 'flex';
@@ -615,6 +693,25 @@
         typeInput.addEventListener('change', updatePlatformOptions);
         window.removeTransaction = removeTransaction;
 
+        searchFab.addEventListener('click', () => {
+            searchModal.classList.remove('hidden');
+            searchInput.value = ''; // Clear previous search
+            handleSearch(); // Show initial message
+            searchInput.focus();
+        });
+
+        searchModalCloseBtn.addEventListener('click', () => {
+            searchModal.classList.add('hidden');
+        });
+
+        searchModal.addEventListener('click', (e) => {
+            if (e.target === searchModal) {
+                searchModal.classList.add('hidden');
+            }
+        });
+
+        searchInput.addEventListener('input', handleSearch);
+
         stickySummaryPanel.addEventListener('click', () => {
             stickySummaryPanel.classList.toggle('visible');
         });
@@ -623,9 +720,5 @@
     </script>
 </body>
 </html>
-
-
-
-
 
 
