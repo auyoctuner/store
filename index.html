@@ -245,7 +245,7 @@
 
     <script>
         // Configuration
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxlC3O8m7jKC9sqhD6qXhxOqFrA_cns78u-odDMRO9AGU3NNRXMvBhpnhn9DAzTnidq4Q/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw9ImlQQ860LcJNjojx6XCJB7ohJz0SC13ZeE_UblzoAdeRNRqk7tLVD71DazRgCaA6vg/exec";
         const SHEET_ID = "1PHtLUtMEYmOLzLYPGxjesMPDtTj3l4DRpsUZUGtHdqg";
 
         // DOM Elements
@@ -322,47 +322,17 @@
         // --- Google Apps Script Connector ---
         function callGoogleScript(action, payload = {}) {
             const callbackName = 'jsonpCallback_' + Date.now() + Math.random().toString(36).substr(2, 5);
-            let script;
-            let timeoutId;
-
             return new Promise((resolve, reject) => {
-                timeoutId = setTimeout(() => {
-                    console.error("Google Script request timed out.");
-                    cleanup();
-                    reject(new Error('การร้องขอข้อมูลหมดเวลา (Timeout) อาจเกิดจากปัญหาการเชื่อมต่อหรือการตั้งค่าสคริปต์ไม่ถูกต้อง'));
-                }, 8000); // 8 second timeout
-
-                const cleanup = () => {
-                    clearTimeout(timeoutId);
-                    if (window[callbackName]) delete window[callbackName];
-                    if (script && document.body.contains(script)) {
-                        document.body.removeChild(script);
-                    }
-                };
-
                 window[callbackName] = function(response) {
-                    cleanup();
-                    if (response && response.status === 'success') {
-                        console.log("Data received from Google Script:", response);
-                        resolve(response);
-                    } else {
-                        console.error("Google Script returned an error:", response);
-                        reject(new Error(response?.message || 'Invalid response from Google Script.'));
-                    }
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    if (response && response.status === 'success') resolve(response);
+                    else reject(new Error(response?.message || 'Invalid response from Google Script.'));
                 };
-
                 const params = new URLSearchParams({ sheetId: SHEET_ID, action, ...payload, callback: callbackName });
-                const fullUrl = `${SCRIPT_URL}?${params.toString()}`;
-                console.log("Calling Google Script:", fullUrl); // Log the URL for debugging
-
-                script = document.createElement('script');
-                script.src = fullUrl;
-                script.onerror = (e) => {
-                    cleanup();
-                    console.error("Failed to load Google Script. Event:", e);
-                    reject(new Error('ไม่สามารถโหลดสคริปต์ได้ อาจเป็นปัญหา CORS หรือเครือข่าย ตรวจสอบ Console สำหรับรายละเอียด'));
-                };
-
+                const script = document.createElement('script');
+                script.src = `${SCRIPT_URL}?${params.toString()}`;
+                script.onerror = () => reject(new Error('Failed to load Google Script.'));
                 document.body.appendChild(script);
             });
         }
@@ -578,7 +548,7 @@
         function populateFilters() {
             const selectedY = filterYearInput.value;
             const selectedM = filterMonthInput.value;
-            const years = [...new Set(transactions.filter(t => t && t.date).map(t => t.date.substring(0, 4)))];
+            const years = [...new Set(transactions.map(t => t.date.substring(0, 4)))];
             const currentYear = new Date().getFullYear().toString();
             if (!years.includes(currentYear)) years.push(currentYear);
             filterYearInput.innerHTML = '';
@@ -658,7 +628,7 @@
         function updateUI() {
             populateFilters();
             const filtered = getFilteredTransactions();
-            filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+            filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
             transactionListEl.innerHTML = '';
             if (filtered.length === 0) {
                  transactionListEl.innerHTML = '<li class="text-center text-gray-500 py-4">ไม่พบรายการในเดือนที่เลือก...</li>';
@@ -696,36 +666,23 @@
 
         // --- Initial Load ---
         async function init(isInitialLoad = true) {
-            console.log("Initializing application...");
-            if (isInitialLoad) {
-                loadingOverlay.style.display = 'flex';
-            }
+            if (isInitialLoad) loadingOverlay.style.display = 'flex';
             initializeDateDropdowns();
-
             const cached = JSON.parse(localStorage.getItem('transactions_cache'));
             if (cached) {
-                console.log("Loaded transactions from cache.", cached);
                 transactions = cached.map(t => ({...t, amount: parseFloat(t.amount) || 0})); 
                 updateUI();
-            } else {
-                console.log("No cache found.");
             }
-
             try {
-                console.log("Fetching data from Google Sheet...");
                 const response = await callGoogleScript('getData');
-                console.log("Successfully fetched data.");
                 transactions = (response.data || []).map(t => ({...t, amount: parseFloat(t.amount) || 0 })); 
                 updateLocalStorage();
             } catch (error) {
                 console.error("Could not sync with Google Sheet.", error);
-                showMessage(`ไม่สามารถโหลดข้อมูลได้: ${error.message}. กรุณาตรวจสอบการตั้งค่า Google Apps Script และการเชื่อมต่ออินเทอร์เน็ต (ดูรายละเอียดเพิ่มเติมใน Console)`);
+                if (isInitialLoad && !cached) showMessage(`ไม่สามารถโหลดข้อมูลได้: ${error.message}`);
             } finally {
-                console.log("Update UI and hide loading overlay.");
                 updateUI();
-                if (isInitialLoad) {
-                    loadingOverlay.style.display = 'none';
-                }
+                if (isInitialLoad) loadingOverlay.style.display = 'none';
             }
         }
 
@@ -763,4 +720,3 @@
     </script>
 </body>
 </html>
-
