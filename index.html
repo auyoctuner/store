@@ -45,13 +45,12 @@
         .input-full-width {
             width: 100%;
         }
-        /* CSS for showing/hiding the new sticky panel */
         #sticky-summary-panel {
-            transform: translateX(calc(100% - 0.75px)); /* Show an extremely tiny 0.75px handle */
+            transform: translateX(calc(100% - 0.75px));
             cursor: pointer;
         }
         #sticky-summary-panel.visible {
-            transform: translateX(0); /* Slides the panel into view */
+            transform: translateX(0);
         }
     </style>
 </head>
@@ -62,13 +61,11 @@
     </div>
 
     <div class="container mx-auto p-4 md:p-8 max-w-4xl">
-        <!-- Header -->
         <header class="text-center mb-8">
             <h1 class="text-3xl md:text-4xl font-bold text-gray-700">รายรับ-รายจ่าย</h1>
             <p class="text-md text-gray-500 mt-2">บันทึกรายรับ-รายจ่ายสำหรับ Shopee, Lazada และอื่นๆ</p>
         </header>
 
-        <!-- Transaction List -->
         <section class="bg-white p-6 rounded-xl shadow-md mb-8">
              <div class="flex flex-col md:flex-row justify-between items-center mb-4 border-b pb-4">
                  <h2 class="text-2xl font-bold mb-4 md:mb-0">ประวัติรายการ</h2>
@@ -88,7 +85,6 @@
              </ul>
         </section>
 
-        <!-- Transaction Form -->
         <section class="bg-white p-6 rounded-xl shadow-md mb-8">
             <div class="flex justify-between items-center mb-4 border-b pb-2">
                  <h2 class="text-2xl font-bold">เพิ่มรายการใหม่</h2>
@@ -137,7 +133,6 @@
             </form>
         </section>
 
-        <!-- Summary Cards -->
         <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <div class="summary-card bg-green-100 p-6 rounded-xl shadow-md text-center">
                 <h2 id="income-title" class="text-lg font-semibold text-green-800">รายรับ</h2>
@@ -153,7 +148,6 @@
             </div>
         </section>
         
-        <!-- Platform Income Summary -->
         <section id="platform-summary-section" class="bg-white p-6 rounded-xl shadow-md mb-8">
             <h2 id="platform-summary-title" class="text-2xl font-bold mb-4 border-b pb-2 text-green-700">สรุปรายรับ</h2> 
             <ul id="platform-summary-list" class="space-y-4">
@@ -161,17 +155,14 @@
             </ul>
         </section>
 
-        <!-- Platform Expense Summary -->
         <section id="platform-expense-summary-section" class="bg-white p-6 rounded-xl shadow-md">
             <h2 id="platform-expense-summary-title" class="text-2xl font-bold mb-4 border-b pb-2 text-red-700">สรุปรายจ่าย</h2> 
             <ul id="platform-expense-summary-list" class="space-y-4">
                  <li class="text-center text-gray-500 py-4">ยังไม่มีข้อมูลรายจ่าย...</li>
             </ul>
         </section>
-
     </div>
 
-    <!-- Modals -->
     <div id="custom-modal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full transform transition-all duration-300 scale-100">
             <div class="p-6">
@@ -196,7 +187,6 @@
         </div>
     </div>
 
-    <!-- Search Modal -->
     <div id="search-modal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-start justify-center z-50 p-4 pt-16">
         <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full transform transition-all duration-300 scale-100">
             <div class="p-6">
@@ -210,21 +200,17 @@
                 </div>
                 <input type="text" id="search-input" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3 mb-4">
                 <ul id="search-results-list" class="space-y-3 max-h-96 overflow-y-auto">
-                    <!-- Search results will be injected here -->
                 </ul>
             </div>
         </div>
     </div>
 
-    <!-- Floating Search Button -->
     <button id="search-fab" class="fixed bottom-6 right-6 bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition z-40">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
     </button>
 
-
-    <!-- NEW: Sticky Summary Panel (Replaces old badge) -->
     <div id="sticky-summary-panel" class="fixed top-4 right-4 bg-gray-800 text-white shadow-lg z-40 rounded-xl p-3 w-auto transform transition-transform duration-300 ease-in-out">
         <div class="space-y-1 text-right">
             <div>
@@ -244,11 +230,9 @@
     </div>
 
     <script>
-        // Configuration
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw9ImlQQ860LcJNjojx6XCJB7ohJz0SC13ZeE_UblzoAdeRNRqk7tLVD71DazRgCaA6vg/exec";
         const SHEET_ID = "1PHtLUtMEYmOLzLYPGxjesMPDtTj3l4DRpsUZUGtHdqg";
 
-        // DOM Elements
         const balanceEl = document.getElementById('balance');
         const totalIncomeEl = document.getElementById('total-income');
         const totalExpenseEl = document.getElementById('total-expense');
@@ -280,15 +264,11 @@
         const confirmMessageEl = document.getElementById('confirm-message');
         const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
         let confirmOkBtn = document.getElementById('confirm-ok-btn'); 
-        
-        // Search Modal Elements
         const searchFab = document.getElementById('search-fab');
         const searchModal = document.getElementById('search-modal');
         const searchModalCloseBtn = document.getElementById('search-modal-close-btn');
         const searchInput = document.getElementById('search-input');
         const searchResultsList = document.getElementById('search-results-list');
-
-        // NEW Sticky Panel Elements
         const stickySummaryPanel = document.getElementById('sticky-summary-panel');
         const stickyTotalBalanceEl = document.getElementById('sticky-total-balance');
         const stickyMonthlyProfitLabelEl = document.getElementById('sticky-monthly-profit-label');
@@ -296,10 +276,30 @@
         const stickyOverallProfitLabelEl = document.getElementById('sticky-overall-profit-label');
         const stickyOverallProfitEl = document.getElementById('sticky-overall-profit');
 
-        // State
         let transactions = [];
 
-        // --- Custom Modals ---
+        /**
+         * FIX: A fully robust function to parse date strings correctly, handling both 'YYYY-MM-DD' and full ISO strings.
+         * @param {string} dateString The date string which could be in various formats.
+         * @returns {Date} A local Date object.
+         */
+        function parseLocalDate(dateString) {
+            if (!dateString) return new Date();
+
+            // Check if the string is in the simple 'YYYY-MM-DD' format (with no time component).
+            // This format is notoriously problematic as browsers interpret it as UTC midnight.
+            if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+                // To fix this, we parse it by its parts. This forces JavaScript to treat it as a local date.
+                const parts = dateString.split('-');
+                // new Date(year, monthIndex, day)
+                return new Date(parts[0], parts[1] - 1, parts[2]);
+            }
+            
+            // For any other format (like a full ISO string '...T...Z' from Google Sheets),
+            // the default Date constructor is generally more reliable and will handle the timezone conversion correctly.
+            return new Date(dateString);
+        }
+
         function showMessage(message) {
             modalMessageEl.textContent = message;
             customModal.classList.remove('hidden');
@@ -319,7 +319,6 @@
         }
         modalCloseBtn.addEventListener('click', () => customModal.classList.add('hidden'));
 
-        // --- Google Apps Script Connector ---
         function callGoogleScript(action, payload = {}) {
             const callbackName = 'jsonpCallback_' + Date.now() + Math.random().toString(36).substr(2, 5);
             return new Promise((resolve, reject) => {
@@ -337,7 +336,6 @@
             });
         }
         
-        // --- Date Logic ---
         const THAI_MONTHS = [
             { value: '01', name: 'มกราคม' }, { value: '02', name: 'กุมภาพันธ์' }, { value: '03', name: 'มีนาคม' },
             { value: '04', name: 'เมษายน' }, { value: '05', name: 'พฤษภาคม' }, { value: '06', name: 'มิถุนายน' },
@@ -405,7 +403,6 @@
             return `${year}-${month}-${day}`;
         }
         
-        // --- Transaction Logic ---
         async function addTransaction(e) {
             e.preventDefault();
             if (typeInput.value === "") { showMessage('กรุณาเลือกประเภท (รายรับ/รายจ่าย) ก่อน'); return; }
@@ -417,19 +414,26 @@
             if (typeInput.value === 'income') descriptionForTransaction = "ยอดโอนเข้าบัญชี";
             else if (typeInput.value === 'expense' && platformInput.value === 'เงินเดือนพนักงาน') descriptionForTransaction = "เงินเดือน(Aom)";
             const transaction = { id: 'id' + Date.now(), date: dateString, type: typeInput.value, platform: platformInput.value, description: descriptionForTransaction, amount: amountValue };
+            
             transactions.push(transaction);
+            // เปลี่ยนการเรียงข้อมูลเป็นจากน้อยไปมาก (วันที่เก่าสุดไปใหม่สุด)
+            transactions.sort((a, b) => parseLocalDate(a.date) - parseLocalDate(b.date));
             updateLocalStorage();
             updateUI();
+
             savingIndicator.style.display = 'inline'; savingIndicator.style.opacity = '1'; addTransactionBtn.disabled = true;
             try {
                 await callGoogleScript('addData', transaction);
             } catch (error) {
                 showMessage('ไม่สามารถบันทึกข้อมูลไปยัง Google Sheet ได้: ' + error.message);
-                await init(false);
+                await init(false); 
             } finally {
                 savingIndicator.style.opacity = '0';
                 setTimeout(() => { savingIndicator.style.display = 'none'; }, 300);
                 descriptionInput.value = ''; amountInput.value = ''; addTransactionBtn.disabled = false;
+                form.reset();
+                initializeDateDropdowns();
+                updatePlatformOptions();
             }
         }
         
@@ -455,35 +459,59 @@
             });
         }
 
-        // --- Utility Functions ---
         function formatMoney(number) { return (typeof number === 'number' ? number : 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'); }
         function getFormattedMonthAndYear(year, month) {
             if (!year) return '(กำลังโหลด...)';
             if (month === 'all') return `(ทั้งปี ${parseInt(year) + 543})`;
             if (!month) return '(กำลังโหลด...)';
-            return `(${new Date(parseInt(year), parseInt(month) - 1, 1).toLocaleDateString('th-TH', { year: 'numeric', month: 'long' })})`;
+            const date = new Date(parseInt(year), parseInt(month) - 1, 1);
+            // FIX: Use local timezone for display to correct for UTC conversion issues from the backend.
+            return `(${date.toLocaleDateString('th-TH', { year: 'numeric', month: 'long' })})`;
         }
         function updateLocalStorage() { localStorage.setItem('transactions_cache', JSON.stringify(transactions)); }
         function getFilteredTransactions() {
             const year = filterYearInput.value, month = filterMonthInput.value;
             if (!year || !month) return [];
-            return transactions.filter(t => t.date && (month === 'all' ? t.date.startsWith(year) : t.date.startsWith(`${year}-${month}`)));
+
+            // FIX: Filter using parsed local date objects instead of string comparison.
+            // This makes the filtering logic robust and consistent with sorting/display logic.
+            return transactions.filter(t => {
+                if (!t.date) return false;
+                const transactionDate = parseLocalDate(t.date);
+                const transactionYear = transactionDate.getFullYear();
+                const transactionMonth = transactionDate.getMonth() + 1; // getMonth is 0-indexed
+
+                if (month === 'all') {
+                    return transactionYear === parseInt(year);
+                } else {
+                    return transactionYear === parseInt(year) && transactionMonth === parseInt(month);
+                }
+            });
         }
         function getPlatformColor(platform) {
             const colors = { 'Shopee': 'text-orange-500', 'Lazada(Auy)': 'text-blue-500', 'Lazada(Aom)': 'text-sky-600', 'สั่งซื้อสินค้า': 'text-red-600', 'เงินเดือนพนักงาน': 'text-purple-600' };
             return colors[platform] || 'text-gray-600';
         }
         
-        // --- UI Rendering ---
         function addTransactionDOM(transaction) {
             const item = document.createElement('li');
             const isIncome = transaction.type === 'income';
+            
+            // FIX: Use the centralized function for consistent date parsing.
+            const localDate = parseLocalDate(transaction.date);
+
+            const displayDate = localDate.toLocaleDateString('th-TH', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+
             item.className = `transaction-item ${isIncome ? 'bg-green-50 hover:bg-green-100' : 'bg-red-50 hover:bg-red-100'} p-4 border rounded-xl flex flex-col transition duration-200 space-y-1`;
             item.innerHTML = `
                 <div class="font-bold text-gray-800 text-base mb-1">${transaction.description}</div>
                 <div class="flex justify-between items-center w-full">
                     <div class="text-sm text-gray-500 flex-grow pr-4">
-                        <span>${new Date(transaction.date).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' })}</span> | 
+                        <span>${displayDate}</span> | 
                         <span class="${getPlatformColor(transaction.platform)} font-semibold">${transaction.platform}</span>
                     </div>
                     <div class="flex items-center space-x-2 flex-shrink-0">
@@ -499,13 +527,23 @@
         function addSearchResultDOM(transaction) {
             const item = document.createElement('li');
             const isIncome = transaction.type === 'income';
+            
+            // FIX: Use the centralized function for consistent date parsing.
+            const localDate = parseLocalDate(transaction.date);
+
+            const displayDate = localDate.toLocaleDateString('th-TH', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+
             item.className = `p-3 border rounded-lg flex flex-col transition duration-200 space-y-1 bg-gray-50`;
             item.innerHTML = `
                 <div class="flex justify-between items-center w-full">
                     <div>
                         <div class="font-bold text-gray-800 text-base">${transaction.description}</div>
                         <div class="text-sm text-gray-500">
-                            <span>${new Date(transaction.date).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' })}</span> |
+                            <span>${displayDate}</span> |
                             <span class="${getPlatformColor(transaction.platform)} font-semibold">${transaction.platform}</span>
                         </div>
                     </div>
@@ -590,7 +628,6 @@
                 return;
             }
 
-            // --- Calculations ---
             const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
             const totalExpense = transactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
             const totalBalance = totalIncome - totalExpense;
@@ -611,7 +648,6 @@
                 overallProfit = 100;
             }
 
-            // --- DOM Updates ---
             stickyTotalBalanceEl.textContent = `฿${formatMoney(totalBalance)}`;
             stickyTotalBalanceEl.classList.toggle('text-green-400', totalBalance >= 0);
             stickyTotalBalanceEl.classList.toggle('text-red-400', totalBalance < 0);
@@ -628,7 +664,8 @@
         function updateUI() {
             populateFilters();
             const filtered = getFilteredTransactions();
-            filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
+            // เปลี่ยนการเรียงข้อมูลเป็นจากน้อยไปมาก (วันที่เก่าสุดไปใหม่สุด)
+            filtered.sort((a, b) => parseLocalDate(a.date) - parseLocalDate(b.date));
             transactionListEl.innerHTML = '';
             if (filtered.length === 0) {
                  transactionListEl.innerHTML = '<li class="text-center text-gray-500 py-4">ไม่พบรายการในเดือนที่เลือก...</li>';
@@ -638,16 +675,15 @@
             updateValues(filtered);
             renderSummaries(filtered);
             updatePlatformOptions();
-            updateStickyPanel(); // Main call to update the panel
+            updateStickyPanel();
         }
 
-        // --- Search Logic ---
         function handleSearch() {
             const query = searchInput.value.toLowerCase().trim();
             searchResultsList.innerHTML = '';
 
             if (query.length === 0) {
-                return; // Just show an empty list if there's no query
+                return;
             }
 
             const results = transactions.filter(t =>
@@ -658,13 +694,12 @@
             if (results.length === 0) {
                 searchResultsList.innerHTML = '<li class="text-center text-gray-500 py-4">ไม่พบรายการที่ตรงกัน</li>';
             } else {
-                results.sort((a, b) => new Date(b.date) - new Date(a.date)); // Newest first
+                // เปลี่ยนการเรียงข้อมูลเป็นจากน้อยไปมาก (วันที่เก่าสุดไปใหม่สุด)
+                results.sort((a, b) => parseLocalDate(a.date) - parseLocalDate(b.date));
                 results.forEach(addSearchResultDOM);
             }
         }
 
-
-        // --- Initial Load ---
         async function init(isInitialLoad = true) {
             if (isInitialLoad) loadingOverlay.style.display = 'flex';
             initializeDateDropdowns();
@@ -676,6 +711,8 @@
             try {
                 const response = await callGoogleScript('getData');
                 transactions = (response.data || []).map(t => ({...t, amount: parseFloat(t.amount) || 0 })); 
+                // เปลี่ยนการเรียงข้อมูลเป็นจากน้อยไปมาก (วันที่เก่าสุดไปใหม่สุด)
+                transactions.sort((a, b) => parseLocalDate(a.date) - parseLocalDate(b.date));
                 updateLocalStorage();
             } catch (error) {
                 console.error("Could not sync with Google Sheet.", error);
@@ -686,7 +723,6 @@
             }
         }
 
-        // --- Event Listeners ---
         form.addEventListener('submit', addTransaction);
         filterYearInput.addEventListener('change', updateUI); 
         filterMonthInput.addEventListener('change', updateUI); 
@@ -695,8 +731,8 @@
 
         searchFab.addEventListener('click', () => {
             searchModal.classList.remove('hidden');
-            searchInput.value = ''; // Clear previous search
-            handleSearch(); // Show initial message
+            searchInput.value = '';
+            handleSearch();
             searchInput.focus();
         });
 
@@ -720,3 +756,10 @@
     </script>
 </body>
 </html>
+
+
+
+
+
+
+
