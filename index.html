@@ -244,8 +244,8 @@
 
     <script>
         // Configuration
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw9ImlQQ860LcJNjojx6XCJB7ohJz0SC13ZeE_UblzoAdeRNRqk7tLVD71DazRgCaA6vg/exec";
-        const SHEET_ID = "1PHtLUtMEYmOLzLYPGxjesMPDtTj3l4DRpsUZUGtHdqg";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzijxz6qk2Xtz5adOOgfrWTyBY0AURwzMsqN4zsO2dtPwnXri-70Q5MLemQVFmBOk4D2w/exec";
+        const SHEET_ID = "1tnxJSvIM2FMZjbYxibkrQ30wQ2vkUgVLD-70Q0U85kY";
 
         // DOM Elements
         const balanceEl = document.getElementById('balance');
@@ -277,7 +277,6 @@
         const modalCloseBtn = document.getElementById('modal-close-btn');
         const confirmModal = document.getElementById('confirm-modal');
         const confirmMessageEl = document.getElementById('confirm-message');
-        // FIX: Changed confirmCancelBtn from const to let for consistency
         let confirmCancelBtn = document.getElementById('confirm-cancel-btn');
         let confirmOkBtn = document.getElementById('confirm-ok-btn');
 
@@ -317,20 +316,17 @@
             customModal.classList.remove('hidden');
         }
 
-        // FIX: Rewrote showConfirm to prevent event listener issues and errors.
         function showConfirm(message, onConfirm) {
             confirmMessageEl.textContent = message;
             confirmModal.classList.remove('hidden');
 
-            // By cloning and replacing the buttons, we remove any previously attached event listeners.
-            // This is a robust way to prevent listeners from stacking up and causing errors.
             const newConfirmOkBtn = confirmOkBtn.cloneNode(true);
             confirmOkBtn.parentNode.replaceChild(newConfirmOkBtn, confirmOkBtn);
-            confirmOkBtn = newConfirmOkBtn; // Update the global reference to the new button.
+            confirmOkBtn = newConfirmOkBtn;
 
             const newConfirmCancelBtn = confirmCancelBtn.cloneNode(true);
             confirmCancelBtn.parentNode.replaceChild(newConfirmCancelBtn, confirmCancelBtn);
-            confirmCancelBtn = newConfirmCancelBtn; // Update the global reference to the new button.
+            confirmCancelBtn = newConfirmCancelBtn;
 
             const closeConfirm = () => confirmModal.classList.add('hidden');
 
@@ -446,9 +442,10 @@
             savingIndicator.style.display = 'inline'; savingIndicator.style.opacity = '1'; addTransactionBtn.disabled = true;
             try {
                 await callGoogleScript('addData', transaction);
+                await init(false);
             } catch (error) {
                 showMessage('ไม่สามารถบันทึกข้อมูลไปยัง Google Sheet ได้: ' + error.message);
-                await init(false); // Re-sync on failure
+                await init(false);
             } finally {
                 savingIndicator.style.opacity = '0';
                 setTimeout(() => { savingIndicator.style.display = 'none'; }, 300);
@@ -468,7 +465,7 @@
                     await callGoogleScript('deleteData', { id });
                 } catch (error) {
                     showMessage('เกิดข้อผิดพลาดในการลบรายการ: ' + error.message);
-                    transactions = originalTransactions; // Revert on failure
+                    transactions = originalTransactions;
                     updateLocalStorage();
                     updateUI();
                 } finally {
@@ -478,7 +475,6 @@
             });
         }
 
-        // --- REVISED: Function to handle checkbox state change without confirmation ---
         function toggleReceivedStatus(checkbox, id) {
             const isReceiving = checkbox.checked;
             const receivedDate = isReceiving ? new Date().toISOString().split('T')[0] : '';
@@ -486,20 +482,20 @@
             const transactionToUpdate = transactions.find(t => t.id === id);
             if (!transactionToUpdate) return;
             const originalReceivedDate = transactionToUpdate.receiveddate;
+            const originalReceivedStatus = transactionToUpdate.receivedstatus;
 
-            // Optimistic UI Update: Apply the change immediately for a responsive feel
             transactionToUpdate.receiveddate = receivedDate;
+            transactionToUpdate.receivedstatus = isReceiving;
             updateLocalStorage();
             updateUI();
 
-            // Call backend to save the change
-            callGoogleScript('updateReceivedStatus', { id, receivedDate })
+            callGoogleScript('updateReceivedStatus', { id, receivedDate, status: isReceiving })
                 .catch(error => {
-                    // If backend fails, revert the change and show an error message
                     showMessage('ไม่สามารถอัปเดตสถานะได้: ' + error.message);
-                    transactionToUpdate.receiveddate = originalReceivedDate; // Revert to original value
+                    transactionToUpdate.receiveddate = originalReceivedDate;
+                    transactionToUpdate.receivedstatus = originalReceivedStatus;
                     updateLocalStorage();
-                    updateUI(); // Re-render to show the reverted state
+                    updateUI();
                 });
         }
 
@@ -540,12 +536,10 @@
             const localDate = parseLocalDate(transaction.date);
             const displayDate = localDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
 
-            // --- Checkbox logic ---
             const isOrder = transaction.platform === 'สั่งซื้อสินค้า';
+            const isChecked = (String(transaction.receivedstatus).toLowerCase() === 'true');
             const receivedDateStr = transaction.receiveddate ? parseLocalDate(transaction.receiveddate).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
-            const isChecked = transaction.receiveddate ? 'checked' : '';
-
-            // --- NEW: Shipping duration logic ---
+            
             let shippingDurationText = '';
             if (transaction.receiveddate) {
                 const orderDate = parseLocalDate(transaction.date);
@@ -554,24 +548,21 @@
                 const dayDiff = Math.round(timeDiff / (1000 * 3600 * 24));
                 
                 if (dayDiff < 0) {
-                  // In case of bad data, don't show anything
                 } else if (dayDiff === 0) {
                     shippingDurationText = ' (ใช้เวลาจัดส่งภายในวันเดียว)';
                 } else {
                     shippingDurationText = ` (ใช้เวลาจัดส่ง ${dayDiff} วัน)`;
                 }
             }
-            // --- End of new logic ---
 
             const checkboxHTML = isOrder ? `
                 <div class="mt-3 pt-3 border-t border-gray-200">
                     <label class="inline-flex items-center space-x-2 cursor-pointer">
-                        <input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" onchange="toggleReceivedStatus(this, '${transaction.id}')" ${isChecked}>
-                        <span class="text-sm text-gray-700">ได้รับสินค้าแล้ว ${receivedDateStr ? `<span class="font-semibold text-green-600">(${receivedDateStr})</span><span class="text-gray-500">${shippingDurationText}</span>` : ''}</span>
+                        <input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" onchange="toggleReceivedStatus(this, '${transaction.id}')" ${isChecked ? 'checked' : ''}>
+                        <span class="text-sm text-gray-700">ได้รับสินค้าแล้ว ${receivedDateStr ? `<span class="font-semibold text-green-600">(${receivedDateStr})</span><span class="text-sm text-gray-600 font-medium">${shippingDurationText}</span>` : ''}</span>
                     </label>
                 </div>
             ` : '';
-            // --- End of logic ---
 
             item.className = `transaction-item ${isIncome ? 'bg-green-50 hover:bg-green-100' : 'bg-red-50 hover:bg-red-100'} p-4 border rounded-xl flex flex-col transition duration-200`;
             item.innerHTML = `
@@ -590,7 +581,7 @@
                         </div>
                     </div>
                 </div>
-                ${checkboxHTML}`; // Append the checkbox HTML
+                ${checkboxHTML}`;
             transactionListEl.appendChild(item);
         }
 
@@ -600,12 +591,10 @@
             const localDate = parseLocalDate(transaction.date);
             const displayDate = localDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
 
-            // --- REVISED: Replicate checkbox logic from the main list for search results ---
             const isOrder = transaction.platform === 'สั่งซื้อสินค้า';
+            const isChecked = (String(transaction.receivedstatus).toLowerCase() === 'true');
             const receivedDateStr = transaction.receiveddate ? parseLocalDate(transaction.receiveddate).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
-            const isChecked = transaction.receiveddate ? 'checked' : '';
 
-            // --- NEW: Shipping duration logic ---
             let shippingDurationText = '';
             if (transaction.receiveddate) {
                 const orderDate = parseLocalDate(transaction.date);
@@ -614,24 +603,21 @@
                 const dayDiff = Math.round(timeDiff / (1000 * 3600 * 24));
                 
                 if (dayDiff < 0) {
-                  // In case of bad data, don't show anything
                 } else if (dayDiff === 0) {
                     shippingDurationText = ' (ใช้เวลาจัดส่งภายในวันเดียว)';
                 } else {
                     shippingDurationText = ` (ใช้เวลาจัดส่ง ${dayDiff} วัน)`;
                 }
             }
-            // --- End of new logic ---
 
             const statusCheckboxHTML = isOrder ? `
                 <div class="mt-3 pt-3 border-t border-gray-200">
                     <label class="inline-flex items-center space-x-2 cursor-pointer">
-                        <input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" onchange="toggleReceivedStatus(this, '${transaction.id}')" ${isChecked}>
-                        <span class="text-sm text-gray-700">ได้รับสินค้าแล้ว ${receivedDateStr ? `<span class="font-semibold text-green-600">(${receivedDateStr})</span><span class="text-gray-500">${shippingDurationText}</span>` : ''}</span>
+                        <input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" onchange="toggleReceivedStatus(this, '${transaction.id}')" ${isChecked ? 'checked' : ''}>
+                        <span class="text-sm text-gray-700">ได้รับสินค้าแล้ว ${receivedDateStr ? `<span class="font-semibold text-green-600">(${receivedDateStr})</span><span class="text-sm text-gray-600 font-medium">${shippingDurationText}</span>` : ''}</span>
                     </label>
                 </div>
             ` : '';
-            // --- End of revised logic ---
 
             item.className = `p-3 border rounded-lg flex flex-col transition duration-200 bg-gray-50`;
             item.innerHTML = `
@@ -651,7 +637,7 @@
                         </div>
                     </div>
                 </div>
-                ${statusCheckboxHTML}`; // Append the interactive checkbox HTML here
+                ${statusCheckboxHTML}`;
             searchResultsList.appendChild(item);
         }
 
@@ -791,7 +777,7 @@
             if (isInitialLoad) loadingOverlay.style.display = 'flex';
             initializeDateDropdowns();
             const cached = JSON.parse(localStorage.getItem('transactions_cache'));
-            if (cached) {
+            if (cached && isInitialLoad) {
                 transactions = cached.map(t => ({...t, amount: parseFloat(t.amount) || 0}));
                 updateUI();
             }
@@ -802,7 +788,7 @@
                 updateLocalStorage();
             } catch (error) {
                 console.error("Could not sync with Google Sheet.", error);
-                if (isInitialLoad && !cached) showMessage(`ไม่สามารถโหลดข้อมูลได้: ${error.message}`);
+                if (!cached) showMessage(`ไม่สามารถโหลดข้อมูลได้: ${error.message}`);
             } finally {
                 updateUI();
                 if (isInitialLoad) loadingOverlay.style.display = 'none';
@@ -835,3 +821,7 @@
     </script>
 </body>
 </html>
+
+
+
+
