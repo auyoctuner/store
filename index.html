@@ -578,7 +578,7 @@
         function populateFilters() {
             const selectedY = filterYearInput.value;
             const selectedM = filterMonthInput.value;
-            const years = [...new Set(transactions.map(t => t.date.substring(0, 4)))];
+            const years = [...new Set(transactions.filter(t => t && t.date).map(t => t.date.substring(0, 4)))];
             const currentYear = new Date().getFullYear().toString();
             if (!years.includes(currentYear)) years.push(currentYear);
             filterYearInput.innerHTML = '';
