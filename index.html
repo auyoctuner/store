@@ -477,7 +477,14 @@
 
         function toggleReceivedStatus(checkbox, id) {
             const isReceiving = checkbox.checked;
-            const receivedDate = isReceiving ? new Date().toISOString().split('T')[0] : '';
+            let receivedDate = '';
+            if (isReceiving) {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                receivedDate = `${year}-${month}-${day}`;
+            }
 
             const transactionToUpdate = transactions.find(t => t.id === id);
             if (!transactionToUpdate) return;
@@ -548,10 +555,11 @@
                 const dayDiff = Math.round(timeDiff / (1000 * 3600 * 24));
                 
                 if (dayDiff < 0) {
+                    shippingDurationText = ' - วันที่ผิดพลาด';
                 } else if (dayDiff === 0) {
-                    shippingDurationText = ' (ใช้เวลาจัดส่งภายในวันเดียว)';
+                    shippingDurationText = ' - จัดส่งในวันเดียว';
                 } else {
-                    shippingDurationText = ` (ใช้เวลาจัดส่ง ${dayDiff} วัน)`;
+                    shippingDurationText = ` - จัดส่ง ${dayDiff} วัน`;
                 }
             }
 
@@ -603,10 +611,11 @@
                 const dayDiff = Math.round(timeDiff / (1000 * 3600 * 24));
                 
                 if (dayDiff < 0) {
+                    shippingDurationText = ' - วันที่ผิดพลาด';
                 } else if (dayDiff === 0) {
-                    shippingDurationText = ' (ใช้เวลาจัดส่งภายในวันเดียว)';
+                    shippingDurationText = ' - จัดส่งในวันเดียว';
                 } else {
-                    shippingDurationText = ` (ใช้เวลาจัดส่ง ${dayDiff} วัน)`;
+                    shippingDurationText = ` - จัดส่ง ${dayDiff} วัน`;
                 }
             }
 
@@ -774,7 +783,7 @@
 
         // --- Initial Load ---
         async function init(isInitialLoad = true) {
-            if (isInitialLoad) loadingOverlay.style.display = 'flex';
+            // if (isInitialLoad) loadingOverlay.style.display = 'flex';
             initializeDateDropdowns();
             const cached = JSON.parse(localStorage.getItem('transactions_cache'));
             if (cached && isInitialLoad) {
@@ -821,7 +830,5 @@
     </script>
 </body>
 </html>
-
-
 
 
