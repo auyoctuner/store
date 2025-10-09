@@ -171,7 +171,7 @@
     </div>
 
     <!-- Modals -->
-    <div id="custom-modal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-center justify-center z-50 p-4">
+    <div id="custom-modal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-center justify-center z-[60] p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full transform transition-all duration-300 scale-100">
             <div class="p-6">
                 <h3 class="text-xl font-bold text-gray-800 mb-4">แจ้งเตือน</h3>
@@ -182,7 +182,7 @@
             </div>
         </div>
     </div>
-    <div id="confirm-modal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-center justify-center z-50 p-4">
+    <div id="confirm-modal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-center justify-center z-[60] p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full transform transition-all duration-300 scale-100">
             <div class="p-6">
                 <h3 class="text-xl font-bold text-red-700 mb-4">ยืนยันการดำเนินการ</h3>
@@ -495,34 +495,55 @@
         }
 
         function toggleReceivedStatus(checkbox, id) {
-            const isReceiving = checkbox.checked;
-            let receivedDate = '';
-            if (isReceiving) {
-                const now = new Date();
-                const year = now.getFullYear();
-                const month = String(now.getMonth() + 1).padStart(2, '0');
-                const day = String(now.getDate()).padStart(2, '0');
-                receivedDate = `${year}-${month}-${day}`;
+            // If the checkbox is not checked, do nothing (shouldn't happen with `disabled`)
+            if (!checkbox.checked) {
+                return;
             }
 
-            const transactionToUpdate = transactions.find(t => t.id === id);
-            if (!transactionToUpdate) return;
-            const originalReceivedDate = transactionToUpdate.receiveddate;
-            const originalReceivedStatus = transactionToUpdate.receivedstatus;
+            // Show confirmation dialog
+            showConfirm('คุณต้องการยืนยันว่าได้รับสินค้านี้แล้วใช่หรือไม่?', (confirmed) => {
+                if (confirmed) {
+                    // --- User confirmed ---
+                    const isReceiving = true;
+                    const now = new Date();
+                    const year = now.getFullYear();
+                    const month = String(now.getMonth() + 1).padStart(2, '0');
+                    const day = String(now.getDate()).padStart(2, '0');
+                    const receivedDate = `${year}-${month}-${day}`;
+                    
+                    const transactionToUpdate = transactions.find(t => t.id === id);
+                    if (!transactionToUpdate) {
+                        checkbox.checked = false; // revert UI just in case
+                        return;
+                    }
+                    
+                    // Store original values for potential rollback on API failure
+                    const originalReceivedDate = transactionToUpdate.receiveddate;
+                    const originalReceivedStatus = transactionToUpdate.receivedstatus;
 
-            transactionToUpdate.receiveddate = receivedDate;
-            transactionToUpdate.receivedstatus = isReceiving;
-            updateLocalStorage();
-            updateUI();
-
-            callGoogleScript('updateReceivedStatus', { id, receivedDate, status: isReceiving })
-                .catch(error => {
-                    showMessage('ไม่สามารถอัปเดตสถานะได้: ' + error.message);
-                    transactionToUpdate.receiveddate = originalReceivedDate;
-                    transactionToUpdate.receivedstatus = originalReceivedStatus;
+                    // Optimistically update UI
+                    transactionToUpdate.receiveddate = receivedDate;
+                    transactionToUpdate.receivedstatus = isReceiving;
                     updateLocalStorage();
-                    updateUI();
-                });
+                    updateUI(); // Re-renders the list, which will disable the checkbox
+
+                    // Call API to sync
+                    callGoogleScript('updateReceivedStatus', { id, receivedDate, status: isReceiving })
+                        .catch(error => {
+                            showMessage('ไม่สามารถอัปเดตสถานะได้: ' + error.message);
+                            // Rollback on failure
+                            transactionToUpdate.receiveddate = originalReceivedDate;
+                            transactionToUpdate.receivedstatus = originalReceivedStatus;
+                            updateLocalStorage();
+                            updateUI(); // Re-render again to show the original state
+                        });
+
+                } else {
+                    // --- User cancelled ---
+                    // Revert the checkbox state visually since the user clicked it
+                    checkbox.checked = false;
+                }
+            });
         }
 
         // --- Utility Functions ---
@@ -608,8 +629,8 @@
 
             const checkboxHTML = isOrder ? `
                 <div class="mt-3 pt-3 border-t border-gray-200">
-                    <label class="inline-flex items-center space-x-2 cursor-pointer">
-                        <input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" onchange="toggleReceivedStatus(this, '${transaction.id}')" ${isChecked ? 'checked' : ''}>
+                    <label class="inline-flex items-center space-x-2 ${isChecked ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'}">
+                        <input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" onchange="toggleReceivedStatus(this, '${transaction.id}')" ${isChecked ? 'checked disabled' : ''}>
                         <span class="text-sm text-gray-700">ได้รับสินค้าแล้ว ${statusDisplayHTML}</span>
                     </label>
                 </div>
@@ -688,8 +709,8 @@
 
             const statusCheckboxHTML = isOrder ? `
                 <div class="mt-3 pt-3 border-t border-gray-200">
-                    <label class="inline-flex items-center space-x-2 cursor-pointer">
-                        <input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" onchange="toggleReceivedStatus(this, '${transaction.id}')" ${isChecked ? 'checked' : ''}>
+                    <label class="inline-flex items-center space-x-2 ${isChecked ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'}">
+                        <input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" onchange="toggleReceivedStatus(this, '${transaction.id}')" ${isChecked ? 'checked disabled' : ''}>
                         <span class="text-sm text-gray-700">ได้รับสินค้าแล้ว ${statusDisplayHTML}</span>
                     </label>
                 </div>
@@ -954,4 +975,8 @@
     </script>
 </body>
 </html>
+"
+Fix the bug in the selected code
+
+
 
