@@ -226,6 +226,14 @@
                 <ul id="search-results-list" class="space-y-3 max-h-96 overflow-y-auto">
                     <!-- Search results will be injected here -->
                 </ul>
+                <!-- Order Summary Footer -->
+                <div id="order-summary" class="hidden mt-4 pt-4 border-t border-gray-200">
+                    <div class="flex justify-end items-center text-sm font-medium text-gray-700">
+                        <span>รวมยอดที่ยังไม่ได้รับ:</span>
+                        <span class="ml-2 font-semibold"><span id="order-count">0</span> รายการ</span>
+                        <span class="ml-2 font-bold text-base">฿<span id="order-total">0.00</span></span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -304,6 +312,10 @@
         const filterNotReceivedBtn = document.getElementById('filter-not-received-btn');
         const activeFilterBar = document.getElementById('active-filter-bar');
         const clearFilterBtn = document.getElementById('clear-filter-btn');
+        const orderSummaryEl = document.getElementById('order-summary');
+        const orderCountEl = document.getElementById('order-count');
+        const orderTotalEl = document.getElementById('order-total');
+
 
         // Sticky Panel Elements
         const stickySummaryPanel = document.getElementById('sticky-summary-panel');
@@ -856,6 +868,7 @@
             
             activeFilterBar.classList.add('hidden');
             activeFilterBar.classList.remove('flex');
+            orderSummaryEl.classList.add('hidden');
             
             filterNotReceivedBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
             filterNotReceivedBtn.classList.add('bg-blue-500', 'hover:bg-blue-600');
@@ -880,6 +893,14 @@
             filterNotReceivedBtn.disabled = true;
 
             const results = transactions.filter(t => t.platform === 'สั่งซื้อสินค้า' && String(t.receivedstatus).toLowerCase() !== 'true');
+            
+            const totalCount = results.length;
+            const totalAmount = results.reduce((acc, t) => acc + t.amount, 0);
+
+            orderCountEl.textContent = totalCount;
+            orderTotalEl.textContent = formatMoney(totalAmount);
+            orderSummaryEl.classList.remove('hidden');
+
 
             if (results.length === 0) {
                 searchResultsList.innerHTML = '<li class="text-center text-gray-500 py-4">ไม่มีรายการสั่งซื้อที่ยังไม่ได้รับ</li>';
@@ -975,8 +996,4 @@
     </script>
 </body>
 </html>
-"
-Fix the bug in the selected code
-
-
 
