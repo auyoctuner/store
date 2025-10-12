@@ -165,13 +165,6 @@
             </div>
         </section>
 
-        <!-- Gemini Financial Analysis -->
-        <section class="bg-white p-6 rounded-xl shadow-md mb-8 text-center">
-            <button id="analyze-finances-btn" class="bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-1 transition duration-300">
-                ✨ วิเคราะห์ภาพรวมการเงิน
-            </button>
-        </section>
-
         <!-- Platform Income Summary -->
         <section id="platform-summary-section" class="bg-white p-6 rounded-xl shadow-md mb-8">
             <h2 id="platform-summary-title" class="text-2xl font-bold mb-4 border-b pb-2 text-green-700">สรุปรายรับ</h2>
@@ -267,45 +260,18 @@
             <div class="p-6">
                 <div class="flex justify-between items-center mb-4">
                      <h3 class="text-xl font-bold text-gray-800">วิเคราะห์ SKU</h3>
-                    <button id="summarize-sku-btn" class="bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-semibold py-2 px-4 rounded-lg hover:shadow-lg transform hover:-translate-y-px transition duration-200 text-sm">
-                        ✨ สรุปภาพรวม
-                    </button>
                     <button id="sku-modal-close-btn" class="text-gray-400 hover:text-gray-600">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
                 </div>
-                <div id="sku-summary-output" class="p-4 mb-4 bg-gray-100 rounded-lg text-gray-700" style="display: none;"></div>
                 <ul id="sku-analysis-list" class="space-y-3 max-h-96 overflow-y-auto">
                     <!-- SKU analysis will be injected here -->
                 </ul>
             </div>
         </div>
     </div>
-    
-    <!-- Gemini Analysis Modal -->
-    <div id="gemini-modal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-center justify-center z-[80] p-4">
-        <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full transform transition-all duration-300 scale-100">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 id="gemini-modal-title" class="text-xl font-bold text-gray-800">✨ กำลังวิเคราะห์...</h3>
-                    <button id="gemini-modal-close-btn" class="text-gray-400 hover:text-gray-600">
-                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                <div id="gemini-modal-content" class="text-gray-700 max-h-96 overflow-y-auto leading-relaxed">
-                    <!-- Loading spinner or content goes here -->
-                </div>
-                 <div class="flex justify-end mt-6">
-                    <button id="gemini-modal-ok-btn" class="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-150">ตกลง</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 
     <!-- Floating Search Button -->
     <button id="search-fab" class="fixed bottom-6 right-6 bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition z-40">
@@ -391,17 +357,6 @@
         const skuModal = document.getElementById('sku-modal');
         const skuModalCloseBtn = document.getElementById('sku-modal-close-btn');
         const skuAnalysisList = document.getElementById('sku-analysis-list');
-        const summarizeSkuBtn = document.getElementById('summarize-sku-btn');
-        const skuSummaryOutput = document.getElementById('sku-summary-output');
-
-
-        // Gemini Modal Elements
-        const analyzeFinancesBtn = document.getElementById('analyze-finances-btn');
-        const geminiModal = document.getElementById('gemini-modal');
-        const geminiModalTitle = document.getElementById('gemini-modal-title');
-        const geminiModalContent = document.getElementById('gemini-modal-content');
-        const geminiModalCloseBtn = document.getElementById('gemini-modal-close-btn');
-        const geminiModalOkBtn = document.getElementById('gemini-modal-ok-btn');
 
         // Sticky Panel Elements
         const stickySummaryPanel = document.getElementById('sticky-summary-panel');
@@ -414,7 +369,6 @@
         // State
         let transactions = [];
         let isFilteringOrders = false;
-        let lastSkuAnalysisData = [];
 
         /**
          * A robust function to parse date strings correctly, handling both 'YYYY-MM-DD' and full ISO strings.
@@ -428,57 +382,6 @@
             return new Date(dateString);
         }
         
-        // --- Gemini API Connector ---
-        async function callGeminiAPI(prompt, retries = 3, delay = 1000) {
-            const apiKey = ""; // API key is handled by the environment
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-            const payload = {
-                contents: [{
-                    parts: [{ text: prompt }]
-                }],
-            };
-
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (!response.ok) {
-                        const errorBody = await response.json();
-                        throw new Error(`API Error: ${response.status} ${response.statusText} - ${JSON.stringify(errorBody)}`);
-                    }
-
-                    const result = await response.json();
-                    
-                    if (result.candidates && result.candidates[0] && result.candidates[0].content.parts[0].text) {
-                        return result.candidates[0].content.parts[0].text;
-                    } else {
-                        throw new Error('การตอบกลับจาก AI ไม่สมบูรณ์');
-                    }
-                } catch (error) {
-                    console.error(`Attempt ${i + 1} failed:`, error);
-                    if (i === retries - 1) {
-                        throw error;
-                    }
-                    await new Promise(res => setTimeout(res, delay));
-                    delay *= 2; // Exponential backoff
-                }
-            }
-            throw new Error('ไม่สามารถเชื่อมต่อกับ AI ได้หลังจากพยายามหลายครั้ง');
-        }
-
-        function formatGeminiResponse(text) {
-             return text
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')     // Italic/List item
-                .replace(/^\* (.*$)/gm, '<li class="ml-4 mb-2 list-disc">$1</li>') // List items
-                .replace(/\n/g, '<br>');
-        }
-
         // --- Custom Modals ---
         function showMessage(message) {
             modalMessageEl.textContent = message;
@@ -1058,7 +961,6 @@
             const sortedSkus = Object.entries(skuData6Months).sort(([, a], [, b]) => b.totalQuantity - a.totalQuantity);
 
             skuAnalysisList.innerHTML = '';
-            lastSkuAnalysisData = []; // Clear previous data
 
             if (sortedSkus.length === 0) {
                 skuAnalysisList.innerHTML = '<li class="text-center text-gray-500 py-4">ไม่พบข้อมูล SKU ที่ขึ้นต้นด้วย "SKU"</li>';
@@ -1071,15 +973,6 @@
                 const data3Months = skuData3Months[sku];
                 const total3Months = data3Months ? data3Months.totalQuantity : 0;
                 const recommendedAverage = total3Months / 3;
-
-                // Store for Gemini analysis
-                 lastSkuAnalysisData.push({
-                    sku: sku,
-                    total_6_months: data6Months.totalQuantity,
-                    avg_6_months: parseFloat(average6Months.toFixed(2)),
-                    recommended_order: parseFloat(recommendedAverage.toFixed(2))
-                });
-
 
                 const item = document.createElement('li');
                 item.className = 'p-4 border rounded-lg flex justify-between items-center bg-gray-50';
@@ -1176,7 +1069,7 @@
 
         // --- Initial Load ---
         async function init(isInitialLoad = true) {
-            if (isInitialLoad) loadingOverlay.style.display = 'flex';
+            // if (isInitialLoad) loadingOverlay.style.display = 'flex';
             initializeDateDropdowns();
             const cached = JSON.parse(localStorage.getItem('transactions_cache'));
             if (cached && isInitialLoad) {
@@ -1225,8 +1118,6 @@
 
         manageSkuBtn.addEventListener('click', () => {
             searchModal.classList.add('hidden');
-            skuSummaryOutput.style.display = 'none';
-            skuSummaryOutput.innerHTML = '';
             showSkuAnalysis();
             skuModal.classList.remove('hidden');
         });
@@ -1237,70 +1128,9 @@
 
         stickySummaryPanel.addEventListener('click', () => stickySummaryPanel.classList.toggle('visible'));
         
-        // --- Gemini Feature Event Listeners ---
-        analyzeFinancesBtn.addEventListener('click', async () => {
-            const filtered = getFilteredTransactions();
-            if (filtered.length === 0) {
-                showMessage('ไม่พบข้อมูลในเดือนที่เลือกเพื่อทำการวิเคราะห์');
-                return;
-            }
-
-            const income = filtered.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
-            const expense = filtered.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
-            const balance = income - expense;
-
-            const expenseDetails = filtered
-                .filter(t => t.type === 'expense')
-                .reduce((acc, t) => {
-                    acc[t.platform] = (acc[t.platform] || 0) + t.amount;
-                    return acc;
-                }, {});
-            
-            const expenseDetailsString = Object.entries(expenseDetails).map(([key, value]) => `- ${key}: ${formatMoney(value)} บาท`).join('\n');
-
-            const monthYearText = filterMonthInput.options[filterMonthInput.selectedIndex].text + " " + filterYearInput.options[filterYearInput.selectedIndex].text;
-
-            const prompt = `คุณคือที่ปรึกษาทางการเงินส่วนตัวที่เป็นมิตรและเข้าใจง่าย ช่วยวิเคราะห์ข้อมูลการเงินจากข้อมูลที่ให้มา โดยไม่ต้องกล่าวถึงคำว่า 'Gemini' หรือ 'AI' ในคำตอบของคุณ\n\nข้อมูลสำหรับ ${monthYearText}:\n- รายรับรวม: ${formatMoney(income)} บาท\n- รายจ่ายรวม: ${formatMoney(expense)} บาท\n- ยอดคงเหลือ: ${formatMoney(balance)} บาท\n\nรายจ่ายแยกตามหมวดหมู่:\n${expenseDetailsString}\n\nจากข้อมูลนี้ โปรด:\n1. สรุปพฤติกรรมการใช้จ่ายใน 1-2 ประโยค\n2. ให้คำแนะนำที่นำไปใช้ได้จริง 2-3 ข้อ เพื่อช่วยในการออมหรือจัดการการเงินให้ดีขึ้น\n3. สรุปด้วยประโยคให้กำลังใจ\n\nจัดรูปแบบคำตอบโดยใช้ markdown เช่น ใช้ '*' สำหรับลิสต์รายการ`;
-
-            geminiModalTitle.textContent = '✨ บทวิเคราะห์การเงิน';
-            geminiModalContent.innerHTML = '<div class="loader"></div><p class="text-center text-gray-500">กำลังประมวลผลข้อมูล...</p>';
-            geminiModal.classList.remove('hidden');
-
-            try {
-                const result = await callGeminiAPI(prompt);
-                geminiModalContent.innerHTML = formatGeminiResponse(result);
-            } catch (error) {
-                geminiModalContent.innerHTML = `<p class="text-red-500">เกิดข้อผิดพลาดในการวิเคราะห์ข้อมูล: ${error.message}</p>`;
-            }
-        });
-
-        summarizeSkuBtn.addEventListener('click', async () => {
-            if (lastSkuAnalysisData.length === 0) {
-                showMessage('ไม่มีข้อมูล SKU ที่จะสรุป');
-                return;
-            }
-            
-            skuSummaryOutput.style.display = 'block';
-            skuSummaryOutput.innerHTML = '<div class="loader" style="width: 20px; height: 20px; border-width: 2px;"></div><p class="text-center text-sm text-gray-500">กำลังสรุปข้อมูล SKU...</p>';
-
-            const skuDataString = JSON.stringify(lastSkuAnalysisData.slice(0, 10)); // Limit to top 10 to keep prompt size reasonable
-
-            const prompt = `คุณคือผู้จัดการสต็อกสินค้าที่มีประสบการณ์ ช่วยวิเคราะห์ข้อมูล SKU จากข้อมูลที่ให้มา โดยไม่ต้องกล่าวถึงคำว่า 'Gemini' หรือ 'AI' ในคำตอบของคุณ\n\nข้อมูลสรุป SKU (เรียงตามยอดสั่งซื้อ 6 เดือนล่าสุด):\n${skuDataString}\n\nจากข้อมูลนี้ โปรด:\n1. ระบุสินค้าที่ขายดีที่สุด (Top Seller) และแนวโน้ม\n2. ชี้ให้เห็นสินค้าที่อาจต้องให้ความสนใจเป็นพิเศษ (เช่น ยอดสั่งซื้อน้อย หรือไม่มีเลยในช่วง 3 เดือนล่าสุด)\n3. ให้คำแนะนำสั้นๆ เกี่ยวกับการจัดการสต็อกตามข้อมูลนี้\n\nจัดรูปแบบคำตอบเป็นย่อหน้าสั้นๆ และใช้ markdown สำหรับการเน้นข้อความ`;
-            
-            try {
-                const result = await callGeminiAPI(prompt);
-                skuSummaryOutput.innerHTML = formatGeminiResponse(result);
-            } catch (error) {
-                skuSummaryOutput.innerHTML = `<p class="text-red-500">เกิดข้อผิดพลาดในการสรุป: ${error.message}</p>`;
-            }
-        });
-
-
-        geminiModalCloseBtn.addEventListener('click', () => geminiModal.classList.add('hidden'));
-        geminiModalOkBtn.addEventListener('click', () => geminiModal.classList.add('hidden'));
-
         init();
     </script>
 </body>
 </html>
+
 
