@@ -258,8 +258,9 @@
     <div id="sku-modal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-start justify-center z-[70] p-4 pt-16">
         <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full transform transition-all duration-300 scale-100">
             <div class="p-6">
-                <div class="flex justify-between items-center mb-4">
-                     <h3 class="text-xl font-bold text-gray-800">วิเคราะห์ SKU</h3>
+                <div class="flex justify-between items-center mb-4 gap-4">
+                    <h3 class="text-xl font-bold text-gray-800 flex-shrink-0">วิเคราะห์ SKU</h3>
+                    <input type="text" id="sku-search-input" placeholder="ค้นหา SKU..." class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2">
                     <button id="sku-modal-close-btn" class="text-gray-400 hover:text-gray-600">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -357,6 +358,8 @@
         const skuModal = document.getElementById('sku-modal');
         const skuModalCloseBtn = document.getElementById('sku-modal-close-btn');
         const skuAnalysisList = document.getElementById('sku-analysis-list');
+        const skuSearchInput = document.getElementById('sku-search-input');
+
 
         // Sticky Panel Elements
         const stickySummaryPanel = document.getElementById('sticky-summary-panel');
@@ -369,6 +372,8 @@
         // State
         let transactions = [];
         let isFilteringOrders = false;
+        let fullSkuAnalysis = [];
+
 
         /**
          * A robust function to parse date strings correctly, handling both 'YYYY-MM-DD' and full ISO strings.
@@ -912,7 +917,45 @@
             return { sku, quantity };
         }
 
+        function renderSkuAnalysis(skusToRender) {
+             skuAnalysisList.innerHTML = '';
+
+            if (skusToRender.length === 0) {
+                skuAnalysisList.innerHTML = '<li class="text-center text-gray-500 py-4">ไม่พบข้อมูล SKU ที่ตรงกัน</li>';
+                return;
+            }
+
+            skusToRender.forEach(([sku, { data6Months, recommendedAverage, shippingInfoHTML }]) => {
+                const average6Months = data6Months.totalQuantity / 6;
+                
+                const item = document.createElement('li');
+                item.className = 'p-4 border rounded-lg bg-gray-50';
+                item.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="font-bold text-gray-800">${sku}</div>
+                            <div class="text-sm text-gray-500 mt-1">สั่งทั้งหมด ${data6Months.totalQuantity} ชิ้น (6 เดือน)</div>
+                        </div>
+                        <div class="flex items-center space-x-6">
+                            <div class="text-right">
+                                <div class="font-bold text-lg text-indigo-600">${average6Months.toFixed(2)}</div>
+                                <div class="text-xs text-gray-500">เฉลี่ยต่อเดือน (จาก 6 เดือน)</div>
+                            </div>
+                            <div class="text-right p-2 rounded-lg bg-green-100 border border-green-200">
+                                <div class="font-bold text-lg text-green-700">${recommendedAverage.toFixed(2)}</div>
+                                <div class="text-xs text-green-800 font-semibold">แนะนำให้สั่งซื้อครั้งถัดไป</div>
+                            </div>
+                        </div>
+                    </div>
+                    ${shippingInfoHTML}
+                `;
+                skuAnalysisList.appendChild(item);
+            });
+        }
+
+
         function showSkuAnalysis() {
+            skuSearchInput.value = '';
             const sixMonthsAgo = new Date();
             sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
             sixMonthsAgo.setHours(0, 0, 0, 0);
@@ -960,40 +1003,52 @@
 
             const sortedSkus = Object.entries(skuData6Months).sort(([, a], [, b]) => b.totalQuantity - a.totalQuantity);
 
-            skuAnalysisList.innerHTML = '';
-
             if (sortedSkus.length === 0) {
-                skuAnalysisList.innerHTML = '<li class="text-center text-gray-500 py-4">ไม่พบข้อมูล SKU ที่ขึ้นต้นด้วย "SKU"</li>';
+                fullSkuAnalysis = [];
+                renderSkuAnalysis([]);
                 return;
             }
 
-            sortedSkus.forEach(([sku, data6Months]) => {
-                const average6Months = data6Months.totalQuantity / 6;
-                
+            fullSkuAnalysis = sortedSkus.map(([sku, data6Months]) => {
                 const data3Months = skuData3Months[sku];
                 const total3Months = data3Months ? data3Months.totalQuantity : 0;
                 const recommendedAverage = total3Months / 3;
 
-                const item = document.createElement('li');
-                item.className = 'p-4 border rounded-lg flex justify-between items-center bg-gray-50';
-                item.innerHTML = `
-                    <div>
-                        <div class="font-bold text-gray-800">${sku}</div>
-                        <div class="text-sm text-gray-500 mt-1">สั่งทั้งหมด ${data6Months.totalQuantity} ชิ้น (6 เดือน)</div>
-                    </div>
-                    <div class="flex items-center space-x-6">
-                        <div class="text-right">
-                            <div class="font-bold text-lg text-indigo-600">${average6Months.toFixed(2)}</div>
-                            <div class="text-xs text-gray-500">เฉลี่ยต่อเดือน (จาก 6 เดือน)</div>
-                        </div>
-                        <div class="text-right p-2 rounded-lg bg-green-100 border border-green-200">
-                            <div class="font-bold text-lg text-green-700">${recommendedAverage.toFixed(2)}</div>
-                            <div class="text-xs text-green-800 font-semibold">แนะนำให้สั่งซื้อครั้งถัดไป</div>
-                        </div>
-                    </div>
-                `;
-                skuAnalysisList.appendChild(item);
+                const shippingDurations = relevantTransactions
+                    .filter(t => {
+                        const { sku: transactionSku } = parseSkuAndQuantity(t.description);
+                        return transactionSku === sku && String(t.receivedstatus).toLowerCase() === 'true' && t.receiveddate;
+                    })
+                    .map(t => {
+                        const orderDate = parseLocalDate(t.date);
+                        const receivedDate = parseLocalDate(t.receiveddate);
+                        const timeDiff = receivedDate.getTime() - orderDate.getTime();
+                        const dayDiff = Math.round(timeDiff / (1000 * 3600 * 24));
+                        return dayDiff >= 0 ? dayDiff : null;
+                    })
+                    .filter(d => d !== null);
+
+                let shippingInfoHTML = '';
+                if (shippingDurations.length > 0) {
+                    const minDays = Math.min(...shippingDurations);
+                    const maxDays = Math.max(...shippingDurations);
+                    const durationText = (minDays === maxDays) 
+                        ? `${minDays} วัน` 
+                        : `${minDays}-${maxDays} วัน`;
+                    shippingInfoHTML = `
+                        <div class="text-xs text-gray-600 mt-2 pt-2 border-t border-gray-200">
+                           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block mr-1 text-gray-400" fill="none" viewBox="0 0 24" stroke="currentColor" stroke-width="2">
+                              <path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                           </svg>
+                           สินค้านี้ใช้เวลาจัดส่ง: <strong>${durationText}</strong>
+                        </div>`;
+                }
+                
+                return [sku, { data6Months, recommendedAverage, shippingInfoHTML }];
             });
+
+            renderSkuAnalysis(fullSkuAnalysis);
         }
 
         function deactivateOrderFilter() {
@@ -1126,11 +1181,16 @@
             searchModal.classList.remove('hidden');
         });
 
+        skuSearchInput.addEventListener('input', () => {
+            const query = skuSearchInput.value.toLowerCase().trim();
+            const filteredSkus = fullSkuAnalysis.filter(([sku]) => sku.toLowerCase().includes(query));
+            renderSkuAnalysis(filteredSkus);
+        });
+
         stickySummaryPanel.addEventListener('click', () => stickySummaryPanel.classList.toggle('visible'));
         
         init();
     </script>
 </body>
 </html>
-
 
