@@ -184,7 +184,7 @@
     </div>
 
     <!-- Modals -->
-    <div id="custom-modal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-center justify-center z-[60] p-4">
+    <div id="custom-modal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-center justify-center z-[80] p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full transform transition-all duration-300 scale-100">
             <div class="p-6">
                 <h3 class="text-xl font-bold text-gray-800 mb-4">แจ้งเตือน</h3>
@@ -195,7 +195,7 @@
             </div>
         </div>
     </div>
-    <div id="confirm-modal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-center justify-center z-[60] p-4">
+    <div id="confirm-modal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-center justify-center z-[80] p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full transform transition-all duration-300 scale-100">
             <div class="p-6">
                 <h3 class="text-xl font-bold text-red-700 mb-4">ยืนยันการดำเนินการ</h3>
@@ -231,25 +231,9 @@
                 <div class="mb-4">
                     <input type="text" id="search-input" placeholder="ค้นหารายการ..." class="block w-full border-black rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-3 placeholder-gray-500">
                 </div>
-                <!-- Active Filter Bar -->
-                <div id="active-filter-bar" class="hidden items-center justify-end mb-2">
-                    <button id="clear-filter-btn" class="text-gray-400 hover:text-gray-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
                 <ul id="search-results-list" class="space-y-3 max-h-96 overflow-y-auto">
                     <!-- Search results will be injected here -->
                 </ul>
-                <!-- Order Summary Footer -->
-                <div id="order-summary" class="hidden mt-4 pt-4 border-t border-gray-200">
-                    <div class="flex justify-end items-center text-sm font-medium text-gray-700">
-                        <span>รวมยอดที่ยังไม่ได้รับ:</span>
-                        <span class="ml-2 font-semibold"><span id="order-count">0</span> รายการ</span>
-                        <span class="ml-2 font-bold text-base">฿<span id="order-total">0.00</span></span>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -273,6 +257,33 @@
             </div>
         </div>
     </div>
+
+    <!-- Order List Modal -->
+    <div id="order-list-modal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 hidden flex items-start justify-center z-[70] p-4 pt-16">
+        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full transform transition-all duration-300 scale-100">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4 gap-4">
+                    <h3 class="text-xl font-bold text-gray-800 flex-shrink-0">รายการสั่งซื้อที่ยังไม่ได้รับ</h3>
+                    <button id="order-list-modal-close-btn" class="text-gray-400 hover:text-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <ul id="order-list-items" class="space-y-3 max-h-96 overflow-y-auto">
+                    <!-- Order list items will be injected here -->
+                </ul>
+                <div id="order-list-summary" class="hidden mt-4 pt-4 border-t border-gray-200">
+                    <div class="flex justify-end items-center text-sm font-medium text-gray-700">
+                        <span>รวมยอดที่ยังไม่ได้รับ:</span>
+                        <span class="ml-2 font-semibold"><span id="order-list-count">0</span> รายการ</span>
+                        <span class="ml-2 font-bold text-base">฿<span id="order-list-total">0.00</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Floating Search Button -->
     <button id="search-fab" class="fixed bottom-6 right-6 bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 transition z-40">
@@ -346,12 +357,6 @@
         const searchInput = document.getElementById('search-input');
         const searchResultsList = document.getElementById('search-results-list');
         const filterNotReceivedBtn = document.getElementById('filter-not-received-btn');
-        const activeFilterBar = document.getElementById('active-filter-bar');
-        const clearFilterBtn = document.getElementById('clear-filter-btn');
-        const orderSummaryEl = document.getElementById('order-summary');
-        const orderCountEl = document.getElementById('order-count');
-        const orderTotalEl = document.getElementById('order-total');
-
 
         // SKU Modal Elements
         const manageSkuBtn = document.getElementById('manage-sku-btn');
@@ -360,6 +365,13 @@
         const skuAnalysisList = document.getElementById('sku-analysis-list');
         const skuSearchInput = document.getElementById('sku-search-input');
 
+        // Order List Modal Elements
+        const orderListModal = document.getElementById('order-list-modal');
+        const orderListModalCloseBtn = document.getElementById('order-list-modal-close-btn');
+        const orderListItemsEl = document.getElementById('order-list-items');
+        const orderListSummaryEl = document.getElementById('order-list-summary');
+        const orderListCountEl = document.getElementById('order-list-count');
+        const orderListTotalEl = document.getElementById('order-list-total');
 
         // Sticky Panel Elements
         const stickySummaryPanel = document.getElementById('sticky-summary-panel');
@@ -371,7 +383,6 @@
 
         // State
         let transactions = [];
-        let isFilteringOrders = false;
         let fullSkuAnalysis = [];
 
 
@@ -578,7 +589,15 @@
                     transactionToUpdate.receiveddate = receivedDate;
                     transactionToUpdate.receivedstatus = isReceiving;
                     updateLocalStorage();
+                    
                     updateUI();
+                    if (!orderListModal.classList.contains('hidden')) {
+                        showOrderList();
+                    }
+                    if (!searchModal.classList.contains('hidden')) {
+                        handleSearch();
+                    }
+
 
                     callGoogleScript('updateReceivedStatus', { id, receivedDate, status: isReceiving })
                         .catch(error => {
@@ -587,6 +606,12 @@
                             transactionToUpdate.receivedstatus = originalReceivedStatus;
                             updateLocalStorage();
                             updateUI();
+                             if (!orderListModal.classList.contains('hidden')) {
+                                showOrderList();
+                            }
+                            if (!searchModal.classList.contains('hidden')) {
+                                handleSearch();
+                            }
                         });
 
                 } else {
@@ -782,6 +807,86 @@
                 ${statusCheckboxHTML}`;
             searchResultsList.appendChild(item);
         }
+
+        function addOrderListDOM(transaction) {
+            const item = document.createElement('li');
+            const isIncome = transaction.type === 'income';
+            const localDate = parseLocalDate(transaction.date);
+            const displayDate = localDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            const isOrder = transaction.platform === 'สั่งซื้อสินค้า';
+            const isChecked = (String(transaction.receivedstatus).toLowerCase() === 'true');
+            const receivedDateStr = transaction.receiveddate ? parseLocalDate(transaction.receiveddate).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
+
+            let statusDisplayHTML = '';
+
+            if (isOrder) {
+                if (isChecked) {
+                    const orderDate = parseLocalDate(transaction.date);
+                    const receivedDate = parseLocalDate(transaction.receiveddate);
+                    const timeDiff = receivedDate.getTime() - orderDate.getTime();
+                    const dayDiff = Math.round(timeDiff / (1000 * 3600 * 24));
+                    
+                    let shippingDurationText = '';
+                    if (dayDiff < 0) {
+                        shippingDurationText = ' - วันที่ผิดพลาด';
+                    } else if (dayDiff === 0) {
+                        shippingDurationText = ' - จัดส่งในวันเดียว';
+                    } else {
+                        shippingDurationText = ` - จัดส่ง ${dayDiff} วัน`;
+                    }
+                    statusDisplayHTML = `<span class="font-semibold text-green-600">(${receivedDateStr})</span><span class="text-sm text-gray-600 font-medium">${shippingDurationText}</span>`;
+                } else {
+                    const orderDate = parseLocalDate(transaction.date);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    orderDate.setHours(0, 0, 0, 0);
+
+                    const timeDiff = today.getTime() - orderDate.getTime();
+                    const dayDiff = Math.round(timeDiff / (1000 * 3600 * 24));
+                    
+                    let daysSinceOrderText = '';
+                    if (dayDiff < 0) {
+                    } else if (dayDiff === 0) {
+                        daysSinceOrderText = '(สั่งวันนี้)';
+                    } else {
+                        daysSinceOrderText = `(สั่งซื้อ ${dayDiff} วันแล้ว)`;
+                    }
+                    statusDisplayHTML = `<span class="text-sm text-amber-600 font-medium">${daysSinceOrderText}</span>`;
+                }
+            }
+
+            const statusCheckboxHTML = isOrder ? `
+                <div class="mt-3 pt-3 border-t border-gray-200">
+                    <label class="inline-flex items-center space-x-2 ${isChecked ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'}">
+                        <input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" onchange="toggleReceivedStatus(this, '${transaction.id}')" ${isChecked ? 'checked disabled' : ''}>
+                        <span class="text-sm text-gray-700">ได้รับสินค้าแล้ว ${statusDisplayHTML}</span>
+                    </label>
+                </div>
+            ` : '';
+
+            item.className = `p-3 border rounded-lg flex flex-col transition duration-200 bg-gray-50`;
+            item.innerHTML = `
+                <div>
+                    <div class="flex justify-between items-start w-full">
+                        <div class="flex-grow">
+                            <div class="font-bold text-gray-800 text-base">${transaction.description}</div>
+                            <div class="text-sm text-gray-500 mt-1">
+                                <span>${displayDate}</span> |
+                                <span class="${getPlatformColor(transaction.platform)} font-semibold">${transaction.platform}</span>
+                            </div>
+                        </div>
+                        <div class="text-right flex-shrink-0 ml-4">
+                            <div class="font-bold text-lg ${isIncome ? 'text-green-600' : 'text-red-600'}">
+                                ${isIncome ? '+' : '-'}฿${formatMoney(transaction.amount)}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                ${statusCheckboxHTML}`;
+            orderListItemsEl.appendChild(item);
+        }
+
 
         function updateValues(filtered) {
             const income = filtered.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
@@ -1051,59 +1156,29 @@
             renderSkuAnalysis(fullSkuAnalysis);
         }
 
-        function deactivateOrderFilter() {
-            if (!isFilteringOrders) return;
-            isFilteringOrders = false;
-            
-            activeFilterBar.classList.add('hidden');
-            activeFilterBar.classList.remove('flex');
-            orderSummaryEl.classList.add('hidden');
-            
-            filterNotReceivedBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
-            filterNotReceivedBtn.classList.add('bg-blue-500', 'hover:bg-blue-600');
-            filterNotReceivedBtn.disabled = false;
-            
-            searchResultsList.innerHTML = '';
-            searchInput.value = '';
-        }
-
-        function activateOrderFilter() {
-            if (isFilteringOrders) return;
-            isFilteringOrders = true;
-
-            searchInput.value = '';
-            searchResultsList.innerHTML = '';
-
-            activeFilterBar.classList.remove('hidden');
-            activeFilterBar.classList.add('flex');
-            
-            filterNotReceivedBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
-            filterNotReceivedBtn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
-            filterNotReceivedBtn.disabled = true;
-
+        function showOrderList() {
             const results = transactions.filter(t => t.platform === 'สั่งซื้อสินค้า' && String(t.receivedstatus).toLowerCase() !== 'true');
             
             const totalCount = results.length;
             const totalAmount = results.reduce((acc, t) => acc + t.amount, 0);
 
-            orderCountEl.textContent = totalCount;
-            orderTotalEl.textContent = formatMoney(totalAmount);
-            orderSummaryEl.classList.remove('hidden');
-
+            orderListCountEl.textContent = totalCount;
+            orderListTotalEl.textContent = formatMoney(totalAmount);
+            
+            orderListItemsEl.innerHTML = '';
 
             if (results.length === 0) {
-                searchResultsList.innerHTML = '<li class="text-center text-gray-500 py-4">ไม่มีรายการสั่งซื้อที่ยังไม่ได้รับ</li>';
+                orderListItemsEl.innerHTML = '<li class="text-center text-gray-500 py-4">ไม่มีรายการสั่งซื้อที่ยังไม่ได้รับ</li>';
+                orderListSummaryEl.classList.add('hidden');
             } else {
+                orderListSummaryEl.classList.remove('hidden');
                 results.sort((a, b) => parseLocalDate(a.date) - parseLocalDate(b.date));
-                results.forEach(addSearchResultDOM);
+                results.forEach(addOrderListDOM);
             }
         }
 
-        function handleSearch() {
-            if (isFilteringOrders) {
-                deactivateOrderFilter();
-            }
 
+        function handleSearch() {
             const query = searchInput.value.toLowerCase().trim();
             searchResultsList.innerHTML = '';
 
@@ -1163,13 +1238,19 @@
 
         searchModalCloseBtn.addEventListener('click', () => {
             searchModal.classList.add('hidden');
-            if (isFilteringOrders) {
-                deactivateOrderFilter();
-            }
         });
         searchInput.addEventListener('input', handleSearch);
-        filterNotReceivedBtn.addEventListener('click', activateOrderFilter);
-        clearFilterBtn.addEventListener('click', deactivateOrderFilter);
+        
+        filterNotReceivedBtn.addEventListener('click', () => {
+             searchModal.classList.add('hidden');
+             showOrderList();
+             orderListModal.classList.remove('hidden');
+        });
+
+        orderListModalCloseBtn.addEventListener('click', () => {
+            orderListModal.classList.add('hidden');
+            searchModal.classList.remove('hidden');
+        });
 
         manageSkuBtn.addEventListener('click', () => {
             searchModal.classList.add('hidden');
