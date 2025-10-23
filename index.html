@@ -130,6 +130,7 @@
                         <option value="Shopee">Shopee</option>
                         <option value="Lazada(Auy)">Lazada(Auy)</option>
                         <option value="Lazada(Aom)">Lazada(Aom)</option>
+                        <option value="ลูกค้า(อื่นๆ)">ลูกค้า(อื่นๆ)</option>
                         <option value="สั่งซื้อสินค้า">สั่งซื้อสินค้า</option>
                         <option value="เงินเดือนพนักงาน" class="expense-only">เงินเดือนพนักงาน</option>
                     </select>
@@ -646,7 +647,7 @@
             });
         }
         function getPlatformColor(platform) {
-            const colors = { 'Shopee': 'text-orange-500', 'Lazada(Auy)': 'text-blue-500', 'Lazada(Aom)': 'text-sky-600', 'สั่งซื้อสินค้า': 'text-red-600', 'เงินเดือนพนักงาน': 'text-purple-600' };
+            const colors = { 'Shopee': 'text-orange-500', 'Lazada(Auy)': 'text-blue-500', 'Lazada(Aom)': 'text-sky-600', 'ลูกค้า(อื่นๆ)': 'text-cyan-600', 'สั่งซื้อสินค้า': 'text-red-600', 'เงินเดือนพนักงาน': 'text-purple-600' };
             return colors[platform] || 'text-gray-600';
         }
 
@@ -1274,4 +1275,7 @@
     </script>
 </body>
 </html>
+
+
+
 
