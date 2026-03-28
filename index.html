@@ -24,6 +24,19 @@
             max-width: 1400px;
             margin: 0 auto;
             padding: 0 12px;
+            padding-bottom: 55px;
+        }
+        
+        @media (min-width: 768px) {
+            .container-custom {
+                padding-bottom: 65px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container-custom {
+                padding-bottom: 48px;
+            }
         }
         
         .glass-card {
@@ -111,37 +124,6 @@
             }
         }
         
-        .fab {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            width: 56px;
-            height: 56px;
-            border-radius: 28px;
-            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 40;
-        }
-        
-        @media (max-width: 768px) {
-            .fab {
-                width: 50px;
-                height: 50px;
-                bottom: 16px;
-                right: 16px;
-            }
-        }
-        
-        .fab:hover {
-            transform: scale(1.1);
-            box-shadow: 0 20px 35px -8px rgba(59, 130, 246, 0.5);
-        }
-        
         .transaction-item {
             animation: slideIn 0.3s ease-out;
             transition: all 0.2s ease;
@@ -186,7 +168,25 @@
             border-radius: 10px;
         }
         
-        .income-card, .expense-card, .balance-card {
+        .income-card {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 16px;
+            transition: all 0.2s ease;
+        }
+        
+        .expense-card {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 16px;
+            transition: all 0.2s ease;
+        }
+        
+        .balance-card {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
             border-radius: 20px;
             padding: 16px;
             transition: all 0.2s ease;
@@ -210,21 +210,6 @@
             }
         }
         
-        .income-card {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-        }
-        
-        .expense-card {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: white;
-        }
-        
-        .balance-card {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: white;
-        }
-        
         .modal-content {
             border-radius: 28px;
             max-width: 95%;
@@ -240,42 +225,6 @@
             }
         }
         
-        #sticky-summary-panel {
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(12px);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: fixed;
-            top: 16px;
-            right: 16px;
-            z-index: 40;
-            cursor: pointer;
-            padding: 12px;
-            width: auto;
-            min-width: 50px;
-        }
-        
-        @media (max-width: 768px) {
-            #sticky-summary-panel {
-                top: 8px;
-                right: 8px;
-                padding: 8px;
-            }
-            #sticky-summary-panel .text-right span:first-child {
-                font-size: 10px;
-            }
-            #sticky-summary-panel .font-bold {
-                font-size: 14px;
-            }
-        }
-        
-        #sticky-summary-panel:hover {
-            background: rgba(15, 23, 42, 0.98);
-            transform: scale(1.02);
-        }
-        
-        /* Platform colors */
         .platform-shopee-auy, .platform-shopee-aom, .platform-lazada-uy, 
         .platform-lazada-aom, .platform-customer, .platform-order, .platform-salary {
             font-weight: 700;
@@ -326,14 +275,14 @@
         
         .toast-notification {
             position: fixed;
-            bottom: 20px;
+            bottom: 65px;
             left: 50%;
             transform: translateX(-50%) translateY(100px);
             background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(12px);
-            padding: 12px 20px;
+            padding: 10px 18px;
             border-radius: 40px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             z-index: 1000;
             color: white;
@@ -345,11 +294,17 @@
             max-width: 90%;
         }
         
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
             .toast-notification {
+                bottom: 60px;
                 font-size: 12px;
-                padding: 10px 16px;
-                bottom: 16px;
+                padding: 8px 16px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .toast-notification {
+                bottom: 52px;
             }
         }
         
@@ -375,7 +330,7 @@
             }
         }
         
-        /* SKU Item Styles - ปรับปรุง icon รถให้เล็กลง */
+        /* SKU Item Styles */
         .sku-item {
             background: white;
             border-radius: 16px;
@@ -403,7 +358,6 @@
             font-size: 0.875rem;
         }
         
-        /* ปรับ icon รถให้เล็กลง */
         .sku-shipping {
             margin-top: 12px;
             padding-top: 12px;
@@ -534,7 +488,6 @@
         button, 
         .btn-gradient, 
         .btn-secondary,
-        .fab,
         input[type="checkbox"],
         select {
             min-height: 44px;
@@ -586,6 +539,258 @@
                 font-size: 12px;
                 padding: 4px 12px;
             }
+        }
+        
+        /* Balance bar styles */
+        .balance-bar-container {
+            position: relative;
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+        
+        .balance-bar-income {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #4ade80, #22c55e);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .balance-bar-expense {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #f87171, #ef4444);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .balance-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 11px;
+        }
+        
+        @media (min-width: 768px) {
+            .balance-stats {
+                font-size: 12px;
+            }
+        }
+        
+        /* Bottom Summary Bar */
+        .bottom-summary-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 6px 10px;
+            border-top: 1px solid rgba(59, 130, 246, 0.3);
+            z-index: 100;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            gap: 4px;
+            flex-wrap: nowrap;
+        }
+        
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            flex: 1;
+            min-width: 50px;
+        }
+        
+        .summary-label {
+            font-size: 9px;
+            color: #94a3b8;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+        
+        .summary-value {
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            white-space: nowrap;
+        }
+        
+        .profit-positive {
+            color: #4ade80;
+        }
+        
+        .profit-negative {
+            color: #f87171;
+        }
+        
+        .summary-divider {
+            width: 1px;
+            height: 28px;
+            background: rgba(59, 130, 246, 0.3);
+        }
+        
+        /* ปุ่มค้นหาใน底部แถบ */
+        .search-bottom-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            background: transparent;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 12px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 55px;
+        }
+        
+        .search-bottom-button svg {
+            width: 18px;
+            height: 18px;
+            stroke-width: 1.8;
+        }
+        
+        .search-bottom-button span {
+            font-size: 9px;
+            font-weight: 500;
+        }
+        
+        .search-bottom-button:hover {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            transform: translateY(-2px);
+        }
+        
+        .salary-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            border: none;
+            padding: 4px 8px;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 55px;
+        }
+        
+        .salary-button svg {
+            width: 14px;
+            height: 14px;
+        }
+        
+        .salary-button span {
+            font-size: 9px;
+            font-weight: 600;
+        }
+        
+        .salary-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
+        }
+        
+        .salary-button:active {
+            transform: translateY(0);
+        }
+        
+        @media (min-width: 768px) {
+            .bottom-summary-bar {
+                padding: 8px 16px;
+                gap: 8px;
+            }
+            .summary-label {
+                font-size: 10px;
+            }
+            .summary-value {
+                font-size: 13px;
+            }
+            .search-bottom-button {
+                padding: 5px 10px;
+                min-width: 65px;
+            }
+            .search-bottom-button svg {
+                width: 20px;
+                height: 20px;
+            }
+            .search-bottom-button span {
+                font-size: 10px;
+            }
+            .salary-button {
+                padding: 5px 10px;
+                min-width: 65px;
+            }
+            .salary-button svg {
+                width: 16px;
+                height: 16px;
+            }
+            .salary-button span {
+                font-size: 10px;
+            }
+            .summary-divider {
+                height: 32px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .bottom-summary-bar {
+                padding: 4px 6px;
+                gap: 2px;
+            }
+            .summary-item {
+                min-width: 45px;
+            }
+            .summary-label {
+                font-size: 8px;
+            }
+            .summary-value {
+                font-size: 10px;
+            }
+            .search-bottom-button {
+                padding: 3px 6px;
+                min-width: 48px;
+            }
+            .search-bottom-button svg {
+                width: 14px;
+                height: 14px;
+            }
+            .search-bottom-button span {
+                font-size: 8px;
+            }
+            .salary-button {
+                padding: 3px 6px;
+                min-width: 48px;
+            }
+            .salary-button svg {
+                width: 12px;
+                height: 12px;
+            }
+            .salary-button span {
+                font-size: 8px;
+            }
+            .summary-divider {
+                height: 24px;
+            }
+        }
+        
+        /* ซ่อน sticky panel เดิม */
+        #sticky-summary-panel {
+            display: none;
         }
     </style>
 </head>
@@ -698,30 +903,57 @@
     <div class="summary-grid">
         <div class="income-card rounded-2xl p-4 md:p-6 shadow-xl transition-all duration-300">
             <div class="flex items-center justify-between">
-                <h2 id="income-title" class="text-sm md:text-lg font-semibold opacity-90">📊 รายรับ</h2>
-                <svg class="w-6 h-6 md:w-8 md:h-8 opacity-75" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                </svg>
+                <div>
+                    <h2 id="income-title" class="text-sm md:text-lg font-semibold opacity-90">📊 รายรับ</h2>
+                    <p id="total-income" class="stat-value mt-2">฿0.00</p>
+                </div>
+                <div class="w-12 h-12 md:w-14 md:h-14 bg-white/20 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 md:w-7 md:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                </div>
             </div>
-            <p id="total-income" class="stat-value mt-2">฿0.00</p>
         </div>
         <div class="expense-card rounded-2xl p-4 md:p-6 shadow-xl transition-all duration-300">
             <div class="flex items-center justify-between">
-                <h2 id="expense-title" class="text-sm md:text-lg font-semibold opacity-90">📉 รายจ่าย</h2>
-                <svg class="w-6 h-6 md:w-8 md:h-8 opacity-75" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
-                </svg>
+                <div>
+                    <h2 id="expense-title" class="text-sm md:text-lg font-semibold opacity-90">📉 รายจ่าย</h2>
+                    <p id="total-expense" class="stat-value mt-2">฿0.00</p>
+                </div>
+                <div class="w-12 h-12 md:w-14 md:h-14 bg-white/20 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 md:w-7 md:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
+                    </svg>
+                </div>
             </div>
-            <p id="total-expense" class="stat-value mt-2">฿0.00</p>
         </div>
         <div class="balance-card rounded-2xl p-4 md:p-6 shadow-xl transition-all duration-300">
             <div class="flex items-center justify-between">
-                <h2 id="balance-title" class="text-sm md:text-lg font-semibold opacity-90">💰 คงเหลือ</h2>
-                <svg class="w-6 h-6 md:w-8 md:h-8 opacity-75" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+                <div>
+                    <h2 id="balance-title" class="text-sm md:text-lg font-semibold opacity-90">💰 คงเหลือ</h2>
+                    <p id="balance" class="stat-value mt-2">฿0.00</p>
+                </div>
+                <div class="w-12 h-12 md:w-14 md:h-14 bg-white/20 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 md:w-7 md:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
             </div>
-            <p id="balance" class="stat-value mt-2">฿0.00</p>
+            <div class="mt-3 pt-2 border-t border-white/20">
+                <div class="flex justify-between text-xs mb-1">
+                    <span>รายรับ</span>
+                    <span>รายจ่าย</span>
+                </div>
+                <div class="balance-bar-container">
+                    <div id="balance-bar-income" class="balance-bar-income" style="width: 0%"></div>
+                    <div id="balance-bar-expense" class="balance-bar-expense" style="width: 0%"></div>
+                </div>
+                <div class="balance-stats">
+                    <span id="bar-income-percent" class="text-green-200">0%</span>
+                    <span id="bar-balance-value" class="font-semibold text-white">คงเหลือ ฿0</span>
+                    <span id="bar-expense-percent" class="text-red-200">0%</span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -750,6 +982,38 @@
             </ul>
         </section>
     </div>
+</div>
+
+<!-- Bottom Summary Bar - มีปุ่มค้นหาแล้ว -->
+<div class="bottom-summary-bar">
+    <button id="search-bottom-btn" class="search-bottom-button">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <span>ค้นหา</span>
+    </button>
+    <div class="summary-divider"></div>
+    <div class="summary-item">
+        <span class="summary-label">💰 ยอดคงเหลือ</span>
+        <span id="bottom-total-balance" class="summary-value">฿0.00</span>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-item">
+        <span class="summary-label">📊 กำไรเดือนนี้</span>
+        <span id="bottom-monthly-profit" class="summary-value profit-positive">0.00%</span>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-item">
+        <span class="summary-label">📈 กำไรทั้งหมด</span>
+        <span id="bottom-overall-profit" class="summary-value profit-positive">0.00%</span>
+    </div>
+    <div class="summary-divider"></div>
+    <button id="salary-btn" class="salary-button">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span>เงินเดือน</span>
+    </button>
 </div>
 
 <div id="toast-notification" class="toast-notification"></div>
@@ -878,26 +1142,45 @@
     </div>
 </div>
 
-<button id="search-fab" class="fab">
-    <svg class="w-6 h-6 md:w-7 md:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-    </svg>
-</button>
-
-<div id="sticky-summary-panel" class="fixed top-2 md:top-4 right-2 md:right-4 shadow-2xl z-40 rounded-2xl p-2 md:p-4 transition-all duration-300 cursor-pointer hover:scale-105">
-    <div class="space-y-1 md:space-y-2">
-        <div class="text-right">
-            <span class="block text-[10px] md:text-xs text-gray-400">💰 ยอดเงินคงเหลือ</span>
-            <span id="sticky-total-balance" class="font-bold text-sm md:text-xl text-white">฿0.00</span>
-        </div>
-        <hr class="border-gray-700 my-1 md:my-2">
-        <div class="text-right">
-            <span id="sticky-monthly-profit-label" class="block text-[10px] md:text-xs text-gray-400">📊 กำไร (เดือนนี้)</span>
-            <span id="sticky-monthly-profit" class="font-semibold text-xs md:text-base text-green-400">0.00%</span>
-        </div>
-        <div class="text-right">
-            <span id="sticky-overall-profit-label" class="block text-[10px] md:text-xs text-gray-400">📈 กำไร (ทั้งหมด)</span>
-            <span id="sticky-overall-profit" class="font-semibold text-xs md:text-base text-green-400">0.00%</span>
+<!-- Salary Modal - แสดงยอดรวมแต่ละเดือน ไม่มีหัวปีแยก -->
+<div id="salary-modal" class="modal fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden items-start justify-center z-[70] p-3 md:p-4 pt-16 md:pt-20">
+    <div class="bg-white rounded-2xl md:rounded-3xl shadow-2xl max-w-2xl w-full modal-content">
+        <div class="p-4 md:p-6">
+            <div class="flex justify-between items-center mb-3 md:mb-4">
+                <div class="flex items-center gap-2 md:gap-3">
+                    <div class="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg md:text-xl font-bold text-gray-800">💵 เงินเดือนพนักงาน</h3>
+                </div>
+                <button id="salary-modal-close-btn" class="text-gray-400 hover:text-gray-600 transition">
+                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- ตัวเลือกปี -->
+            <div class="mb-4">
+                <select id="salary-year-select" class="modern-select w-40">
+                    <option value="all">ทุกปี</option>
+                </select>
+            </div>
+            
+            <!-- แสดงยอดรวมเงินเดือนแต่ละเดือน (แสดงปีหลังเดือน ไม่มีหัวปีแยก) -->
+            <div id="salary-list" class="space-y-2 md:space-y-3 max-h-80 md:max-h-96 overflow-y-auto pr-1">
+                <li class="text-center text-gray-500 py-6 md:py-8">📭 ไม่พบข้อมูลเงินเดือน</li>
+            </div>
+            
+            <!-- สรุปรวมเงินเดือนทั้งปี -->
+            <div id="salary-summary" class="hidden mt-4 pt-3 border-t-2 border-gray-100">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm font-semibold text-gray-600">💰 รวมเงินเดือนทั้งปี:</span>
+                    <span id="salary-total" class="text-xl font-bold text-purple-600">฿0.00</span>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -969,7 +1252,6 @@
     const refreshDataBtn = document.getElementById('refresh-data-btn');
 
     // Search Modal Elements
-    const searchFab = document.getElementById('search-fab');
     const searchModal = document.getElementById('search-modal');
     const searchModalCloseBtn = document.getElementById('search-modal-close-btn');
     const searchInput = document.getElementById('search-input');
@@ -991,13 +1273,20 @@
     const orderListCountEl = document.getElementById('order-list-count');
     const orderListTotalEl = document.getElementById('order-list-total');
 
-    // Sticky Panel Elements
-    const stickySummaryPanel = document.getElementById('sticky-summary-panel');
-    const stickyTotalBalanceEl = document.getElementById('sticky-total-balance');
-    const stickyMonthlyProfitLabelEl = document.getElementById('sticky-monthly-profit-label');
-    const stickyMonthlyProfitEl = document.getElementById('sticky-monthly-profit');
-    const stickyOverallProfitLabelEl = document.getElementById('sticky-overall-profit-label');
-    const stickyOverallProfitEl = document.getElementById('sticky-overall-profit');
+    // Salary Modal Elements
+    const salaryModal = document.getElementById('salary-modal');
+    const salaryModalCloseBtn = document.getElementById('salary-modal-close-btn');
+    const salaryYearSelect = document.getElementById('salary-year-select');
+    const salaryListEl = document.getElementById('salary-list');
+    const salarySummaryEl = document.getElementById('salary-summary');
+    const salaryTotalEl = document.getElementById('salary-total');
+
+    // Bottom Bar Elements
+    const bottomTotalBalanceEl = document.getElementById('bottom-total-balance');
+    const bottomMonthlyProfitEl = document.getElementById('bottom-monthly-profit');
+    const bottomOverallProfitEl = document.getElementById('bottom-overall-profit');
+    const salaryBtn = document.getElementById('salary-btn');
+    const searchBottomBtn = document.getElementById('search-bottom-btn');
 
     // State
     let transactions = [];
@@ -1294,7 +1583,7 @@
         }
     }
 
-    // ฟังก์ชันลบ - กำหนดให้เป็น global function
+    // ฟังก์ชันลบ
     window.removeTransaction = async function(id) {
         showConfirm('คุณต้องการลบรายการนี้ใช่หรือไม่?', async (confirmed) => {
             if (!confirmed) return;
@@ -1417,6 +1706,115 @@
         const diffTime = today.getTime() - order.getTime();
         const diffDays = Math.round(diffTime / (1000 * 3600 * 24));
         return diffDays;
+    }
+
+    // Salary Functions - แสดงยอดรวมแต่ละเดือน ไม่มีหัวปีแยก
+    function loadSalaryData() {
+        if (!salaryYearSelect) return;
+        
+        const selectedYear = salaryYearSelect.value;
+        
+        let salaryTransactions = transactions.filter(t => t.platform === 'เงินเดือนพนักงาน');
+        
+        if (selectedYear !== 'all') {
+            salaryTransactions = salaryTransactions.filter(t => {
+                const year = t.date ? t.date.substring(0, 4) : '';
+                return year === selectedYear;
+            });
+        }
+        
+        // จัดกลุ่มตามปีและเดือน
+        const monthlySummary = {};
+        const thaiMonths = {
+            '01': 'มกราคม', '02': 'กุมภาพันธ์', '03': 'มีนาคม',
+            '04': 'เมษายน', '05': 'พฤษภาคม', '06': 'มิถุนายน',
+            '07': 'กรกฎาคม', '08': 'สิงหาคม', '09': 'กันยายน',
+            '10': 'ตุลาคม', '11': 'พฤศจิกายน', '12': 'ธันวาคม'
+        };
+        
+        salaryTransactions.forEach(t => {
+            if (t.date) {
+                const year = t.date.substring(0, 4);
+                const month = t.date.substring(5, 7);
+                const amount = t.amount;
+                const key = `${year}-${month}`;
+                if (!monthlySummary[key]) {
+                    monthlySummary[key] = {
+                        year: year,
+                        month: month,
+                        amount: 0
+                    };
+                }
+                monthlySummary[key].amount += amount;
+            }
+        });
+        
+        // เรียงตามปีและเดือน (ปีล่าสุดก่อน)
+        const sortedKeys = Object.keys(monthlySummary).sort((a, b) => {
+            const [yearA, monthA] = a.split('-');
+            const [yearB, monthB] = b.split('-');
+            if (yearA !== yearB) return yearB - yearA;
+            return monthA - monthB;
+        });
+        
+        if (salaryListEl) {
+            salaryListEl.innerHTML = '';
+            
+            if (sortedKeys.length === 0) {
+                salaryListEl.innerHTML = '<li class="text-center text-gray-500 py-6 md:py-8">📭 ไม่พบข้อมูลเงินเดือน</li>';
+                if (salarySummaryEl) salarySummaryEl.classList.add('hidden');
+                return;
+            }
+            
+            let totalYear = 0;
+            
+            sortedKeys.forEach(key => {
+                const data = monthlySummary[key];
+                const amount = data.amount;
+                const yearAD = parseInt(data.year);
+                const yearBE = yearAD + 543;
+                const monthName = thaiMonths[data.month] || data.month;
+                
+                totalYear += amount;
+                
+                const item = document.createElement('li');
+                item.className = 'p-3 md:p-4 border rounded-xl flex justify-between items-center bg-gradient-to-r from-purple-50 to-white hover:shadow-md transition-all duration-200';
+                item.innerHTML = `
+                    <div>
+                        <div class="font-semibold text-gray-800 text-base">📅 ${monthName} ${yearBE}</div>
+                        <div class="text-xs text-gray-500 mt-1">เงินเดือนพนักงาน</div>
+                    </div>
+                    <div class="font-bold text-xl text-purple-600">฿${formatMoney(amount)}</div>
+                `;
+                salaryListEl.appendChild(item);
+            });
+            
+            if (salaryTotalEl) salaryTotalEl.textContent = `฿${formatMoney(totalYear)}`;
+            if (salarySummaryEl) salarySummaryEl.classList.remove('hidden');
+        }
+    }
+
+    function showSalaryModal() {
+        // เตรียมปีใน dropdown
+        const years = [...new Set(transactions
+            .filter(t => t.platform === 'เงินเดือนพนักงาน')
+            .map(t => t.date ? t.date.substring(0, 4) : null)
+            .filter(y => y))];
+        
+        if (salaryYearSelect) {
+            const currentYear = salaryYearSelect.value;
+            salaryYearSelect.innerHTML = '<option value="all">ทุกปี</option>';
+            years.sort((a,b) => b - a).forEach(y => {
+                const option = document.createElement('option');
+                option.value = y;
+                option.textContent = parseInt(y) + 543;
+                salaryYearSelect.appendChild(option);
+            });
+            if (currentYear && years.includes(currentYear)) salaryYearSelect.value = currentYear;
+        }
+        
+        loadSalaryData();
+        salaryModal.classList.remove('hidden');
     }
 
     function addOrderListDOM(transaction) {
@@ -1583,12 +1981,41 @@
         const expense = filtered.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
         const balance = income - expense;
         const monthYearText = getFormattedMonthAndYear(filterYearInput.value, filterMonthInput.value);
+        
         incomeTitleEl.innerHTML = `📊 รายรับ ${monthYearText}`;
         expenseTitleEl.innerHTML = `📉 รายจ่าย ${monthYearText}`;
         balanceTitleEl.innerHTML = `💰 คงเหลือ ${monthYearText}`;
+        
         totalIncomeEl.innerText = `฿${formatMoney(income)}`;
         totalExpenseEl.innerText = `฿${formatMoney(expense)}`;
         balanceEl.innerText = `฿${formatMoney(balance)}`;
+        
+        // อัปเดตแถบแสดงสถานะ
+        const total = income + expense;
+        if (total > 0) {
+            const incomePercent = (income / total) * 100;
+            const expensePercent = (expense / total) * 100;
+            
+            const incomeBar = document.getElementById('balance-bar-income');
+            const expenseBar = document.getElementById('balance-bar-expense');
+            const incomePercentSpan = document.getElementById('bar-income-percent');
+            const expensePercentSpan = document.getElementById('bar-expense-percent');
+            const balanceValueSpan = document.getElementById('bar-balance-value');
+            
+            if (incomeBar) incomeBar.style.width = `${incomePercent}%`;
+            if (expenseBar) expenseBar.style.width = `${expensePercent}%`;
+            if (incomePercentSpan) incomePercentSpan.textContent = `${incomePercent.toFixed(1)}%`;
+            if (expensePercentSpan) expensePercentSpan.textContent = `${expensePercent.toFixed(1)}%`;
+            if (balanceValueSpan) balanceValueSpan.textContent = `คงเหลือ ฿${formatMoney(balance)}`;
+        } else {
+            const incomeBar = document.getElementById('balance-bar-income');
+            const expenseBar = document.getElementById('balance-bar-expense');
+            if (incomeBar) incomeBar.style.width = '0%';
+            if (expenseBar) expenseBar.style.width = '0%';
+            if (document.getElementById('bar-income-percent')) document.getElementById('bar-income-percent').textContent = '0%';
+            if (document.getElementById('bar-expense-percent')) document.getElementById('bar-expense-percent').textContent = '0%';
+            if (document.getElementById('bar-balance-value')) document.getElementById('bar-balance-value').textContent = `คงเหลือ ฿0.00`;
+        }
     }
 
     function updatePlatformOptions() {
@@ -1672,33 +2099,48 @@
         });
     }
 
-    function updateStickyPanel() {
+    function updateBottomSummaryBar() {
         if (!transactions || transactions.length === 0) {
-            stickySummaryPanel.classList.remove('visible');
+            if (bottomTotalBalanceEl) bottomTotalBalanceEl.textContent = '฿0.00';
+            if (bottomMonthlyProfitEl) {
+                bottomMonthlyProfitEl.textContent = '0.00%';
+                bottomMonthlyProfitEl.className = 'summary-value profit-positive';
+            }
+            if (bottomOverallProfitEl) {
+                bottomOverallProfitEl.textContent = '0.00%';
+                bottomOverallProfitEl.className = 'summary-value profit-positive';
+            }
             return;
         }
 
         const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
         const totalExpense = transactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
         const totalBalance = totalIncome - totalExpense;
+        
         const filtered = getFilteredTransactions();
         const monthlyIncome = filtered.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
         const monthlyExpenseForProfit = filtered.filter(t => t.type === 'expense' && t.platform !== 'เงินเดือนพนักงาน').reduce((acc, t) => acc + t.amount, 0);
         const totalExpenseForProfit = transactions.filter(t => t.type === 'expense' && t.platform !== 'เงินเดือนพนักงาน').reduce((acc, t) => acc + t.amount, 0);
+        
         let monthlyProfit = (monthlyExpenseForProfit > 0) ? ((monthlyIncome - monthlyExpenseForProfit) / monthlyExpenseForProfit) * 100 : (monthlyIncome > 0 ? 100 : 0);
         let overallProfit = (totalExpenseForProfit > 0) ? ((totalIncome - totalExpenseForProfit) / totalExpenseForProfit) * 100 : (totalIncome > 0 ? 100 : 0);
+        
+        if (bottomTotalBalanceEl) {
+            bottomTotalBalanceEl.textContent = `฿${formatMoney(totalBalance)}`;
+            bottomTotalBalanceEl.style.color = totalBalance >= 0 ? '#4ade80' : '#f87171';
+        }
+        if (bottomMonthlyProfitEl) {
+            bottomMonthlyProfitEl.textContent = `${monthlyProfit.toFixed(2)}%`;
+            bottomMonthlyProfitEl.className = `summary-value ${monthlyProfit >= 0 ? 'profit-positive' : 'profit-negative'}`;
+        }
+        if (bottomOverallProfitEl) {
+            bottomOverallProfitEl.textContent = `${overallProfit.toFixed(2)}%`;
+            bottomOverallProfitEl.className = `summary-value ${overallProfit >= 0 ? 'profit-positive' : 'profit-negative'}`;
+        }
+    }
 
-        stickyTotalBalanceEl.textContent = `฿${formatMoney(totalBalance)}`;
-        stickyTotalBalanceEl.classList.toggle('text-green-400', totalBalance >= 0);
-        stickyTotalBalanceEl.classList.toggle('text-red-400', totalBalance < 0);
-        const monthYearText = getFormattedMonthAndYear(filterYearInput.value, filterMonthInput.value);
-        stickyMonthlyProfitLabelEl.textContent = `📊 กำไร ${monthYearText}`;
-        stickyMonthlyProfitEl.textContent = `${monthlyProfit.toFixed(2)}%`;
-        stickyMonthlyProfitEl.classList.toggle('text-green-400', monthlyProfit >= 0);
-        stickyMonthlyProfitEl.classList.toggle('text-red-400', monthlyProfit < 0);
-        stickyOverallProfitEl.textContent = `${overallProfit.toFixed(2)}%`;
-        stickyOverallProfitEl.classList.toggle('text-green-400', overallProfit >= 0);
-        stickyOverallProfitEl.classList.toggle('text-red-400', overallProfit < 0);
+    function updateStickyPanel() {
+        updateBottomSummaryBar();
     }
 
     function updateUI() {
@@ -1901,12 +2343,34 @@
     filterMonthInput.addEventListener('change', () => updateUI());
     typeInput.addEventListener('change', updatePlatformOptions);
     
-    searchFab.addEventListener('click', () => {
-        searchModal.classList.remove('hidden');
-        searchInput.value = '';
-        handleSearch();
-        searchInput.focus();
-    });
+    // Bottom bar buttons
+    if (searchBottomBtn) {
+        searchBottomBtn.addEventListener('click', () => {
+            if (searchModal) searchModal.classList.remove('hidden');
+            if (searchInput) {
+                searchInput.value = '';
+                handleSearch();
+                searchInput.focus();
+            }
+        });
+    }
+    
+    // Salary button
+    if (salaryBtn) {
+        salaryBtn.addEventListener('click', showSalaryModal);
+    }
+    
+    if (salaryModalCloseBtn) {
+        salaryModalCloseBtn.addEventListener('click', () => {
+            if (salaryModal) salaryModal.classList.add('hidden');
+        });
+    }
+    
+    if (salaryYearSelect) {
+        salaryYearSelect.addEventListener('change', loadSalaryData);
+    }
+    
+    // Other modals
     searchModalCloseBtn.addEventListener('click', () => searchModal.classList.add('hidden'));
     searchInput.addEventListener('input', handleSearch);
     
@@ -1934,8 +2398,6 @@
         const filteredSkus = fullSkuAnalysis.filter(([sku]) => sku.toLowerCase().includes(query));
         renderSkuAnalysis(filteredSkus);
     });
-    
-    stickySummaryPanel.addEventListener('click', () => stickySummaryPanel.classList.toggle('visible'));
     
     // Initialize
     initializeDateDropdowns();
