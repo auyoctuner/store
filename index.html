@@ -226,7 +226,8 @@
         }
         
         .platform-shopee-auy, .platform-shopee-aom, .platform-lazada-uy, 
-        .platform-lazada-aom, .platform-customer, .platform-order, .platform-salary {
+        .platform-lazada-aom, .platform-customer, .platform-order, .platform-salary,
+        .platform-other {
             font-weight: 700;
             display: inline-block;
         }
@@ -268,6 +269,12 @@
         }
         .platform-salary { 
             background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .platform-other { 
+            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -538,50 +545,6 @@
             .badge {
                 font-size: 12px;
                 padding: 4px 12px;
-            }
-        }
-        
-        /* Balance bar styles */
-        .balance-bar-container {
-            position: relative;
-            width: 100%;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 8px 0;
-        }
-        
-        .balance-bar-income {
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            background: linear-gradient(90deg, #4ade80, #22c55e);
-            border-radius: 4px;
-            transition: width 0.5s ease;
-        }
-        
-        .balance-bar-expense {
-            position: absolute;
-            right: 0;
-            top: 0;
-            height: 100%;
-            background: linear-gradient(90deg, #f87171, #ef4444);
-            border-radius: 4px;
-            transition: width 0.5s ease;
-        }
-        
-        .balance-stats {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 8px;
-            font-size: 11px;
-        }
-        
-        @media (min-width: 768px) {
-            .balance-stats {
-                font-size: 12px;
             }
         }
         
@@ -884,6 +847,7 @@
                     <option value="ลูกค้า(อื่นๆ)">👥 ลูกค้า(อื่นๆ)</option>
                     <option value="สั่งซื้อสินค้า">📋 สั่งซื้อสินค้า</option>
                     <option value="เงินเดือนพนักงาน">💵 เงินเดือนพนักงาน</option>
+                    <option value="อื่นๆ">📌 อื่นๆ</option>
                 </select>
             </div>
             <div class="lg:col-span-2">
@@ -939,21 +903,6 @@
                     </svg>
                 </div>
             </div>
-            <div class="mt-3 pt-2 border-t border-white/20">
-                <div class="flex justify-between text-xs mb-1">
-                    <span>รายรับ</span>
-                    <span>รายจ่าย</span>
-                </div>
-                <div class="balance-bar-container">
-                    <div id="balance-bar-income" class="balance-bar-income" style="width: 0%"></div>
-                    <div id="balance-bar-expense" class="balance-bar-expense" style="width: 0%"></div>
-                </div>
-                <div class="balance-stats">
-                    <span id="bar-income-percent" class="text-green-200">0%</span>
-                    <span id="bar-balance-value" class="font-semibold text-white">คงเหลือ ฿0</span>
-                    <span id="bar-expense-percent" class="text-red-200">0%</span>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -984,7 +933,7 @@
     </div>
 </div>
 
-<!-- Bottom Summary Bar - มีปุ่มค้นหาแล้ว -->
+<!-- Bottom Summary Bar -->
 <div class="bottom-summary-bar">
     <button id="search-bottom-btn" class="search-bottom-button">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1142,7 +1091,7 @@
     </div>
 </div>
 
-<!-- Salary Modal - แสดงยอดรวมแต่ละเดือน ไม่มีหัวปีแยก -->
+<!-- Salary Modal -->
 <div id="salary-modal" class="modal fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden items-start justify-center z-[70] p-3 md:p-4 pt-16 md:pt-20">
     <div class="bg-white rounded-2xl md:rounded-3xl shadow-2xl max-w-2xl w-full modal-content">
         <div class="p-4 md:p-6">
@@ -1162,19 +1111,16 @@
                 </button>
             </div>
             
-            <!-- ตัวเลือกปี -->
             <div class="mb-4">
                 <select id="salary-year-select" class="modern-select w-40">
                     <option value="all">ทุกปี</option>
                 </select>
             </div>
             
-            <!-- แสดงยอดรวมเงินเดือนแต่ละเดือน (แสดงปีหลังเดือน ไม่มีหัวปีแยก) -->
             <div id="salary-list" class="space-y-2 md:space-y-3 max-h-80 md:max-h-96 overflow-y-auto pr-1">
                 <li class="text-center text-gray-500 py-6 md:py-8">📭 ไม่พบข้อมูลเงินเดือน</li>
             </div>
             
-            <!-- สรุปรวมเงินเดือนทั้งปี -->
             <div id="salary-summary" class="hidden mt-4 pt-3 border-t-2 border-gray-100">
                 <div class="flex justify-between items-center">
                     <span class="text-sm font-semibold text-gray-600">💰 รวมเงินเดือนทั้งปี:</span>
@@ -1693,7 +1639,8 @@
             'Lazada(Aom)': 'platform-lazada-aom', 
             'ลูกค้า(อื่นๆ)': 'platform-customer', 
             'สั่งซื้อสินค้า': 'platform-order', 
-            'เงินเดือนพนักงาน': 'platform-salary' 
+            'เงินเดือนพนักงาน': 'platform-salary',
+            'อื่นๆ': 'platform-other'
         };
         return colors[platform] || 'text-gray-600';
     }
@@ -1708,7 +1655,7 @@
         return diffDays;
     }
 
-    // Salary Functions - แสดงยอดรวมแต่ละเดือน ไม่มีหัวปีแยก
+    // Salary Functions
     function loadSalaryData() {
         if (!salaryYearSelect) return;
         
@@ -1723,7 +1670,6 @@
             });
         }
         
-        // จัดกลุ่มตามปีและเดือน
         const monthlySummary = {};
         const thaiMonths = {
             '01': 'มกราคม', '02': 'กุมภาพันธ์', '03': 'มีนาคม',
@@ -1749,7 +1695,6 @@
             }
         });
         
-        // เรียงตามปีและเดือน (ปีล่าสุดก่อน)
         const sortedKeys = Object.keys(monthlySummary).sort((a, b) => {
             const [yearA, monthA] = a.split('-');
             const [yearB, monthB] = b.split('-');
@@ -1795,7 +1740,6 @@
     }
 
     function showSalaryModal() {
-        // เตรียมปีใน dropdown
         const years = [...new Set(transactions
             .filter(t => t.platform === 'เงินเดือนพนักงาน')
             .map(t => t.date ? t.date.substring(0, 4) : null)
@@ -1989,40 +1933,13 @@
         totalIncomeEl.innerText = `฿${formatMoney(income)}`;
         totalExpenseEl.innerText = `฿${formatMoney(expense)}`;
         balanceEl.innerText = `฿${formatMoney(balance)}`;
-        
-        // อัปเดตแถบแสดงสถานะ
-        const total = income + expense;
-        if (total > 0) {
-            const incomePercent = (income / total) * 100;
-            const expensePercent = (expense / total) * 100;
-            
-            const incomeBar = document.getElementById('balance-bar-income');
-            const expenseBar = document.getElementById('balance-bar-expense');
-            const incomePercentSpan = document.getElementById('bar-income-percent');
-            const expensePercentSpan = document.getElementById('bar-expense-percent');
-            const balanceValueSpan = document.getElementById('bar-balance-value');
-            
-            if (incomeBar) incomeBar.style.width = `${incomePercent}%`;
-            if (expenseBar) expenseBar.style.width = `${expensePercent}%`;
-            if (incomePercentSpan) incomePercentSpan.textContent = `${incomePercent.toFixed(1)}%`;
-            if (expensePercentSpan) expensePercentSpan.textContent = `${expensePercent.toFixed(1)}%`;
-            if (balanceValueSpan) balanceValueSpan.textContent = `คงเหลือ ฿${formatMoney(balance)}`;
-        } else {
-            const incomeBar = document.getElementById('balance-bar-income');
-            const expenseBar = document.getElementById('balance-bar-expense');
-            if (incomeBar) incomeBar.style.width = '0%';
-            if (expenseBar) expenseBar.style.width = '0%';
-            if (document.getElementById('bar-income-percent')) document.getElementById('bar-income-percent').textContent = '0%';
-            if (document.getElementById('bar-expense-percent')) document.getElementById('bar-expense-percent').textContent = '0%';
-            if (document.getElementById('bar-balance-value')) document.getElementById('bar-balance-value').textContent = `คงเหลือ ฿0.00`;
-        }
     }
 
     function updatePlatformOptions() {
         const type = typeInput.value;
         platformInput.disabled = !type;
         Array.from(platformInput.options).forEach(opt => {
-            const expenseOnly = ['สั่งซื้อสินค้า', 'เงินเดือนพนักงาน'];
+            const expenseOnly = ['สั่งซื้อสินค้า', 'เงินเดือนพนักงาน', 'อื่นๆ'];
             const incomeOnly = ['Shopee(Auy)', 'Shopee(Aom)', 'Lazada(Auy)', 'Lazada(Aom)', 'ลูกค้า(อื่นๆ)'];
             
             if (type === 'income') {
@@ -2343,7 +2260,6 @@
     filterMonthInput.addEventListener('change', () => updateUI());
     typeInput.addEventListener('change', updatePlatformOptions);
     
-    // Bottom bar buttons
     if (searchBottomBtn) {
         searchBottomBtn.addEventListener('click', () => {
             if (searchModal) searchModal.classList.remove('hidden');
@@ -2355,7 +2271,6 @@
         });
     }
     
-    // Salary button
     if (salaryBtn) {
         salaryBtn.addEventListener('click', showSalaryModal);
     }
@@ -2370,7 +2285,6 @@
         salaryYearSelect.addEventListener('change', loadSalaryData);
     }
     
-    // Other modals
     searchModalCloseBtn.addEventListener('click', () => searchModal.classList.add('hidden'));
     searchInput.addEventListener('input', handleSearch);
     
@@ -2399,7 +2313,6 @@
         renderSkuAnalysis(filteredSkus);
     });
     
-    // Initialize
     initializeDateDropdowns();
     
     const cached = JSON.parse(localStorage.getItem('transactions_cache'));
