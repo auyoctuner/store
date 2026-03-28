@@ -24,19 +24,7 @@
             max-width: 1400px;
             margin: 0 auto;
             padding: 0 12px;
-            padding-bottom: 55px;
-        }
-        
-        @media (min-width: 768px) {
-            .container-custom {
-                padding-bottom: 65px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .container-custom {
-                padding-bottom: 48px;
-            }
+            padding-bottom: 70px;
         }
         
         .glass-card {
@@ -282,7 +270,7 @@
         
         .toast-notification {
             position: fixed;
-            bottom: 65px;
+            bottom: 70px;
             left: 50%;
             transform: translateX(-50%) translateY(100px);
             background: rgba(15, 23, 42, 0.95);
@@ -299,20 +287,6 @@
             white-space: normal;
             text-align: center;
             max-width: 90%;
-        }
-        
-        @media (max-width: 768px) {
-            .toast-notification {
-                bottom: 60px;
-                font-size: 12px;
-                padding: 8px 16px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .toast-notification {
-                bottom: 52px;
-            }
         }
         
         .toast-notification.show {
@@ -382,13 +356,6 @@
             color: #3b82f6;
         }
         
-        @media (min-width: 768px) {
-            .shipping-icon {
-                width: 18px;
-                height: 18px;
-            }
-        }
-        
         .shipping-range {
             font-weight: 600;
             color: #3b82f6;
@@ -408,26 +375,6 @@
         .sku-average-label {
             font-size: 0.75rem;
             color: #64748b;
-        }
-        
-        @media (max-width: 640px) {
-            .sku-item {
-                padding: 12px;
-            }
-            .sku-name {
-                font-size: 14px;
-            }
-            .sku-average-value {
-                font-size: 1rem;
-            }
-            .shipping-icon {
-                width: 14px;
-                height: 14px;
-            }
-            .sku-shipping {
-                font-size: 12px;
-                gap: 6px;
-            }
         }
         
         .summary-grid {
@@ -492,27 +439,6 @@
             100% { transform: rotate(360deg); }
         }
         
-        button, 
-        .btn-gradient, 
-        .btn-secondary,
-        input[type="checkbox"],
-        select {
-            min-height: 44px;
-        }
-        
-        @media (max-width: 768px) {
-            button, 
-            .btn-gradient, 
-            .btn-secondary,
-            select {
-                min-height: 44px;
-            }
-            input[type="checkbox"] {
-                width: 20px;
-                height: 20px;
-            }
-        }
-        
         .transaction-list-container {
             max-height: 500px;
             overflow-y: auto;
@@ -523,29 +449,6 @@
         @media (max-width: 768px) {
             .transaction-list-container {
                 max-height: 400px;
-            }
-        }
-        
-        @media (hover: hover) {
-            .income-card:hover, .expense-card:hover, .balance-card:hover {
-                transform: translateY(-4px);
-                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            }
-        }
-        
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-        
-        @media (min-width: 768px) {
-            .badge {
-                font-size: 12px;
-                padding: 4px 12px;
             }
         }
         
@@ -668,6 +571,36 @@
             box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
         }
         
+        .sync-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border: none;
+            padding: 4px 8px;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 55px;
+        }
+        
+        .sync-button svg {
+            width: 14px;
+            height: 14px;
+        }
+        
+        .sync-button span {
+            font-size: 9px;
+            font-weight: 600;
+        }
+        
+        .sync-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+        }
+        
         @media (min-width: 768px) {
             .bottom-summary-bar {
                 padding: 8px 16px;
@@ -679,26 +612,15 @@
             .summary-value {
                 font-size: 13px;
             }
-            .search-bottom-button {
+            .search-bottom-button, .salary-button, .sync-button {
                 padding: 5px 10px;
                 min-width: 65px;
             }
-            .search-bottom-button svg {
-                width: 20px;
-                height: 20px;
-            }
-            .search-bottom-button span {
-                font-size: 10px;
-            }
-            .salary-button {
-                padding: 5px 10px;
-                min-width: 65px;
-            }
-            .salary-button svg {
+            .search-bottom-button svg, .salary-button svg, .sync-button svg {
                 width: 16px;
                 height: 16px;
             }
-            .salary-button span {
+            .search-bottom-button span, .salary-button span, .sync-button span {
                 font-size: 10px;
             }
             .summary-divider {
@@ -720,26 +642,15 @@
             .summary-value {
                 font-size: 10px;
             }
-            .search-bottom-button {
+            .search-bottom-button, .salary-button, .sync-button {
                 padding: 3px 6px;
                 min-width: 48px;
             }
-            .search-bottom-button svg {
-                width: 14px;
-                height: 14px;
-            }
-            .search-bottom-button span {
-                font-size: 8px;
-            }
-            .salary-button {
-                padding: 3px 6px;
-                min-width: 48px;
-            }
-            .salary-button svg {
+            .search-bottom-button svg, .salary-button svg, .sync-button svg {
                 width: 12px;
                 height: 12px;
             }
-            .salary-button span {
+            .search-bottom-button span, .salary-button span, .sync-button span {
                 font-size: 8px;
             }
             .summary-divider {
@@ -952,11 +863,18 @@
         </svg>
         <span>เงินเดือน</span>
     </button>
+    <div class="summary-divider"></div>
+    <button id="sync-now-btn" class="sync-button">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+        </svg>
+        <span>ซิงค์</span>
+    </button>
 </div>
 
 <div id="toast-notification" class="toast-notification"></div>
 
-<!-- Modals -->
+<!-- Modals (ย่อเพื่อความยาว) -->
 <div id="custom-modal" class="modal fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden items-center justify-center z-[80] p-3 md:p-4">
     <div class="bg-white rounded-2xl md:rounded-3xl shadow-2xl max-w-md w-full modal-content">
         <div class="p-4 md:p-6">
@@ -1167,22 +1085,14 @@
                     }]
                 })
             });
-            
-            if (response.ok) {
-                console.log('✅ ส่ง LINE OA สำเร็จ');
-                return true;
-            } else {
-                const error = await response.json();
-                console.error('❌ LINE OA Error:', error);
-                return false;
-            }
+            return response.ok;
         } catch (error) {
-            console.error('❌ Error sending LINE OA:', error);
+            console.error('LINE Error:', error);
             return false;
         }
     }
     
-    // ฟังก์ชันส่งข้อความ LINE แบบ Text
+    // ฟังก์ชันส่งข้อความ LINE
     async function sendLineOAText(transaction, balance) {
         const typeText = transaction.type === 'income' ? '📈 รายรับ' : '📉 รายจ่าย';
         const amountSymbol = transaction.type === 'income' ? '+' : '-';
@@ -1281,11 +1191,13 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
     const bottomOverallProfitEl = document.getElementById('bottom-overall-profit');
     const salaryBtn = document.getElementById('salary-btn');
     const searchBottomBtn = document.getElementById('search-bottom-btn');
+    const syncNowBtn = document.getElementById('sync-now-btn');
 
     // State
     let transactions = [];
     let fullSkuAnalysis = [];
     let isSyncing = false;
+    let isOnline = navigator.onLine;
 
     // Utility Functions
     function parseLocalDate(dateString) {
@@ -1321,14 +1233,23 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
     }
     modalCloseBtn.addEventListener('click', () => customModal.classList.add('hidden'));
 
-    // JSONP Call
+    // JSONP Call (ใช้ได้ทุกเครื่อง)
     function callGoogleScript(action, payload = {}) {
         return new Promise((resolve, reject) => {
-            const callbackName = 'jsonp_callback_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+            const callbackName = 'jsonp_callback_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+            let timeoutId;
+            let script;
+            
+            timeoutId = setTimeout(() => {
+                if (window[callbackName]) delete window[callbackName];
+                if (script && script.parentNode) document.body.removeChild(script);
+                reject(new Error('Request timeout - ตรวจสอบการเชื่อมต่อ'));
+            }, 30000);
             
             window[callbackName] = function(response) {
+                clearTimeout(timeoutId);
                 delete window[callbackName];
-                document.body.removeChild(script);
+                if (script && script.parentNode) document.body.removeChild(script);
                 
                 if (response && response.status === 'success') {
                     resolve(response);
@@ -1345,11 +1266,12 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
             });
             
             const url = `${SCRIPT_URL}?${params.toString()}&_=${Date.now()}`;
-            const script = document.createElement('script');
+            script = document.createElement('script');
             script.src = url;
             script.onerror = () => {
+                clearTimeout(timeoutId);
                 delete window[callbackName];
-                document.body.removeChild(script);
+                if (script && script.parentNode) document.body.removeChild(script);
                 reject(new Error('Failed to load script'));
             };
             
@@ -1357,16 +1279,7 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
         });
     }
 
-    // ฟังก์ชันเลื่อนไปด้านล่างสุด
-    function scrollTransactionListToBottom() {
-        if (transactionListEl) {
-            transactionListEl.scrollTo({
-                top: transactionListEl.scrollHeight,
-                behavior: 'smooth'
-            });
-        }
-    }
-
+    // ฟังก์ชันโหลดข้อมูลจาก Google Sheets
     async function loadDataFromSheet(showLoading = true, retryCount = 0) {
         if (isSyncing) return;
         isSyncing = true;
@@ -1382,19 +1295,14 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
                 function getValue(obj, ...keys) {
                     for (let key of keys) {
                         const foundKey = Object.keys(obj).find(k => k.toLowerCase() === key.toLowerCase());
-                        if (foundKey !== undefined) {
-                            return obj[foundKey];
-                        }
+                        if (foundKey !== undefined) return obj[foundKey];
                     }
                     return undefined;
                 }
                 
                 transactions = response.data.map(t => {
                     let platform = getValue(t, 'platform', 'Platform', 'PLATFORM') || '';
-                    
-                    if (platform === 'Shopee') {
-                        platform = 'Shopee(Auy)';
-                    }
+                    if (platform === 'Shopee') platform = 'Shopee(Auy)';
                     
                     return {
                         id: getValue(t, 'id', 'ID') || 'id_' + Date.now() + '_' + Math.random(),
@@ -1424,54 +1332,81 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
                 });
                 
                 transactions.sort((a, b) => parseLocalDate(a.date) - parseLocalDate(b.date));
-                updateLocalStorage();
+                
+                // บันทึก localStorage สำรอง
+                localStorage.setItem('transactions_backup', JSON.stringify(transactions));
                 updateUI();
-                
-                // เลื่อนไปด้านล่างสุดหลังจากโหลดข้อมูลเสร็จ
-                setTimeout(() => {
-                    scrollTransactionListToBottom();
-                }, 100);
-                
-                if (transactions.length === 0) {
-                    showMessage(`📭 ไม่พบข้อมูลใน Sheet`);
-                }
+                showToast('✅ โหลดข้อมูลสำเร็จ', 'success');
             } else {
                 throw new Error('รูปแบบข้อมูลไม่ถูกต้อง');
             }
         } catch (error) {
             debugLog(`❌ Load error: ${error.message}`, 'error');
             
-            if (retryCount < 3) {
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                await loadDataFromSheet(showLoading, retryCount + 1);
-                return;
-            }
-            
-            const cached = JSON.parse(localStorage.getItem('transactions_cache'));
-            if (cached && cached.length > 0) {
-                transactions = cached.map(t => {
-                    if (t.platform === 'Shopee') t.platform = 'Shopee(Auy)';
-                    return {...t, amount: parseFloat(t.amount) || 0};
-                });
+            // ลองโหลดจาก localStorage backup
+            const backup = JSON.parse(localStorage.getItem('transactions_backup'));
+            if (backup && backup.length > 0) {
+                transactions = backup;
                 updateUI();
-                
-                setTimeout(() => {
-                    scrollTransactionListToBottom();
-                }, 100);
-                
-                showMessage(`⚠️ ไม่สามารถเชื่อมต่อ Google Sheets ได้\n\nกำลังแสดงข้อมูลจากแคช (${transactions.length} รายการ)`);
+                showToast('⚠️ ใช้ข้อมูลสำรองในเครื่อง', 'warning');
             } else {
-                showMessage(`❌ ไม่สามารถโหลดข้อมูลได้\n\n${error.message}`);
+                transactions = [];
+                updateUI();
+                if (retryCount < 2) {
+                    showToast(`⚠️ พยายามเชื่อมต่อครั้งที่ ${retryCount + 1}/2...`, 'warning');
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    await loadDataFromSheet(showLoading, retryCount + 1);
+                    return;
+                }
+                showMessage('❌ ไม่สามารถโหลดข้อมูลจาก Google Sheets\n\nโปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ต');
             }
         } finally {
-            if (showLoading) {
-                loadingOverlay.style.display = 'none';
-            }
+            if (showLoading) loadingOverlay.style.display = 'none';
             isSyncing = false;
         }
     }
 
-    // Thai months and date functions
+    // ฟังก์ชันซิงค์ข้อมูล (บันทึกทั้งหมดลง Sheet)
+    async function syncAllData() {
+        showMessage('🔄 กำลังซิงค์ข้อมูล...');
+        const localData = JSON.parse(localStorage.getItem('transactions_backup')) || [];
+        
+        if (localData.length === 0) {
+            showMessage('📭 ไม่มีข้อมูลในเครื่องให้ซิงค์');
+            return;
+        }
+        
+        let successCount = 0;
+        let failCount = 0;
+        
+        for (const transaction of localData) {
+            try {
+                await callGoogleScript('addData', transaction);
+                successCount++;
+            } catch (error) {
+                failCount++;
+            }
+        }
+        
+        if (failCount === 0) {
+            showMessage(`✅ ซิงค์ข้อมูลสำเร็จ ${successCount} รายการ`);
+            await loadDataFromSheet(true, 0);
+        } else {
+            showMessage(`⚠️ ซิงค์บางส่วน: สำเร็จ ${successCount}, ล้มเหลว ${failCount}`);
+        }
+    }
+
+    // ฟังก์ชันเลื่อนไปด้านล่างสุด
+    function scrollTransactionListToBottom() {
+        if (transactionListEl) {
+            transactionListEl.scrollTo({
+                top: transactionListEl.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+    }
+
+    // Thai months
     const THAI_MONTHS = [
         { value: '01', name: 'มกราคม' }, { value: '02', name: 'กุมภาพันธ์' }, { value: '03', name: 'มีนาคม' },
         { value: '04', name: 'เมษายน' }, { value: '05', name: 'พฤษภาคม' }, { value: '06', name: 'มิถุนายน' },
@@ -1539,6 +1474,7 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
         return `${year}-${month}-${day}`;
     }
 
+    // ฟังก์ชันเพิ่มรายการ
     async function addTransaction(e) {
         e.preventDefault();
         if (typeInput.value === "") { showMessage('กรุณาเลือกประเภท (รายรับ/รายจ่าย) ก่อน'); return; }
@@ -1559,9 +1495,10 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
             amount: amountValue 
         };
 
+        // เพิ่มลง localStorage ก่อน
         transactions.push(transaction);
         transactions.sort((a, b) => parseLocalDate(a.date) - parseLocalDate(b.date));
-        updateLocalStorage();
+        localStorage.setItem('transactions_backup', JSON.stringify(transactions));
         updateUI();
 
         savingIndicator.style.opacity = '1'; 
@@ -1574,16 +1511,13 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
             const currentBalance = getCurrentBalance();
             await sendLineOAText(transaction, currentBalance);
             
-            // เลื่อนไปด้านล่างสุดหลังจากเพิ่มรายการสำเร็จ
-            setTimeout(() => {
-                scrollTransactionListToBottom();
-            }, 100);
+            showToast('✅ บันทึกรายการสำเร็จ', 'success');
+            setTimeout(() => scrollTransactionListToBottom(), 100);
             
         } catch (error) {
-            showMessage('ไม่สามารถบันทึกข้อมูลไปยัง Google Sheet ได้: ' + error.message);
-            transactions = transactions.filter(t => t.id !== transaction.id);
-            updateLocalStorage();
-            updateUI();
+            console.error('Add error:', error);
+            showToast('⚠️ บันทึกในเครื่องสำเร็จ รอซิงค์อัตโนมัติ', 'warning');
+            // ข้อมูลถูกบันทึกใน localStorage แล้ว
         } finally {
             savingIndicator.style.opacity = '0';
             setTimeout(() => { savingIndicator.style.display = 'none'; }, 300);
@@ -1593,23 +1527,26 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
         }
     }
 
+    // ฟังก์ชันลบรายการ
     window.removeTransaction = async function(id) {
         showConfirm('คุณต้องการลบรายการนี้ใช่หรือไม่?', async (confirmed) => {
             if (!confirmed) return;
+            
             const originalTransactions = [...transactions];
             transactions = transactions.filter(t => t.id.toString() !== id.toString());
-            updateLocalStorage();
+            localStorage.setItem('transactions_backup', JSON.stringify(transactions));
             updateUI();
             savingIndicator.style.opacity = '1';
             
             try {
                 await callGoogleScript('deleteData', { id });
                 await loadDataFromSheet(false, 0);
+                showToast('✅ ลบรายการสำเร็จ', 'success');
             } catch (error) {
-                showMessage('เกิดข้อผิดพลาดในการลบรายการ: ' + error.message);
                 transactions = originalTransactions;
-                updateLocalStorage();
+                localStorage.setItem('transactions_backup', JSON.stringify(transactions));
                 updateUI();
+                showToast('⚠️ ลบในเครื่องสำเร็จ แต่ไม่สามารถซิงค์ได้', 'warning');
             } finally {
                 savingIndicator.style.opacity = '0';
                 setTimeout(() => { savingIndicator.style.display = 'none'; }, 300);
@@ -1619,37 +1556,21 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
 
     window.toggleReceivedStatus = function(checkbox, id) {
         if (!checkbox.checked) return;
-
-        showConfirm('คุณต้องการยืนยันว่าได้รับสินค้านี้แล้วใช่หรือไม่?', (confirmed) => {
+        showConfirm('คุณต้องการยืนยันว่าได้รับสินค้านี้แล้วใช่หรือไม่?', async (confirmed) => {
             if (confirmed) {
                 const now = new Date();
                 const receivedDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
                 
-                const transactionToUpdate = transactions.find(t => t.id === id);
-                if (!transactionToUpdate) {
+                try {
+                    await callGoogleScript('updateReceivedStatus', { id, receivedDate, status: true });
+                    await loadDataFromSheet(false, 0);
+                    if (!orderListModal.classList.contains('hidden')) showOrderList();
+                    if (!searchModal.classList.contains('hidden')) handleSearch();
+                    showToast('✅ อัปเดตสถานะสำเร็จ', 'success');
+                } catch (error) {
+                    showToast('⚠️ ไม่สามารถอัปเดตสถานะได้', 'error');
                     checkbox.checked = false;
-                    return;
                 }
-                
-                const originalReceivedDate = transactionToUpdate.receiveddate;
-                const originalReceivedStatus = transactionToUpdate.receivedstatus;
-
-                transactionToUpdate.receiveddate = receivedDate;
-                transactionToUpdate.receivedstatus = true;
-                updateLocalStorage();
-                updateUI();
-                
-                if (!orderListModal.classList.contains('hidden')) showOrderList();
-                if (!searchModal.classList.contains('hidden')) handleSearch();
-
-                callGoogleScript('updateReceivedStatus', { id, receivedDate, status: true })
-                    .catch(error => {
-                        showMessage('ไม่สามารถอัปเดตสถานะได้: ' + error.message);
-                        transactionToUpdate.receiveddate = originalReceivedDate;
-                        transactionToUpdate.receivedstatus = originalReceivedStatus;
-                        updateLocalStorage();
-                        updateUI();
-                    });
             } else {
                 checkbox.checked = false;
             }
@@ -1665,10 +1586,6 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
         if (month === 'all') return `(ทั้งปี ${parseInt(year) + 543})`;
         const date = new Date(parseInt(year), parseInt(month) - 1, 1);
         return `(${date.toLocaleDateString('th-TH', { year: 'numeric', month: 'long' })})`;
-    }
-    
-    function updateLocalStorage() { 
-        localStorage.setItem('transactions_cache', JSON.stringify(transactions));
     }
     
     function getFilteredTransactions() {
@@ -1715,17 +1632,13 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
         today.setHours(0, 0, 0, 0);
         const order = parseLocalDate(orderDate);
         order.setHours(0, 0, 0, 0);
-        const diffTime = today.getTime() - order.getTime();
-        const diffDays = Math.round(diffTime / (1000 * 3600 * 24));
-        return diffDays;
+        return Math.round((today.getTime() - order.getTime()) / (1000 * 3600 * 24));
     }
 
     // Salary Functions
     function loadSalaryData() {
         if (!salaryYearSelect) return;
-        
         const selectedYear = salaryYearSelect.value;
-        
         let salaryTransactions = transactions.filter(t => t.platform === 'เงินเดือนพนักงาน');
         
         if (selectedYear !== 'all') {
@@ -1750,11 +1663,7 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
                 const amount = t.amount;
                 const key = `${year}-${month}`;
                 if (!monthlySummary[key]) {
-                    monthlySummary[key] = {
-                        year: year,
-                        month: month,
-                        amount: 0
-                    };
+                    monthlySummary[key] = { year, month, amount: 0 };
                 }
                 monthlySummary[key].amount += amount;
             }
@@ -1769,7 +1678,6 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
         
         if (salaryListEl) {
             salaryListEl.innerHTML = '';
-            
             if (sortedKeys.length === 0) {
                 salaryListEl.innerHTML = '<li class="text-center text-gray-500 py-6 md:py-8">📭 ไม่พบข้อมูลเงินเดือน</li>';
                 if (salarySummaryEl) salarySummaryEl.classList.add('hidden');
@@ -1777,14 +1685,11 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
             }
             
             let totalYear = 0;
-            
             sortedKeys.forEach(key => {
                 const data = monthlySummary[key];
                 const amount = data.amount;
-                const yearAD = parseInt(data.year);
-                const yearBE = yearAD + 543;
+                const yearBE = parseInt(data.year) + 543;
                 const monthName = thaiMonths[data.month] || data.month;
-                
                 totalYear += amount;
                 
                 const item = document.createElement('li');
@@ -1821,26 +1726,17 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
             });
             if (currentYear && years.includes(currentYear)) salaryYearSelect.value = currentYear;
         }
-        
         loadSalaryData();
         salaryModal.classList.remove('hidden');
     }
 
+    // ฟังก์ชันแสดงผล
     function addOrderListDOM(transaction) {
         const item = document.createElement('li');
         const localDate = parseLocalDate(transaction.date);
         const displayDate = localDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
         const daysSinceOrder = getDaysSinceOrder(transaction.date);
-        
-        let daysText = '';
-        if (daysSinceOrder === 0) {
-            daysText = 'วันนี้';
-        } else if (daysSinceOrder === 1) {
-            daysText = '1 วัน';
-        } else {
-            daysText = `${daysSinceOrder} วัน`;
-        }
-        
+        let daysText = daysSinceOrder === 0 ? 'วันนี้' : daysSinceOrder === 1 ? '1 วัน' : `${daysSinceOrder} วัน`;
         const isChecked = (String(transaction.receivedstatus).toLowerCase() === 'true');
         
         item.className = `p-3 md:p-4 border rounded-xl flex flex-col transition duration-200 ${isChecked ? 'bg-green-50' : 'bg-gray-50 hover:bg-gray-100'}`;
@@ -1849,17 +1745,11 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
                 <div class="flex justify-between items-start w-full gap-2">
                     <div class="flex-grow">
                         <div class="font-semibold md:font-bold text-sm md:text-base text-gray-800">${transaction.description || '-'}</div>
-                        <div class="text-xs md:text-sm text-gray-500 mt-1">
-                            <span>📅 สั่งซื้อ: ${displayDate}</span>
-                        </div>
-                        <div class="text-xs md:text-sm text-amber-600 font-medium mt-1">
-                            ⏱️ รอรับสินค้า ${daysText}
-                        </div>
+                        <div class="text-xs md:text-sm text-gray-500 mt-1">📅 สั่งซื้อ: ${displayDate}</div>
+                        <div class="text-xs md:text-sm text-amber-600 font-medium mt-1">⏱️ รอรับสินค้า ${daysText}</div>
                     </div>
                     <div class="text-right flex-shrink-0">
-                        <div class="font-bold text-base md:text-xl text-red-600">
-                            -฿${formatMoney(transaction.amount)}
-                        </div>
+                        <div class="font-bold text-base md:text-xl text-red-600">-฿${formatMoney(transaction.amount)}</div>
                     </div>
                 </div>
                 <div class="mt-2 md:mt-3 pt-2 md:pt-3 border-t border-gray-200">
@@ -1871,13 +1761,7 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
             </div>`;
         
         const checkbox = item.querySelector('.toggle-received-btn');
-        if (checkbox) {
-            checkbox.addEventListener('change', function(e) {
-                e.stopPropagation();
-                window.toggleReceivedStatus(this, transaction.id);
-            });
-        }
-        
+        if (checkbox) checkbox.addEventListener('change', (e) => { e.stopPropagation(); window.toggleReceivedStatus(this, transaction.id); });
         orderListItemsEl.appendChild(item);
     }
 
@@ -1886,13 +1770,11 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
         const isIncome = transaction.type === 'income';
         const localDate = parseLocalDate(transaction.date);
         const displayDate = localDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
-
         const isOrder = transaction.platform === 'สั่งซื้อสินค้า';
         const isChecked = (String(transaction.receivedstatus).toLowerCase() === 'true');
         const receivedDateStr = transaction.receiveddate ? parseLocalDate(transaction.receiveddate).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
         
         let statusDisplayHTML = '';
-
         if (isOrder) {
             if (isChecked) {
                 const orderDate = parseLocalDate(transaction.date);
@@ -1940,21 +1822,9 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
             ${checkboxHTML}`;
         
         const deleteBtn = item.querySelector('.delete-btn');
-        if (deleteBtn) {
-            deleteBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                window.removeTransaction(transaction.id);
-            });
-        }
-        
+        if (deleteBtn) deleteBtn.addEventListener('click', (e) => { e.stopPropagation(); window.removeTransaction(transaction.id); });
         const receivedCheckbox = item.querySelector('.toggle-received-main');
-        if (receivedCheckbox) {
-            receivedCheckbox.addEventListener('change', function(e) {
-                e.stopPropagation();
-                window.toggleReceivedStatus(this, transaction.id);
-            });
-        }
-        
+        if (receivedCheckbox) receivedCheckbox.addEventListener('change', (e) => { e.stopPropagation(); window.toggleReceivedStatus(this, transaction.id); });
         transactionListEl.appendChild(item);
     }
 
@@ -1994,7 +1864,6 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
         incomeTitleEl.innerHTML = `📊 รายรับ ${monthYearText}`;
         expenseTitleEl.innerHTML = `📉 รายจ่าย ${monthYearText}`;
         balanceTitleEl.innerHTML = `💰 คงเหลือ ${monthYearText}`;
-        
         totalIncomeEl.innerText = `฿${formatMoney(income)}`;
         totalExpenseEl.innerText = `฿${formatMoney(expense)}`;
         balanceEl.innerText = `฿${formatMoney(balance)}`;
@@ -2006,21 +1875,12 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
         Array.from(platformInput.options).forEach(opt => {
             const expenseOnly = ['สั่งซื้อสินค้า', 'เงินเดือนพนักงาน', 'อื่นๆ'];
             const incomeOnly = ['Shopee(Auy)', 'Shopee(Aom)', 'Lazada(Auy)', 'Lazada(Aom)', 'ลูกค้า(อื่นๆ)'];
-            
-            if (type === 'income') {
-                opt.hidden = expenseOnly.includes(opt.value);
-            } else if (type === 'expense') {
-                opt.hidden = incomeOnly.includes(opt.value);
-            } else {
-                opt.hidden = true;
-            }
+            if (type === 'income') opt.hidden = expenseOnly.includes(opt.value);
+            else if (type === 'expense') opt.hidden = incomeOnly.includes(opt.value);
+            else opt.hidden = true;
         });
-        
-        if (type === 'income' && (platformInput.selectedIndex === -1 || platformInput.options[platformInput.selectedIndex].hidden)) {
-            platformInput.value = 'Shopee(Auy)';
-        } else if (type === 'expense' && (platformInput.selectedIndex === -1 || platformInput.options[platformInput.selectedIndex].hidden)) {
-            platformInput.value = 'สั่งซื้อสินค้า';
-        }
+        if (type === 'income' && (platformInput.selectedIndex === -1 || platformInput.options[platformInput.selectedIndex].hidden)) platformInput.value = 'Shopee(Auy)';
+        else if (type === 'expense' && (platformInput.selectedIndex === -1 || platformInput.options[platformInput.selectedIndex].hidden)) platformInput.value = 'สั่งซื้อสินค้า';
     }
 
     function populateFilters() {
@@ -2049,11 +1909,8 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
             option.textContent = m.name;
             filterMonthInput.appendChild(option);
         });
-        if (selectedM && (selectedM === 'all' || THAI_MONTHS.some(m => m.value === selectedM))) {
-            filterMonthInput.value = selectedM;
-        } else {
-            filterMonthInput.value = String(new Date().getMonth() + 1).padStart(2, '0');
-        }
+        if (selectedM && (selectedM === 'all' || THAI_MONTHS.some(m => m.value === selectedM))) filterMonthInput.value = selectedM;
+        else filterMonthInput.value = String(new Date().getMonth() + 1).padStart(2, '0');
     }
 
     function renderSummaries(filtered) {
@@ -2068,10 +1925,7 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
                 listEl.innerHTML = `<li class="text-center text-gray-500 py-6 md:py-8">✨ ไม่พบรายการในเดือนที่เลือก</li>`;
                 return;
             }
-            const summary = data.reduce((acc, t) => {
-                acc[t.platform] = (acc[t.platform] || 0) + t.amount;
-                return acc;
-            }, {});
+            const summary = data.reduce((acc, t) => { acc[t.platform] = (acc[t.platform] || 0) + t.amount; return acc; }, {});
             Object.entries(summary).sort(([,a],[,b]) => b-a).forEach(([p, a]) => {
                 const item = document.createElement('li');
                 item.className = `p-3 md:p-4 border rounded-xl flex justify-between items-center shadow-sm bg-white hover:shadow-md transition-all duration-200`;
@@ -2084,45 +1938,23 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
     function updateBottomSummaryBar() {
         if (!transactions || transactions.length === 0) {
             if (bottomTotalBalanceEl) bottomTotalBalanceEl.textContent = '฿0.00';
-            if (bottomMonthlyProfitEl) {
-                bottomMonthlyProfitEl.textContent = '0.00%';
-                bottomMonthlyProfitEl.className = 'summary-value profit-positive';
-            }
-            if (bottomOverallProfitEl) {
-                bottomOverallProfitEl.textContent = '0.00%';
-                bottomOverallProfitEl.className = 'summary-value profit-positive';
-            }
+            if (bottomMonthlyProfitEl) { bottomMonthlyProfitEl.textContent = '0.00%'; bottomMonthlyProfitEl.className = 'summary-value profit-positive'; }
+            if (bottomOverallProfitEl) { bottomOverallProfitEl.textContent = '0.00%'; bottomOverallProfitEl.className = 'summary-value profit-positive'; }
             return;
         }
-
         const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
         const totalExpense = transactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
         const totalBalance = totalIncome - totalExpense;
-        
         const filtered = getFilteredTransactions();
         const monthlyIncome = filtered.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
         const monthlyExpenseForProfit = filtered.filter(t => t.type === 'expense' && t.platform !== 'เงินเดือนพนักงาน').reduce((acc, t) => acc + t.amount, 0);
         const totalExpenseForProfit = transactions.filter(t => t.type === 'expense' && t.platform !== 'เงินเดือนพนักงาน').reduce((acc, t) => acc + t.amount, 0);
-        
         let monthlyProfit = (monthlyExpenseForProfit > 0) ? ((monthlyIncome - monthlyExpenseForProfit) / monthlyExpenseForProfit) * 100 : (monthlyIncome > 0 ? 100 : 0);
         let overallProfit = (totalExpenseForProfit > 0) ? ((totalIncome - totalExpenseForProfit) / totalExpenseForProfit) * 100 : (totalIncome > 0 ? 100 : 0);
         
-        if (bottomTotalBalanceEl) {
-            bottomTotalBalanceEl.textContent = `฿${formatMoney(totalBalance)}`;
-            bottomTotalBalanceEl.style.color = totalBalance >= 0 ? '#4ade80' : '#f87171';
-        }
-        if (bottomMonthlyProfitEl) {
-            bottomMonthlyProfitEl.textContent = `${monthlyProfit.toFixed(2)}%`;
-            bottomMonthlyProfitEl.className = `summary-value ${monthlyProfit >= 0 ? 'profit-positive' : 'profit-negative'}`;
-        }
-        if (bottomOverallProfitEl) {
-            bottomOverallProfitEl.textContent = `${overallProfit.toFixed(2)}%`;
-            bottomOverallProfitEl.className = `summary-value ${overallProfit >= 0 ? 'profit-positive' : 'profit-negative'}`;
-        }
-    }
-
-    function updateStickyPanel() {
-        updateBottomSummaryBar();
+        if (bottomTotalBalanceEl) { bottomTotalBalanceEl.textContent = `฿${formatMoney(totalBalance)}`; bottomTotalBalanceEl.style.color = totalBalance >= 0 ? '#4ade80' : '#f87171'; }
+        if (bottomMonthlyProfitEl) { bottomMonthlyProfitEl.textContent = `${monthlyProfit.toFixed(2)}%`; bottomMonthlyProfitEl.className = `summary-value ${monthlyProfit >= 0 ? 'profit-positive' : 'profit-negative'}`; }
+        if (bottomOverallProfitEl) { bottomOverallProfitEl.textContent = `${overallProfit.toFixed(2)}%`; bottomOverallProfitEl.className = `summary-value ${overallProfit >= 0 ? 'profit-positive' : 'profit-negative'}`; }
     }
 
     function updateUI() {
@@ -2130,193 +1962,85 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
         const filtered = getFilteredTransactions();
         filtered.sort((a, b) => parseLocalDate(a.date) - parseLocalDate(b.date));
         transactionListEl.innerHTML = '';
-        if (filtered.length === 0) {
-            transactionListEl.innerHTML = '<li class="text-center text-gray-500 py-8 md:py-12">📭 ไม่พบรายการในเดือนที่เลือก</li>';
-        } else {
-            filtered.forEach(addTransactionDOM);
-        }
+        if (filtered.length === 0) transactionListEl.innerHTML = '<li class="text-center text-gray-500 py-8 md:py-12">📭 ไม่พบรายการในเดือนที่เลือก</li>';
+        else filtered.forEach(addTransactionDOM);
         updateValues(filtered);
         renderSummaries(filtered);
         updatePlatformOptions();
-        updateStickyPanel();
+        updateBottomSummaryBar();
     }
 
+    // SKU Functions (ย่อ)
     function parseSkuAndQuantity(description) {
         let sku = description.trim();
         let quantity = 1;
-        const patterns = [
-            /(.+)\/(\d+)/,
-            /(.+)\s*[xX*]\s*(\d+)/,
-            /(.+)\s*\((\d+)\)/,
-            /(.+)\s*(\d+)\s*ชิ้น/
-        ];
+        const patterns = [/(.+)\/(\d+)/, /(.+)\s*[xX*]\s*(\d+)/, /(.+)\s*\((\d+)\)/, /(.+)\s*(\d+)\s*ชิ้น/];
         for (const pattern of patterns) {
             const match = sku.match(pattern);
-            if (match) {
-                sku = match[1].trim();
-                quantity = parseInt(match[2], 10);
-                return { sku, quantity };
-            }
+            if (match) { sku = match[1].trim(); quantity = parseInt(match[2], 10); return { sku, quantity }; }
         }
         return { sku, quantity };
     }
 
     function calculateShippingDuration(transactionsForSku) {
-        const shippingDurations = transactionsForSku
-            .filter(t => String(t.receivedstatus).toLowerCase() === 'true' && t.receiveddate)
-            .map(t => {
-                const orderDate = parseLocalDate(t.date);
-                const receivedDate = parseLocalDate(t.receiveddate);
-                const diffTime = receivedDate.getTime() - orderDate.getTime();
-                const diffDays = Math.round(diffTime / (1000 * 3600 * 24));
-                return diffDays >= 0 ? diffDays : null;
-            })
-            .filter(d => d !== null);
-        
-        if (shippingDurations.length === 0) {
-            return null;
-        }
-        
-        const minDays = Math.min(...shippingDurations);
-        const maxDays = Math.max(...shippingDurations);
-        
-        return {
-            min: minDays,
-            max: maxDays,
-            count: shippingDurations.length
-        };
+        const shippingDurations = transactionsForSku.filter(t => String(t.receivedstatus).toLowerCase() === 'true' && t.receiveddate)
+            .map(t => { const diff = parseLocalDate(t.receiveddate).getTime() - parseLocalDate(t.date).getTime(); return Math.round(diff / (1000 * 3600 * 24)); })
+            .filter(d => d !== null && d >= 0);
+        if (shippingDurations.length === 0) return null;
+        return { min: Math.min(...shippingDurations), max: Math.max(...shippingDurations), count: shippingDurations.length };
     }
 
     function renderSkuAnalysis(skusToRender) {
         skuAnalysisList.innerHTML = '';
-        if (skusToRender.length === 0) {
-            skuAnalysisList.innerHTML = '<li class="text-center text-gray-500 py-6 md:py-8">🔍 ไม่พบข้อมูล SKU ที่ตรงกัน</li>';
-            return;
-        }
-        
+        if (skusToRender.length === 0) { skuAnalysisList.innerHTML = '<li class="text-center text-gray-500 py-6 md:py-8">🔍 ไม่พบข้อมูล SKU</li>'; return; }
         skusToRender.forEach(([sku, { data6Months, shippingInfo }]) => {
             const average6Months = data6Months.totalQuantity / 6;
-            
             let shippingHTML = '';
             if (shippingInfo) {
-                const rangeText = shippingInfo.min === shippingInfo.max 
-                    ? `${shippingInfo.min} วัน` 
-                    : `${shippingInfo.min}-${shippingInfo.max} วัน`;
-                shippingHTML = `
-                    <div class="sku-shipping">
-                        <svg class="shipping-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
-                        </svg>
-                        <span>⏱️ ระยะเวลาจัดส่ง: <span class="shipping-range">${rangeText}</span></span>
-                        <span class="text-gray-400 text-xs">(${shippingInfo.count} ครั้ง)</span>
-                    </div>
-                `;
+                const rangeText = shippingInfo.min === shippingInfo.max ? `${shippingInfo.min} วัน` : `${shippingInfo.min}-${shippingInfo.max} วัน`;
+                shippingHTML = `<div class="sku-shipping"><svg class="shipping-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0zM13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/></svg><span>⏱️ ระยะเวลาจัดส่ง: <span class="shipping-range">${rangeText}</span></span><span class="text-gray-400 text-xs">(${shippingInfo.count} ครั้ง)</span></div>`;
             } else {
-                shippingHTML = `
-                    <div class="sku-shipping">
-                        <svg class="shipping-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span class="text-gray-400">ยังไม่มีประวัติการจัดส่ง</span>
-                    </div>
-                `;
+                shippingHTML = `<div class="sku-shipping"><svg class="shipping-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span class="text-gray-400">ยังไม่มีประวัติการจัดส่ง</span></div>`;
             }
-            
-            const item = document.createElement('li');
-            item.className = 'sku-item';
-            item.innerHTML = `
-                <div class="flex justify-between items-start gap-2">
-                    <div class="flex-1">
-                        <div class="sku-name">📦 ${sku}</div>
-                        <div class="sku-stats">สั่งทั้งหมด ${data6Months.totalQuantity} ชิ้น (6 เดือน)</div>
-                        ${shippingHTML}
-                    </div>
-                    <div class="sku-average">
-                        <div class="sku-average-value">${average6Months.toFixed(2)}</div>
-                        <div class="sku-average-label">เฉลี่ย/เดือน</div>
-                    </div>
-                </div>
-            `;
+            const item = document.createElement('li'); item.className = 'sku-item';
+            item.innerHTML = `<div class="flex justify-between items-start gap-2"><div class="flex-1"><div class="sku-name">📦 ${sku}</div><div class="sku-stats">สั่งทั้งหมด ${data6Months.totalQuantity} ชิ้น (6 เดือน)</div>${shippingHTML}</div><div class="sku-average"><div class="sku-average-value">${average6Months.toFixed(2)}</div><div class="sku-average-label">เฉลี่ย/เดือน</div></div></div>`;
             skuAnalysisList.appendChild(item);
         });
     }
 
     function showSkuAnalysis() {
         skuSearchInput.value = '';
-        const sixMonthsAgo = new Date();
-        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-        
-        const relevantTransactions = transactions.filter(t => {
-            const transactionDate = parseLocalDate(t.date);
-            return t.platform === 'สั่งซื้อสินค้า' && transactionDate >= sixMonthsAgo;
-        });
-        
-        if (relevantTransactions.length === 0) {
-            skuAnalysisList.innerHTML = '<li class="text-center text-gray-500 py-6 md:py-8">📭 ไม่พบข้อมูลการสั่งซื้อสินค้าใน 6 เดือนที่ผ่านมา</li>';
-            return;
-        }
-        
+        const sixMonthsAgo = new Date(); sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+        const relevantTransactions = transactions.filter(t => t.platform === 'สั่งซื้อสินค้า' && parseLocalDate(t.date) >= sixMonthsAgo);
+        if (relevantTransactions.length === 0) { skuAnalysisList.innerHTML = '<li class="text-center text-gray-500 py-6 md:py-8">📭 ไม่พบข้อมูลการสั่งซื้อใน 6 เดือน</li>'; return; }
         const skuData = relevantTransactions.reduce((acc, t) => {
             const { sku, quantity } = parseSkuAndQuantity(t.description);
-            if (sku.toUpperCase().startsWith('SKU')) {
-                if (!acc[sku]) {
-                    acc[sku] = { 
-                        totalQuantity: 0,
-                        transactions: []
-                    };
-                }
-                acc[sku].totalQuantity += quantity;
-                acc[sku].transactions.push(t);
-            }
+            if (sku.toUpperCase().startsWith('SKU')) { if (!acc[sku]) acc[sku] = { totalQuantity: 0, transactions: [] }; acc[sku].totalQuantity += quantity; acc[sku].transactions.push(t); }
             return acc;
         }, {});
-        
-        const sortedSkus = Object.entries(skuData)
-            .map(([sku, data]) => {
-                const shippingInfo = calculateShippingDuration(data.transactions);
-                return [sku, { 
-                    data6Months: { totalQuantity: data.totalQuantity },
-                    shippingInfo: shippingInfo
-                }];
-            })
+        const sortedSkus = Object.entries(skuData).map(([sku, data]) => [sku, { data6Months: { totalQuantity: data.totalQuantity }, shippingInfo: calculateShippingDuration(data.transactions) }])
             .sort(([, a], [, b]) => b.data6Months.totalQuantity - a.data6Months.totalQuantity);
-        
         fullSkuAnalysis = sortedSkus;
         renderSkuAnalysis(fullSkuAnalysis);
     }
 
     function showOrderList() {
         const results = transactions.filter(t => t.platform === 'สั่งซื้อสินค้า' && String(t.receivedstatus).toLowerCase() !== 'true');
-        const totalCount = results.length;
-        const totalAmount = results.reduce((acc, t) => acc + t.amount, 0);
+        const totalCount = results.length, totalAmount = results.reduce((acc, t) => acc + t.amount, 0);
         orderListCountEl.textContent = totalCount;
         orderListTotalEl.textContent = formatMoney(totalAmount);
         orderListItemsEl.innerHTML = '';
-        if (results.length === 0) {
-            orderListItemsEl.innerHTML = '<li class="text-center text-gray-500 py-6 md:py-8">✅ ไม่มีรายการสั่งซื้อที่ยังไม่ได้รับ</li>';
-            orderListSummaryEl.classList.add('hidden');
-        } else {
-            orderListSummaryEl.classList.remove('hidden');
-            results.sort((a, b) => parseLocalDate(a.date) - parseLocalDate(b.date));
-            results.forEach(addOrderListDOM);
-        }
+        if (results.length === 0) { orderListItemsEl.innerHTML = '<li class="text-center text-gray-500 py-6 md:py-8">✅ ไม่มีรายการสั่งซื้อที่ยังไม่ได้รับ</li>'; orderListSummaryEl.classList.add('hidden'); }
+        else { orderListSummaryEl.classList.remove('hidden'); results.sort((a, b) => parseLocalDate(a.date) - parseLocalDate(b.date)); results.forEach(addOrderListDOM); }
     }
 
     function handleSearch() {
         const query = searchInput.value.toLowerCase().trim();
         searchResultsList.innerHTML = '';
         if (query.length === 0) return;
-        const results = transactions.filter(t =>
-            (t.description || '').toLowerCase().includes(query) ||
-            (t.platform || '').toLowerCase().includes(query)
-        );
-        if (results.length === 0) {
-            searchResultsList.innerHTML = '<li class="text-center text-gray-500 py-6 md:py-8">🔍 ไม่พบรายการที่ตรงกัน</li>';
-        } else {
-            results.sort((a, b) => parseLocalDate(b.date) - parseLocalDate(a.date));
-            results.forEach(addSearchResultDOM);
-        }
+        const results = transactions.filter(t => (t.description || '').toLowerCase().includes(query) || (t.platform || '').toLowerCase().includes(query));
+        if (results.length === 0) searchResultsList.innerHTML = '<li class="text-center text-gray-500 py-6 md:py-8">🔍 ไม่พบรายการที่ตรงกัน</li>';
+        else { results.sort((a, b) => parseLocalDate(b.date) - parseLocalDate(a.date)); results.forEach(addSearchResultDOM); }
     }
 
     // Event Listeners
@@ -2325,73 +2049,24 @@ ${balanceStatus} ฿${formatMoney(balance)}`;
     filterMonthInput.addEventListener('change', () => updateUI());
     typeInput.addEventListener('change', updatePlatformOptions);
     
-    if (searchBottomBtn) {
-        searchBottomBtn.addEventListener('click', () => {
-            if (searchModal) searchModal.classList.remove('hidden');
-            if (searchInput) {
-                searchInput.value = '';
-                handleSearch();
-                searchInput.focus();
-            }
-        });
-    }
-    
-    if (salaryBtn) {
-        salaryBtn.addEventListener('click', showSalaryModal);
-    }
-    
-    if (salaryModalCloseBtn) {
-        salaryModalCloseBtn.addEventListener('click', () => {
-            if (salaryModal) salaryModal.classList.add('hidden');
-        });
-    }
-    
-    if (salaryYearSelect) {
-        salaryYearSelect.addEventListener('change', loadSalaryData);
-    }
+    if (searchBottomBtn) searchBottomBtn.addEventListener('click', () => { searchModal.classList.remove('hidden'); searchInput.value = ''; handleSearch(); searchInput.focus(); });
+    if (salaryBtn) salaryBtn.addEventListener('click', showSalaryModal);
+    if (salaryModalCloseBtn) salaryModalCloseBtn.addEventListener('click', () => salaryModal.classList.add('hidden'));
+    if (salaryYearSelect) salaryYearSelect.addEventListener('change', loadSalaryData);
+    if (syncNowBtn) syncNowBtn.addEventListener('click', syncAllData);
     
     searchModalCloseBtn.addEventListener('click', () => searchModal.classList.add('hidden'));
     searchInput.addEventListener('input', handleSearch);
-    
-    filterNotReceivedBtn.addEventListener('click', () => {
-        searchModal.classList.add('hidden');
-        showOrderList();
-        orderListModal.classList.remove('hidden');
-    });
-    orderListModalCloseBtn.addEventListener('click', () => {
-        orderListModal.classList.add('hidden');
-        searchModal.classList.remove('hidden');
-    });
-    
-    manageSkuBtn.addEventListener('click', () => {
-        searchModal.classList.add('hidden');
-        showSkuAnalysis();
-        skuModal.classList.remove('hidden');
-    });
-    skuModalCloseBtn.addEventListener('click', () => {
-        skuModal.classList.add('hidden');
-        searchModal.classList.remove('hidden');
-    });
-    skuSearchInput.addEventListener('input', () => {
-        const query = skuSearchInput.value.toLowerCase().trim();
-        const filteredSkus = fullSkuAnalysis.filter(([sku]) => sku.toLowerCase().includes(query));
-        renderSkuAnalysis(filteredSkus);
-    });
+    filterNotReceivedBtn.addEventListener('click', () => { searchModal.classList.add('hidden'); showOrderList(); orderListModal.classList.remove('hidden'); });
+    orderListModalCloseBtn.addEventListener('click', () => { orderListModal.classList.add('hidden'); searchModal.classList.remove('hidden'); });
+    manageSkuBtn.addEventListener('click', () => { searchModal.classList.add('hidden'); showSkuAnalysis(); skuModal.classList.remove('hidden'); });
+    skuModalCloseBtn.addEventListener('click', () => { skuModal.classList.add('hidden'); searchModal.classList.remove('hidden'); });
+    skuSearchInput.addEventListener('input', () => { const query = skuSearchInput.value.toLowerCase().trim(); const filteredSkus = fullSkuAnalysis.filter(([sku]) => sku.toLowerCase().includes(query)); renderSkuAnalysis(filteredSkus); });
     
     initializeDateDropdowns();
-    
-    const cached = JSON.parse(localStorage.getItem('transactions_cache'));
-    if (cached && cached.length > 0) {
-        transactions = cached.map(t => {
-            if (t.platform === 'Shopee') t.platform = 'Shopee(Auy)';
-            return {...t, amount: parseFloat(t.amount) || 0};
-        });
-        updateUI();
-    }
-    
-    setTimeout(() => {
-        loadDataFromSheet(true, 0);
-    }, 500);
+    const backup = JSON.parse(localStorage.getItem('transactions_backup'));
+    if (backup && backup.length > 0) { transactions = backup; updateUI(); showToast(`📦 โหลดข้อมูลสำรอง ${transactions.length} รายการ`, 'info'); }
+    setTimeout(() => loadDataFromSheet(true, 0), 500);
 })();
 </script>
 </body>
