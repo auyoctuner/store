@@ -817,6 +817,7 @@
                     <option value="ลูกค้า(อื่นๆ)">👥 ลูกค้า(อื่นๆ)</option>
                     <option value="สั่งซื้อสินค้า">📋 สั่งซื้อสินค้า</option>
                     <option value="เงินเดือนพนักงาน">💵 เงินเดือนพนักงาน</option>
+                    <option value="รายจ่ายอื่นๆ">📝 รายจ่ายอื่นๆ</option>
                 </select>
             </div>
             <div class="lg:col-span-2">
@@ -902,7 +903,7 @@
     </div>
 </div>
 
-<!-- Bottom Summary Bar - ไม่มีเส้นขอบ -->
+<!-- Bottom Summary Bar -->
 <div class="bottom-summary-bar">
     <div class="summary-item">
         <span class="summary-label">💰 ยอดคงเหลือ</span>
@@ -1101,7 +1102,7 @@
 (function() {
     // Configuration
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzijxz6qk2Xtz5adOOgfrWTyBY0AURwzMsqN4zsO2dtPwnXri-70Q5MLemQVFmBOk4D2w/exec";
-    const SHEET_ID = "1vYDHpXqds6Uh-pqC1iKMn-q0gY4fQRBHiB4y1M5JbZQ";
+    const SHEET_ID = "1tnxJSvIM2FMZjbYxibkrQ30wQ2vkUgVLD-70Q0U85kY";
     
     function debugLog(message, type = 'info') {
         console.log(`[${type.toUpperCase()}]`, message);
@@ -1431,6 +1432,7 @@
         let descriptionForTransaction = descriptionInput.value.trim();
         if (typeInput.value === 'income') descriptionForTransaction = descriptionForTransaction || "ยอดโอนเข้าบัญชี";
         else if (typeInput.value === 'expense' && platformInput.value === 'เงินเดือนพนักงาน') descriptionForTransaction = "เงินเดือน(Aom)";
+        else if (typeInput.value === 'expense' && platformInput.value === 'รายจ่ายอื่นๆ') descriptionForTransaction = descriptionForTransaction || "รายจ่ายอื่นๆ";
         
         const transaction = { 
             id: 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9), 
@@ -1571,7 +1573,8 @@
             'Lazada(Aom)': 'platform-lazada-aom', 
             'ลูกค้า(อื่นๆ)': 'platform-customer', 
             'สั่งซื้อสินค้า': 'platform-order', 
-            'เงินเดือนพนักงาน': 'platform-salary' 
+            'เงินเดือนพนักงาน': 'platform-salary',
+            'รายจ่ายอื่นๆ': 'text-gray-600'
         };
         return colors[platform] || 'text-gray-600';
     }
@@ -1753,6 +1756,7 @@
         const displayDate = localDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
 
         const isOrder = transaction.platform === 'สั่งซื้อสินค้า';
+        const isOtherExpense = transaction.platform === 'รายจ่ายอื่นๆ';
         const isChecked = (String(transaction.receivedstatus).toLowerCase() === 'true');
         const receivedDateStr = transaction.receiveddate ? parseLocalDate(transaction.receiveddate).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
         
@@ -1776,7 +1780,8 @@
             }
         }
 
-        const checkboxHTML = isOrder ? `
+        // แสดง checkbox เฉพาะกรณีเป็น "สั่งซื้อสินค้า" เท่านั้น (ไม่แสดงสำหรับรายจ่ายอื่นๆ)
+        const checkboxHTML = (isOrder && !isOtherExpense) ? `
             <div class="mt-2 md:mt-3 pt-2 md:pt-3 border-t border-gray-200">
                 <label class="inline-flex items-center space-x-2 ${isChecked ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'}">
                     <input type="checkbox" class="h-4 w-4 md:h-5 md:w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 toggle-received-main" data-id="${transaction.id}" ${isChecked ? 'checked disabled' : ''}>
@@ -1869,7 +1874,7 @@
         const type = typeInput.value;
         platformInput.disabled = !type;
         Array.from(platformInput.options).forEach(opt => {
-            const expenseOnly = ['สั่งซื้อสินค้า', 'เงินเดือนพนักงาน'];
+            const expenseOnly = ['สั่งซื้อสินค้า', 'เงินเดือนพนักงาน', 'รายจ่ายอื่นๆ'];
             const incomeOnly = ['Shopee(Auy)', 'Shopee(Aom)', 'Lazada(Auy)', 'Lazada(Aom)', 'ลูกค้า(อื่นๆ)'];
             
             if (type === 'income') {
