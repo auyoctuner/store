@@ -287,7 +287,6 @@
             }
         }
         
-        /* SKU Item Styles */
         .sku-item {
             background: white;
             border-radius: 16px;
@@ -499,7 +498,7 @@
             }
         }
         
-        /* Bottom Summary Bar - ลบเส้นขอบทั้งหมด */
+        /* Bottom Summary Bar */
         .bottom-summary-bar {
             position: fixed;
             bottom: 0;
@@ -534,6 +533,18 @@
             gap: 2px;
             flex: 1;
             min-width: 50px;
+            transition: all 0.2s ease;
+            border-radius: 12px;
+            padding: 4px 8px;
+        }
+        
+        .summary-item-clickable {
+            cursor: pointer;
+        }
+        
+        .summary-item-clickable:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
         }
         
         .summary-label {
@@ -559,7 +570,43 @@
             color: #f87171;
         }
         
-        /* ปุ่มค้นหา - อยู่ขวาสุด */
+        .balance-history-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+            padding: 4px 8px;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 55px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0;
+        }
+        
+        .balance-history-button svg {
+            width: 18px;
+            height: 18px;
+            stroke-width: 1.8;
+        }
+        
+        .balance-history-button span {
+            font-size: 9px;
+            font-weight: 600;
+        }
+        
+        .balance-history-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+        
+        .balance-history-button:active {
+            transform: translateY(0);
+        }
+        
         .search-bottom-button {
             display: flex;
             flex-direction: column;
@@ -632,7 +679,61 @@
             transform: translateY(0);
         }
         
-        /* ทำให้การ์ดทั้ง 3 ใบสูงเท่ากัน */
+        .balance-history-item {
+            background: white;
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .balance-history-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .month-name {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #1e293b;
+        }
+        
+        .balance-amount {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #3b82f6;
+        }
+        
+        .balance-positive {
+            color: #10b981;
+        }
+        
+        .balance-negative {
+            color: #ef4444;
+        }
+        
+        .income-amount {
+            color: #10b981;
+        }
+        
+        .expense-amount {
+            color: #ef4444;
+        }
+        
+        @media (max-width: 640px) {
+            .balance-history-item {
+                padding: 12px;
+            }
+            .month-name {
+                font-size: 14px;
+            }
+            .balance-amount {
+                font-size: 1rem;
+            }
+        }
+        
         .income-card, .expense-card, .balance-card {
             height: 100%;
             display: flex;
@@ -640,7 +741,6 @@
             justify-content: space-between;
         }
         
-        /* ลบเส้นขอบและพื้นที่ว่างส่วนเกินใน Balance Card */
         .balance-card .mt-3,
         .balance-card .border-t,
         .balance-card .balance-bar-container,
@@ -658,6 +758,20 @@
             }
             .summary-value {
                 font-size: 13px;
+            }
+            .summary-item {
+                padding: 6px 12px;
+            }
+            .balance-history-button {
+                padding: 5px 10px;
+                min-width: 65px;
+            }
+            .balance-history-button svg {
+                width: 20px;
+                height: 20px;
+            }
+            .balance-history-button span {
+                font-size: 10px;
             }
             .search-bottom-button {
                 padding: 5px 10px;
@@ -690,12 +804,24 @@
             }
             .summary-item {
                 min-width: 45px;
+                padding: 2px 4px;
             }
             .summary-label {
                 font-size: 8px;
             }
             .summary-value {
                 font-size: 10px;
+            }
+            .balance-history-button {
+                padding: 3px 6px;
+                min-width: 48px;
+            }
+            .balance-history-button svg {
+                width: 14px;
+                height: 14px;
+            }
+            .balance-history-button span {
+                font-size: 8px;
             }
             .search-bottom-button {
                 padding: 3px 6px;
@@ -721,7 +847,6 @@
             }
         }
         
-        /* ซ่อน sticky panel เดิม */
         #sticky-summary-panel {
             display: none;
         }
@@ -903,12 +1028,8 @@
     </div>
 </div>
 
-<!-- Bottom Summary Bar -->
+<!-- Bottom Summary Bar - แบบแยก 2 ช่อง -->
 <div class="bottom-summary-bar">
-    <div class="summary-item">
-        <span class="summary-label">💰 ยอดคงเหลือ</span>
-        <span id="bottom-total-balance" class="summary-value">฿0.00</span>
-    </div>
     <div class="summary-item">
         <span class="summary-label">📊 กำไรเดือนนี้</span>
         <span id="bottom-monthly-profit" class="summary-value profit-positive">0.00%</span>
@@ -917,6 +1038,16 @@
         <span class="summary-label">📈 กำไรทั้งหมด</span>
         <span id="bottom-overall-profit" class="summary-value profit-positive">0.00%</span>
     </div>
+    <div id="balance-click-area" class="summary-item summary-item-clickable">
+        <span class="summary-label">💰 ยอดคงเหลือ</span>
+        <span id="bottom-total-balance" class="summary-value">฿0.00</span>
+    </div>
+    <button id="balance-history-btn" class="balance-history-button">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+        </svg>
+        <span>ประวัติ</span>
+    </button>
     <button id="salary-btn" class="salary-button">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -929,6 +1060,37 @@
         </svg>
         <span>ค้นหา</span>
     </button>
+</div>
+
+<!-- Balance History Modal -->
+<div id="balance-history-modal" class="modal fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden items-start justify-center z-[70] p-3 md:p-4 pt-16 md:pt-20">
+    <div class="bg-white rounded-2xl md:rounded-3xl shadow-2xl max-w-2xl w-full modal-content">
+        <div class="p-4 md:p-6">
+            <div class="flex justify-between items-center mb-3 md:mb-4">
+                <div class="flex items-center gap-2 md:gap-3">
+                    <div class="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg md:text-xl font-bold text-gray-800">📊 ประวัติยอดคงเหลือรายเดือน</h3>
+                </div>
+                <button id="balance-history-modal-close-btn" class="text-gray-400 hover:text-gray-600 transition">
+                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="mb-3 md:mb-4">
+                <select id="history-year-select" class="modern-select w-40">
+                    <option value="all">ทุกปี</option>
+                </select>
+            </div>
+            <ul id="balance-history-list" class="space-y-2 md:space-y-3 max-h-80 md:max-h-96 overflow-y-auto pr-1">
+                <li class="text-center text-gray-500 py-6 md:py-8">📭 ไม่พบข้อมูล</li>
+            </ul>
+        </div>
+    </div>
 </div>
 
 <!-- Modals -->
@@ -1174,6 +1336,14 @@
     const salarySummaryEl = document.getElementById('salary-summary');
     const salaryTotalEl = document.getElementById('salary-total');
 
+    // Balance History Modal Elements
+    const balanceHistoryModal = document.getElementById('balance-history-modal');
+    const balanceHistoryModalCloseBtn = document.getElementById('balance-history-modal-close-btn');
+    const historyYearSelect = document.getElementById('history-year-select');
+    const balanceHistoryList = document.getElementById('balance-history-list');
+    const balanceHistoryBtn = document.getElementById('balance-history-btn');
+    const balanceClickArea = document.getElementById('balance-click-area');
+
     // Bottom Bar Elements
     const bottomTotalBalanceEl = document.getElementById('bottom-total-balance');
     const bottomMonthlyProfitEl = document.getElementById('bottom-monthly-profit');
@@ -1354,6 +1524,134 @@
         await loadDataFromSheet(true, 0);
     });
 
+    // Balance History Functions
+    function calculateMonthlyBalance() {
+        const monthlyData = {};
+        
+        transactions.forEach(t => {
+            if (!t.date) return;
+            const date = parseLocalDate(t.date);
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const key = `${year}-${month}`;
+            const amount = t.type === 'income' ? t.amount : -t.amount;
+            
+            if (!monthlyData[key]) {
+                monthlyData[key] = {
+                    year: year,
+                    month: month,
+                    balance: 0,
+                    income: 0,
+                    expense: 0
+                };
+            }
+            monthlyData[key].balance += amount;
+            if (t.type === 'income') {
+                monthlyData[key].income += t.amount;
+            } else {
+                monthlyData[key].expense += t.amount;
+            }
+        });
+        
+        const sortedKeys = Object.keys(monthlyData).sort();
+        let cumulativeBalance = 0;
+        const result = [];
+        
+        sortedKeys.forEach(key => {
+            const data = monthlyData[key];
+            cumulativeBalance += data.balance;
+            result.push({
+                year: data.year,
+                month: data.month,
+                balance: cumulativeBalance,
+                monthlyChange: data.balance,
+                income: data.income,
+                expense: data.expense
+            });
+        });
+        
+        return result;
+    }
+    
+    function loadBalanceHistory() {
+        const selectedYear = historyYearSelect.value;
+        const monthlyBalances = calculateMonthlyBalance();
+        
+        let filteredBalances = monthlyBalances;
+        if (selectedYear !== 'all') {
+            filteredBalances = monthlyBalances.filter(b => b.year.toString() === selectedYear);
+        }
+        
+        const thaiMonths = {
+            1: 'มกราคม', 2: 'กุมภาพันธ์', 3: 'มีนาคม',
+            4: 'เมษายน', 5: 'พฤษภาคม', 6: 'มิถุนายน',
+            7: 'กรกฎาคม', 8: 'สิงหาคม', 9: 'กันยายน',
+            10: 'ตุลาคม', 11: 'พฤศจิกายน', 12: 'ธันวาคม'
+        };
+        
+        if (balanceHistoryList) {
+            balanceHistoryList.innerHTML = '';
+            
+            if (filteredBalances.length === 0) {
+                balanceHistoryList.innerHTML = '<li class="text-center text-gray-500 py-6 md:py-8">📭 ไม่พบข้อมูลยอดคงเหลือ</li>';
+                return;
+            }
+            
+            filteredBalances.sort((a, b) => {
+                if (a.year !== b.year) return b.year - a.year;
+                return b.month - a.month;
+            });
+            
+            filteredBalances.forEach(data => {
+                const yearBE = data.year + 543;
+                const monthName = thaiMonths[data.month];
+                const balanceClass = data.balance >= 0 ? 'balance-positive' : 'balance-negative';
+                const changeClass = data.monthlyChange >= 0 ? 'balance-positive' : 'balance-negative';
+                
+                const item = document.createElement('li');
+                item.className = 'balance-history-item';
+                item.innerHTML = `
+                    <div class="flex justify-between items-start gap-2 flex-wrap">
+                        <div>
+                            <div class="month-name">📅 ${monthName} ${yearBE}</div>
+                            <div class="text-xs text-gray-500 mt-1">
+                                <span class="income-amount">📈 +${formatMoney(data.income)}</span> | 
+                                <span class="expense-amount">📉 -${formatMoney(data.expense)}</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="balance-amount ${balanceClass}">฿${formatMoney(data.balance)}</div>
+                            <div class="text-xs ${changeClass}">
+                                ${data.monthlyChange >= 0 ? '+' : ''}${formatMoney(data.monthlyChange)}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                balanceHistoryList.appendChild(item);
+            });
+        }
+    }
+    
+    function showBalanceHistoryModal() {
+        const monthlyBalances = calculateMonthlyBalance();
+        const years = [...new Set(monthlyBalances.map(b => b.year.toString()))];
+        
+        if (historyYearSelect) {
+            const currentYear = historyYearSelect.value;
+            historyYearSelect.innerHTML = '<option value="all">ทุกปี</option>';
+            years.sort((a,b) => b - a).forEach(y => {
+                const option = document.createElement('option');
+                option.value = y;
+                option.textContent = parseInt(y) + 543;
+                historyYearSelect.appendChild(option);
+            });
+            if (currentYear && years.includes(currentYear)) historyYearSelect.value = currentYear;
+        }
+        
+        loadBalanceHistory();
+        balanceHistoryModal.classList.remove('hidden');
+    }
+
     // Thai months and date functions
     const THAI_MONTHS = [
         { value: '01', name: 'มกราคม' }, { value: '02', name: 'กุมภาพันธ์' }, { value: '03', name: 'มีนาคม' },
@@ -1472,6 +1770,7 @@
         showConfirm('คุณต้องการลบรายการนี้ใช่หรือไม่?', async (confirmed) => {
             if (!confirmed) return;
             const originalTransactions = [...transactions];
+            const transactionToDelete = transactions.find(t => t.id.toString() === id.toString());
             transactions = transactions.filter(t => t.id.toString() !== id.toString());
             updateLocalStorage();
             updateUI();
@@ -1780,7 +2079,6 @@
             }
         }
 
-        // แสดง checkbox เฉพาะกรณีเป็น "สั่งซื้อสินค้า" เท่านั้น (ไม่แสดงสำหรับรายจ่ายอื่นๆ)
         const checkboxHTML = (isOrder && !isOtherExpense) ? `
             <div class="mt-2 md:mt-3 pt-2 md:pt-3 border-t border-gray-200">
                 <label class="inline-flex items-center space-x-2 ${isChecked ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'}">
@@ -2218,6 +2516,22 @@
     
     if (salaryYearSelect) {
         salaryYearSelect.addEventListener('change', loadSalaryData);
+    }
+    
+    // Balance History Event Listeners
+    if (balanceHistoryBtn) {
+        balanceHistoryBtn.addEventListener('click', showBalanceHistoryModal);
+    }
+    if (balanceClickArea) {
+        balanceClickArea.addEventListener('click', showBalanceHistoryModal);
+    }
+    if (balanceHistoryModalCloseBtn) {
+        balanceHistoryModalCloseBtn.addEventListener('click', () => {
+            balanceHistoryModal.classList.add('hidden');
+        });
+    }
+    if (historyYearSelect) {
+        historyYearSelect.addEventListener('change', loadBalanceHistory);
     }
     
     searchModalCloseBtn.addEventListener('click', () => searchModal.classList.add('hidden'));
