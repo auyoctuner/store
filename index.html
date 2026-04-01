@@ -644,41 +644,6 @@
             transform: translateY(0);
         }
         
-        .salary-button {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2px;
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            border: none;
-            padding: 4px 8px;
-            border-radius: 12px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            min-width: 55px;
-            flex-shrink: 0;
-        }
-        
-        .salary-button svg {
-            width: 14px;
-            height: 14px;
-        }
-        
-        .salary-button span {
-            font-size: 9px;
-            font-weight: 600;
-        }
-        
-        .salary-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
-        }
-        
-        .salary-button:active {
-            transform: translateY(0);
-        }
-        
         .balance-history-item {
             background: white;
             border-radius: 16px;
@@ -726,6 +691,32 @@
             font-size: 0.7rem;
             color: #6b7280;
             margin-top: 2px;
+        }
+        
+        .view-expense-btn {
+            background: #e5e7eb;
+            border: none;
+            border-radius: 9999px;
+            padding: 2px 10px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: 8px;
+        }
+        
+        .view-expense-btn:hover {
+            background: #d1d5db;
+            transform: translateY(-1px);
+        }
+        
+        @media (max-width: 640px) {
+            .view-expense-btn {
+                font-size: 0.6rem;
+                padding: 1px 6px;
+                margin-left: 4px;
+            }
         }
         
         @media (max-width: 640px) {
@@ -793,17 +784,6 @@
             .search-bottom-button span {
                 font-size: 10px;
             }
-            .salary-button {
-                padding: 5px 10px;
-                min-width: 65px;
-            }
-            .salary-button svg {
-                width: 16px;
-                height: 16px;
-            }
-            .salary-button span {
-                font-size: 10px;
-            }
         }
         
         @media (max-width: 480px) {
@@ -843,16 +823,9 @@
             .search-bottom-button span {
                 font-size: 8px;
             }
-            .salary-button {
-                padding: 3px 6px;
-                min-width: 48px;
-            }
-            .salary-button svg {
-                width: 12px;
-                height: 12px;
-            }
-            .salary-button span {
-                font-size: 8px;
+            .view-expense-btn {
+                font-size: 0.55rem;
+                padding: 1px 4px;
             }
         }
         
@@ -1096,7 +1069,44 @@
     </div>
 </div>
 
-<!-- Modals -->
+<!-- Expense Detail Modal -->
+<div id="expense-list-modal" class="modal fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden items-start justify-center z-[70] p-3 md:p-4 pt-16 md:pt-20">
+    <div class="bg-white rounded-2xl md:rounded-3xl shadow-2xl max-w-2xl w-full modal-content">
+        <div class="p-4 md:p-6">
+            <div class="flex justify-between items-center mb-3 md:mb-4">
+                <div class="flex items-center gap-2 md:gap-3">
+                    <div class="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg md:text-xl font-bold text-gray-800">📋 รายการรายจ่าย - <span id="expense-modal-month"></span></h3>
+                </div>
+                <button id="expense-modal-close-btn" class="text-gray-400 hover:text-gray-600 transition">
+                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="mb-3 md:mb-4 flex gap-2 flex-wrap">
+                <button id="expense-all-btn" class="btn-gradient text-sm py-1 px-3">ทั้งหมด</button>
+                <button id="expense-salary-btn" class="btn-secondary text-sm py-1 px-3">💰 เงินเดือน</button>
+                <button id="expense-other-btn" class="btn-secondary text-sm py-1 px-3">📝 อื่นๆ</button>
+            </div>
+            <ul id="expense-list-items" class="space-y-2 md:space-y-3 max-h-80 md:max-h-96 overflow-y-auto pr-1">
+                <li class="text-center text-gray-500 py-6 md:py-8">📭 ไม่พบรายการ</li>
+            </ul>
+            <div id="expense-list-summary" class="hidden mt-4 pt-3 border-t-2 border-gray-100">
+                <div class="flex justify-end items-center gap-4">
+                    <span class="text-sm font-semibold text-gray-600">รวมรายจ่าย:</span>
+                    <span id="expense-list-total" class="text-xl font-bold text-red-600">฿0.00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Other Modals -->
 <div id="custom-modal" class="modal fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden items-center justify-center z-[80] p-3 md:p-4">
     <div class="bg-white rounded-2xl md:rounded-3xl shadow-2xl max-w-md w-full modal-content">
         <div class="p-4 md:p-6">
@@ -1347,6 +1357,17 @@
     const balanceHistoryBtn = document.getElementById('balance-history-btn');
     const balanceClickArea = document.getElementById('balance-click-area');
 
+    // Expense Detail Modal Elements
+    const expenseModal = document.getElementById('expense-list-modal');
+    const expenseModalCloseBtn = document.getElementById('expense-modal-close-btn');
+    const expenseModalMonthSpan = document.getElementById('expense-modal-month');
+    const expenseListItems = document.getElementById('expense-list-items');
+    const expenseListSummary = document.getElementById('expense-list-summary');
+    const expenseListTotal = document.getElementById('expense-list-total');
+    const expenseAllBtn = document.getElementById('expense-all-btn');
+    const expenseSalaryBtn = document.getElementById('expense-salary-btn');
+    const expenseOtherBtn = document.getElementById('expense-other-btn');
+
     // Bottom Bar Elements
     const bottomTotalBalanceEl = document.getElementById('bottom-total-balance');
     const bottomMonthlyProfitEl = document.getElementById('bottom-monthly-profit');
@@ -1357,6 +1378,7 @@
     let transactions = [];
     let fullSkuAnalysis = [];
     let isSyncing = false;
+    let currentExpenses = [];  // เก็บรายจ่ายของเดือนที่เลือก
 
     // Utility Functions
     function parseLocalDate(dateString) {
@@ -1546,7 +1568,8 @@
                     income: 0,
                     expense: 0,
                     salary: 0,
-                    expenseWithoutSalary: 0
+                    expenseWithoutSalary: 0,
+                    expenseDetails: []  // เก็บรายการรายจ่าย
                 };
             }
             monthlyData[key].balance += amount;
@@ -1554,6 +1577,14 @@
                 monthlyData[key].income += t.amount;
             } else {
                 monthlyData[key].expense += t.amount;
+                // เก็บรายละเอียดรายจ่าย
+                monthlyData[key].expenseDetails.push({
+                    description: t.description,
+                    platform: t.platform,
+                    amount: t.amount,
+                    date: t.date,
+                    isSalary: t.platform === 'เงินเดือนพนักงาน'
+                });
                 if (t.platform === 'เงินเดือนพนักงาน') {
                     monthlyData[key].salary += t.amount;
                 } else {
@@ -1577,11 +1608,78 @@
                 income: data.income,
                 expense: data.expense,
                 salary: data.salary,
-                expenseWithoutSalary: data.expenseWithoutSalary
+                expenseWithoutSalary: data.expenseWithoutSalary,
+                expenseDetails: data.expenseDetails
             });
         });
         
         return result;
+    }
+    
+    function renderExpenseList(filter = 'all') {
+        if (!currentExpenses.length) {
+            expenseListItems.innerHTML = '<li class="text-center text-gray-500 py-6 md:py-8">📭 ไม่พบรายการ</li>';
+            expenseListSummary.classList.add('hidden');
+            return;
+        }
+        
+        let filtered = currentExpenses;
+        if (filter === 'salary') {
+            filtered = currentExpenses.filter(e => e.isSalary);
+        } else if (filter === 'other') {
+            filtered = currentExpenses.filter(e => !e.isSalary);
+        }
+        
+        if (filtered.length === 0) {
+            expenseListItems.innerHTML = '<li class="text-center text-gray-500 py-6 md:py-8">📭 ไม่พบรายการ</li>';
+            expenseListSummary.classList.add('hidden');
+            return;
+        }
+        
+        const total = filtered.reduce((sum, e) => sum + e.amount, 0);
+        expenseListTotal.textContent = `฿${formatMoney(total)}`;
+        expenseListSummary.classList.remove('hidden');
+        
+        expenseListItems.innerHTML = '';
+        filtered.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(e => {
+            const date = parseLocalDate(e.date);
+            const displayDate = date.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+            
+            const item = document.createElement('li');
+            item.className = 'p-3 md:p-4 border rounded-xl flex justify-between items-center bg-white hover:shadow-md transition-all duration-200';
+            item.innerHTML = `
+                <div>
+                    <div class="font-semibold text-gray-800">${e.description || '-'}</div>
+                    <div class="text-xs text-gray-500 mt-1">
+                        📅 ${displayDate} | <span class="${e.isSalary ? 'platform-salary' : 'text-gray-600'}">${e.platform}</span>
+                    </div>
+                </div>
+                <div class="font-bold text-red-600">-฿${formatMoney(e.amount)}</div>
+            `;
+            expenseListItems.appendChild(item);
+        });
+    }
+    
+    function showExpenseModal(year, month) {
+        const monthlyBalances = calculateMonthlyBalance();
+        const monthData = monthlyBalances.find(b => b.year === year && b.month === month);
+        
+        if (!monthData || !monthData.expenseDetails) {
+            expenseListItems.innerHTML = '<li class="text-center text-gray-500 py-6 md:py-8">📭 ไม่พบรายการ</li>';
+            expenseListSummary.classList.add('hidden');
+            expenseModal.classList.remove('hidden');
+            return;
+        }
+        
+        const monthNames = ['', 'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 
+                            'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+        const yearBE = year + 543;
+        expenseModalMonthSpan.textContent = `${monthNames[month]} ${yearBE}`;
+        
+        currentExpenses = monthData.expenseDetails;
+        renderExpenseList('all');
+        
+        expenseModal.classList.remove('hidden');
     }
     
     function loadBalanceHistory() {
@@ -1628,6 +1726,7 @@
                             <div class="text-xs text-gray-500 mt-1">
                                 <span class="income-amount">📈 +${formatMoney(data.income)}</span> | 
                                 <span class="expense-amount">📉 -${formatMoney(data.expense)}</span>
+                                <button class="view-expense-btn" data-year="${data.year}" data-month="${data.month}">ดูรายจ่าย</button>
                             </div>
                             <div class="expense-detail">
                                 💼 เงินเดือน: -${formatMoney(data.salary)} | 
@@ -1643,6 +1742,16 @@
                     </div>
                 `;
                 balanceHistoryList.appendChild(item);
+            });
+            
+            // เพิ่ม event listener ให้ปุ่มดูรายจ่าย
+            document.querySelectorAll('.view-expense-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const year = parseInt(btn.dataset.year);
+                    const month = parseInt(btn.dataset.month);
+                    showExpenseModal(year, month);
+                });
             });
         }
     }
@@ -1901,6 +2010,112 @@
         const diffTime = today.getTime() - order.getTime();
         const diffDays = Math.round(diffTime / (1000 * 3600 * 24));
         return diffDays;
+    }
+
+    // ฟังก์ชัน salary modal (คงเดิม)
+    function loadSalaryData() {
+        if (!salaryYearSelect) return;
+        
+        const selectedYear = salaryYearSelect.value;
+        
+        let salaryTransactions = transactions.filter(t => t.platform === 'เงินเดือนพนักงาน');
+        
+        if (selectedYear !== 'all') {
+            salaryTransactions = salaryTransactions.filter(t => {
+                const year = t.date ? t.date.substring(0, 4) : '';
+                return year === selectedYear;
+            });
+        }
+        
+        const monthlySummary = {};
+        const thaiMonths = {
+            '01': 'มกราคม', '02': 'กุมภาพันธ์', '03': 'มีนาคม',
+            '04': 'เมษายน', '05': 'พฤษภาคม', '06': 'มิถุนายน',
+            '07': 'กรกฎาคม', '08': 'สิงหาคม', '09': 'กันยายน',
+            '10': 'ตุลาคม', '11': 'พฤศจิกายน', '12': 'ธันวาคม'
+        };
+        
+        salaryTransactions.forEach(t => {
+            if (t.date) {
+                const year = t.date.substring(0, 4);
+                const month = t.date.substring(5, 7);
+                const amount = t.amount;
+                const key = `${year}-${month}`;
+                if (!monthlySummary[key]) {
+                    monthlySummary[key] = {
+                        year: year,
+                        month: month,
+                        amount: 0
+                    };
+                }
+                monthlySummary[key].amount += amount;
+            }
+        });
+        
+        const sortedKeys = Object.keys(monthlySummary).sort((a, b) => {
+            const [yearA, monthA] = a.split('-');
+            const [yearB, monthB] = b.split('-');
+            if (yearA !== yearB) return yearB - yearA;
+            return monthA - monthB;
+        });
+        
+        if (salaryListEl) {
+            salaryListEl.innerHTML = '';
+            
+            if (sortedKeys.length === 0) {
+                salaryListEl.innerHTML = '<li class="text-center text-gray-500 py-6 md:py-8">📭 ไม่พบข้อมูลเงินเดือน</li>';
+                if (salarySummaryEl) salarySummaryEl.classList.add('hidden');
+                return;
+            }
+            
+            let totalYear = 0;
+            
+            sortedKeys.forEach(key => {
+                const data = monthlySummary[key];
+                const amount = data.amount;
+                const yearAD = parseInt(data.year);
+                const yearBE = yearAD + 543;
+                const monthName = thaiMonths[data.month] || data.month;
+                
+                totalYear += amount;
+                
+                const item = document.createElement('li');
+                item.className = 'p-3 md:p-4 border rounded-xl flex justify-between items-center bg-gradient-to-r from-purple-50 to-white hover:shadow-md transition-all duration-200';
+                item.innerHTML = `
+                    <div>
+                        <div class="font-semibold text-gray-800 text-base">📅 ${monthName} ${yearBE}</div>
+                        <div class="text-xs text-gray-500 mt-1">เงินเดือนพนักงาน</div>
+                    </div>
+                    <div class="font-bold text-xl text-purple-600">฿${formatMoney(amount)}</div>
+                `;
+                salaryListEl.appendChild(item);
+            });
+            
+            if (salaryTotalEl) salaryTotalEl.textContent = `฿${formatMoney(totalYear)}`;
+            if (salarySummaryEl) salarySummaryEl.classList.remove('hidden');
+        }
+    }
+
+    function showSalaryModal() {
+        const years = [...new Set(transactions
+            .filter(t => t.platform === 'เงินเดือนพนักงาน')
+            .map(t => t.date ? t.date.substring(0, 4) : null)
+            .filter(y => y))];
+        
+        if (salaryYearSelect) {
+            const currentYear = salaryYearSelect.value;
+            salaryYearSelect.innerHTML = '<option value="all">ทุกปี</option>';
+            years.sort((a,b) => b - a).forEach(y => {
+                const option = document.createElement('option');
+                option.value = y;
+                option.textContent = parseInt(y) + 543;
+                salaryYearSelect.appendChild(option);
+            });
+            if (currentYear && years.includes(currentYear)) salaryYearSelect.value = currentYear;
+        }
+        
+        loadSalaryData();
+        salaryModal.classList.remove('hidden');
     }
 
     function addOrderListDOM(transaction) {
@@ -2414,6 +2629,22 @@
         });
     }
     
+    // Salary button
+    const salaryBtn = document.getElementById('salary-btn');
+    if (salaryBtn) {
+        salaryBtn.addEventListener('click', showSalaryModal);
+    }
+    
+    if (salaryModalCloseBtn) {
+        salaryModalCloseBtn.addEventListener('click', () => {
+            if (salaryModal) salaryModal.classList.add('hidden');
+        });
+    }
+    
+    if (salaryYearSelect) {
+        salaryYearSelect.addEventListener('change', loadSalaryData);
+    }
+    
     // Balance History Event Listeners
     if (balanceHistoryBtn) {
         balanceHistoryBtn.addEventListener('click', showBalanceHistoryModal);
@@ -2428,6 +2659,22 @@
     }
     if (historyYearSelect) {
         historyYearSelect.addEventListener('change', loadBalanceHistory);
+    }
+    
+    // Expense Modal Event Listeners
+    if (expenseModalCloseBtn) {
+        expenseModalCloseBtn.addEventListener('click', () => {
+            expenseModal.classList.add('hidden');
+        });
+    }
+    if (expenseAllBtn) {
+        expenseAllBtn.addEventListener('click', () => renderExpenseList('all'));
+    }
+    if (expenseSalaryBtn) {
+        expenseSalaryBtn.addEventListener('click', () => renderExpenseList('salary'));
+    }
+    if (expenseOtherBtn) {
+        expenseOtherBtn.addEventListener('click', () => renderExpenseList('other'));
     }
     
     searchModalCloseBtn.addEventListener('click', () => searchModal.classList.add('hidden'));
