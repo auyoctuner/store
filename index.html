@@ -711,11 +711,112 @@
             transform: translateY(-1px);
         }
         
+        .shipping-estimate {
+            font-size: 0.7rem;
+            color: #2563eb;
+            margin-top: 2px;
+        }
+        
+        /* Banner แจ้งเตือนสินค้าเลยกำหนด */
+        .overdue-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 200;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .overdue-banner.show {
+            transform: translateY(0);
+        }
+        
+        .overdue-banner-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .overdue-banner-icon {
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .overdue-banner-text {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .overdue-banner-detail {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        .overdue-banner-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: 18px;
+            transition: all 0.2s;
+        }
+        
+        .overdue-banner-close:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        body {
+            padding-top: 0;
+        }
+        
+        body.banner-shown {
+            padding-top: 60px;
+        }
+        
+        @media (max-width: 640px) {
+            .overdue-banner {
+                padding: 8px 12px;
+            }
+            .overdue-banner-text {
+                font-size: 12px;
+            }
+            .overdue-banner-detail {
+                font-size: 10px;
+            }
+            body.banner-shown {
+                padding-top: 70px;
+            }
+        }
+        
         @media (max-width: 640px) {
             .view-expense-btn {
                 font-size: 0.6rem;
                 padding: 1px 6px;
                 margin-left: 4px;
+            }
+            .shipping-estimate {
+                font-size: 0.65rem;
             }
         }
         
@@ -784,6 +885,19 @@
             .search-bottom-button span {
                 font-size: 10px;
             }
+            .view-expense-btn {
+                font-size: 0.75rem;
+                padding: 2px 12px;
+            }
+            .overdue-banner {
+                padding: 14px 20px;
+            }
+            .overdue-banner-text {
+                font-size: 15px;
+            }
+            .overdue-banner-detail {
+                font-size: 13px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -835,6 +949,22 @@
     </style>
 </head>
 <body>
+
+<!-- Banner แจ้งเตือนสินค้าเลยกำหนด -->
+<div id="overdue-banner" class="overdue-banner" style="display: none;">
+    <div class="overdue-banner-content">
+        <div class="overdue-banner-icon">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+        </div>
+        <div>
+            <div class="overdue-banner-text" id="overdue-banner-text">⚠️ มีสินค้าเลยกำหนดส่งมอบ</div>
+            <div class="overdue-banner-detail" id="overdue-banner-detail"></div>
+        </div>
+    </div>
+    <button id="overdue-banner-close" class="overdue-banner-close">✕</button>
+</div>
 
 <div class="container-custom">
     <header class="text-center mb-6 md:mb-10">
@@ -1106,6 +1236,41 @@
     </div>
 </div>
 
+<!-- Order List Modal -->
+<div id="order-list-modal" class="modal fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden items-start justify-center z-[70] p-3 md:p-4 pt-16 md:pt-20">
+    <div class="bg-white rounded-2xl md:rounded-3xl shadow-2xl max-w-2xl w-full modal-content">
+        <div class="p-4 md:p-6">
+            <div class="flex justify-between items-center mb-3 md:mb-4 gap-2 md:gap-4">
+                <div class="flex items-center gap-2 md:gap-3">
+                    <div class="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg md:text-xl font-bold text-gray-800">📦 รายการสั่งซื้อที่ยังไม่ได้รับ</h3>
+                </div>
+                <button id="order-list-modal-close-btn" class="text-gray-400 hover:text-gray-600 transition">
+                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <ul id="order-list-items" class="space-y-2 md:space-y-3 max-h-80 md:max-h-96 overflow-y-auto pr-1"></ul>
+            <div id="order-list-summary" class="hidden mt-3 md:mt-4 pt-3 md:pt-4 border-t-2 border-gray-100">
+                <div class="flex justify-end items-center gap-2 md:gap-4 flex-wrap">
+                    <span class="text-xs md:text-sm font-semibold text-gray-600">รวมยอดที่ยังไม่ได้รับ:</span>
+                    <span class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 md:px-4 md:py-2 rounded-full font-semibold text-xs md:text-sm">
+                        <span id="order-list-count">0</span> รายการ
+                    </span>
+                    <span class="text-xl md:text-2xl font-bold text-orange-600">
+                        ฿<span id="order-list-total">0.00</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Other Modals -->
 <div id="custom-modal" class="modal fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden items-center justify-center z-[80] p-3 md:p-4">
     <div class="bg-white rounded-2xl md:rounded-3xl shadow-2xl max-w-md w-full modal-content">
@@ -1192,40 +1357,6 @@
             </div>
             <input type="text" id="sku-search-input" placeholder="🔍 ค้นหา SKU..." class="modern-input w-full mb-3 md:mb-4">
             <ul id="sku-analysis-list" class="space-y-2 md:space-y-3 max-h-80 md:max-h-96 overflow-y-auto pr-1"></ul>
-        </div>
-    </div>
-</div>
-
-<div id="order-list-modal" class="modal fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden items-start justify-center z-[70] p-3 md:p-4 pt-16 md:pt-20">
-    <div class="bg-white rounded-2xl md:rounded-3xl shadow-2xl max-w-2xl w-full modal-content">
-        <div class="p-4 md:p-6">
-            <div class="flex justify-between items-center mb-3 md:mb-4 gap-2 md:gap-4">
-                <div class="flex items-center gap-2 md:gap-3">
-                    <div class="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center">
-                        <svg class="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg md:text-xl font-bold text-gray-800">📦 รายการสั่งซื้อที่ยังไม่ได้รับ</h3>
-                </div>
-                <button id="order-list-modal-close-btn" class="text-gray-400 hover:text-gray-600 transition">
-                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-            <ul id="order-list-items" class="space-y-2 md:space-y-3 max-h-80 md:max-h-96 overflow-y-auto pr-1"></ul>
-            <div id="order-list-summary" class="hidden mt-3 md:mt-4 pt-3 md:pt-4 border-t-2 border-gray-100">
-                <div class="flex justify-end items-center gap-2 md:gap-4 flex-wrap">
-                    <span class="text-xs md:text-sm font-semibold text-gray-600">รวมยอดที่ยังไม่ได้รับ:</span>
-                    <span class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 md:px-4 md:py-2 rounded-full font-semibold text-xs md:text-sm">
-                        <span id="order-list-count">0</span> รายการ
-                    </span>
-                    <span class="text-xl md:text-2xl font-bold text-orange-600">
-                        ฿<span id="order-list-total">0.00</span>
-                    </span>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -1368,6 +1499,12 @@
     const expenseSalaryBtn = document.getElementById('expense-salary-btn');
     const expenseOtherBtn = document.getElementById('expense-other-btn');
 
+    // Banner Elements
+    const overdueBanner = document.getElementById('overdue-banner');
+    const overdueBannerText = document.getElementById('overdue-banner-text');
+    const overdueBannerDetail = document.getElementById('overdue-banner-detail');
+    const overdueBannerClose = document.getElementById('overdue-banner-close');
+
     // Bottom Bar Elements
     const bottomTotalBalanceEl = document.getElementById('bottom-total-balance');
     const bottomMonthlyProfitEl = document.getElementById('bottom-monthly-profit');
@@ -1378,7 +1515,7 @@
     let transactions = [];
     let fullSkuAnalysis = [];
     let isSyncing = false;
-    let currentExpenses = [];  // เก็บรายจ่ายของเดือนที่เลือก
+    let currentExpenses = [];
 
     // Utility Functions
     function parseLocalDate(dateString) {
@@ -1510,6 +1647,9 @@
                 updateLocalStorage();
                 updateUI();
                 
+                // ตรวจสอบสินค้าเลยกำหนดส่งมอบหลังจากโหลดข้อมูลเสร็จ
+                checkAndShowOverdueBanner();
+                
                 if (transactions.length === 0) {
                     showMessage(`📭 ไม่พบข้อมูลใน Sheet`);
                 }
@@ -1532,6 +1672,7 @@
                     return {...t, amount: parseFloat(t.amount) || 0};
                 });
                 updateUI();
+                checkAndShowOverdueBanner();
                 showMessage(`⚠️ ไม่สามารถเชื่อมต่อ Google Sheets ได้\n\nกำลังแสดงข้อมูลจากแคช (${transactions.length} รายการ)`);
             } else {
                 showMessage(`❌ ไม่สามารถโหลดข้อมูลได้\n\n${error.message}`);
@@ -1547,6 +1688,130 @@
     refreshDataBtn.addEventListener('click', async () => {
         await loadDataFromSheet(true, 0);
     });
+
+    // ฟังก์ชันคำนวณระยะเวลาจัดส่งแยกตาม SKU (แก้ไขแล้ว)
+    function getShippingEstimate(orderDescription) {
+        if (!orderDescription) return null;
+        
+        // ดึงเฉพาะ SKU จากข้อความ (เช่น SKU001, SKU-001, SKU_001)
+        let skuCode = orderDescription;
+        const skuPattern = /(SKU[-\s]?[A-Z0-9]+)/i;
+        const match = orderDescription.match(skuPattern);
+        if (match) {
+            skuCode = match[1];
+        }
+        
+        // ค้นหารายการสั่งซื้อที่รับแล้ว และมี SKU ตรงกัน
+        const deliveredOrders = transactions.filter(t => 
+            t.platform === 'สั่งซื้อสินค้า' && 
+            String(t.receivedstatus).toLowerCase() === 'true' &&
+            t.receiveddate &&
+            t.description && t.description.toLowerCase().includes(skuCode.toLowerCase())
+        );
+        
+        if (deliveredOrders.length === 0) return null;
+        
+        // คำนวณระยะเวลาจัดส่งแต่ละครั้ง
+        const shippingDurations = deliveredOrders.map(t => {
+            const orderDate = parseLocalDate(t.date);
+            const receivedDate = parseLocalDate(t.receiveddate);
+            const diffDays = Math.round((receivedDate - orderDate) / (1000 * 3600 * 24));
+            return diffDays >= 0 ? diffDays : null;
+        }).filter(d => d !== null);
+        
+        if (shippingDurations.length === 0) return null;
+        
+        // ใช้ Percentile (5% - 95%) ตัดค่าผิดปกติ
+        const sorted = [...shippingDurations].sort((a,b) => a - b);
+        const minIdx = Math.floor(sorted.length * 0.05);
+        const maxIdx = Math.floor(sorted.length * 0.95);
+        const min = sorted[minIdx];
+        const max = sorted[maxIdx];
+        
+        return { 
+            min: min, 
+            max: max, 
+            count: shippingDurations.length 
+        };
+    }
+    
+    // ฟังก์ชันตรวจสอบและแสดงแบนเนอร์สินค้าเลยกำหนด
+    function checkAndShowOverdueBanner() {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // หารายการสั่งซื้อที่ยังไม่ได้รับ
+        const pendingOrders = transactions.filter(t => 
+            t.platform === 'สั่งซื้อสินค้า' && 
+            String(t.receivedstatus).toLowerCase() !== 'true'
+        );
+        
+        const overdueOrders = [];
+        
+        for (const order of pendingOrders) {
+            const estimate = getShippingEstimate(order.description);
+            if (!estimate) continue; // ไม่มีประวัติ
+            
+            const orderDate = parseLocalDate(order.date);
+            orderDate.setHours(0, 0, 0, 0);
+            const daysSinceOrder = Math.round((today - orderDate) / (1000 * 3600 * 24));
+            
+            // ถ้าเกินระยะเวลาจัดส่งสูงสุด (max)
+            if (daysSinceOrder > estimate.max) {
+                overdueOrders.push({
+                    description: order.description,
+                    overdueDays: daysSinceOrder - estimate.max,
+                    estimateMax: estimate.max
+                });
+            }
+        }
+        
+        if (overdueOrders.length > 0) {
+            const totalOverdue = overdueOrders.length;
+            const maxOverdueDays = Math.max(...overdueOrders.map(o => o.overdueDays));
+            
+            let detailText = '';
+            if (totalOverdue === 1) {
+                detailText = `📦 ${overdueOrders[0].description.substring(0, 30)} (เลย ${overdueOrders[0].overdueDays} วัน)`;
+            } else {
+                detailText = `📦 ${totalOverdue} รายการ (เลยสูงสุด ${maxOverdueDays} วัน)`;
+            }
+            
+            overdueBannerText.textContent = `⚠️ มีสินค้าเลยกำหนดส่งมอบ ${totalOverdue} รายการ`;
+            overdueBannerDetail.textContent = detailText;
+            overdueBanner.style.display = 'flex';
+            setTimeout(() => {
+                overdueBanner.classList.add('show');
+                document.body.classList.add('banner-shown');
+            }, 100);
+        } else {
+            overdueBanner.classList.remove('show');
+            setTimeout(() => {
+                overdueBanner.style.display = 'none';
+                document.body.classList.remove('banner-shown');
+            }, 300);
+        }
+    }
+    
+    // ปิดแบนเนอร์
+    if (overdueBannerClose) {
+        overdueBannerClose.addEventListener('click', () => {
+            overdueBanner.classList.remove('show');
+            setTimeout(() => {
+                overdueBanner.style.display = 'none';
+                document.body.classList.remove('banner-shown');
+            }, 300);
+        });
+    }
+    
+    // คลิกที่แบนเนอร์เพื่อเปิดรายการสั่งซื้อ
+    if (overdueBanner) {
+        overdueBanner.addEventListener('click', (e) => {
+            if (e.target !== overdueBannerClose) {
+                filterNotReceivedBtn.click();
+            }
+        });
+    }
 
     // Balance History Functions
     function calculateMonthlyBalance() {
@@ -1569,7 +1834,7 @@
                     expense: 0,
                     salary: 0,
                     expenseWithoutSalary: 0,
-                    expenseDetails: []  // เก็บรายการรายจ่าย
+                    expenseDetails: []
                 };
             }
             monthlyData[key].balance += amount;
@@ -1577,7 +1842,6 @@
                 monthlyData[key].income += t.amount;
             } else {
                 monthlyData[key].expense += t.amount;
-                // เก็บรายละเอียดรายจ่าย
                 monthlyData[key].expenseDetails.push({
                     description: t.description,
                     platform: t.platform,
@@ -1744,7 +2008,6 @@
                 balanceHistoryList.appendChild(item);
             });
             
-            // เพิ่ม event listener ให้ปุ่มดูรายจ่าย
             document.querySelectorAll('.view-expense-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -1774,6 +2037,148 @@
         
         loadBalanceHistory();
         balanceHistoryModal.classList.remove('hidden');
+    }
+
+    // Order List Functions (แก้ไขแล้ว - จะแสดง "คาดว่าจัดส่ง")
+    function addOrderListDOM(transaction) {
+        const item = document.createElement('li');
+        const localDate = parseLocalDate(transaction.date);
+        const displayDate = localDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+        const daysSinceOrder = getDaysSinceOrder(transaction.date);
+        
+        let daysText = '';
+        if (daysSinceOrder === 0) {
+            daysText = 'วันนี้';
+        } else if (daysSinceOrder === 1) {
+            daysText = '1 วัน';
+        } else {
+            daysText = `${daysSinceOrder} วัน`;
+        }
+        
+        // คำนวณระยะเวลาจัดส่งโดยประมาณแยกตาม SKU นี้
+        const estimate = getShippingEstimate(transaction.description);
+        let estimateHTML = '';
+        if (estimate) {
+            const rangeText = estimate.min === estimate.max 
+                ? `${estimate.min} วัน` 
+                : `${estimate.min}-${estimate.max} วัน`;
+            estimateHTML = `<div class="shipping-estimate">🚚 คาดว่าจัดส่ง ${rangeText} (จาก ${estimate.count} ครั้ง)</div>`;
+        }
+        
+        const isChecked = (String(transaction.receivedstatus).toLowerCase() === 'true');
+        
+        item.className = `p-3 md:p-4 border rounded-xl flex flex-col transition duration-200 ${isChecked ? 'bg-green-50' : 'bg-gray-50 hover:bg-gray-100'}`;
+        item.innerHTML = `
+            <div>
+                <div class="flex justify-between items-start w-full gap-2">
+                    <div class="flex-grow">
+                        <div class="font-semibold md:font-bold text-sm md:text-base text-gray-800">${transaction.description || '-'}</div>
+                        <div class="text-xs md:text-sm text-gray-500 mt-1">
+                            <span>📅 สั่งซื้อ: ${displayDate}</span>
+                        </div>
+                        <div class="text-xs md:text-sm text-amber-600 font-medium mt-1">
+                            ⏱️ รอรับสินค้า ${daysText}
+                        </div>
+                        ${estimateHTML}
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        <div class="font-bold text-base md:text-xl text-red-600">
+                            -฿${formatMoney(transaction.amount)}
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-2 md:mt-3 pt-2 md:pt-3 border-t border-gray-200">
+                    <label class="inline-flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" class="h-4 w-4 md:h-5 md:w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 toggle-received-btn" data-id="${transaction.id}" ${isChecked ? 'checked disabled' : ''}>
+                        <span class="text-xs md:text-sm text-gray-700">✅ ได้รับสินค้าแล้ว</span>
+                    </label>
+                </div>
+            </div>`;
+        
+        const checkbox = item.querySelector('.toggle-received-btn');
+        if (checkbox) {
+            checkbox.addEventListener('change', function(e) {
+                e.stopPropagation();
+                window.toggleReceivedStatus(this, transaction.id);
+            });
+        }
+        
+        orderListItemsEl.appendChild(item);
+    }
+    
+    function showOrderList() {
+        const results = transactions.filter(t => t.platform === 'สั่งซื้อสินค้า' && String(t.receivedstatus).toLowerCase() !== 'true');
+        const totalCount = results.length;
+        const totalAmount = results.reduce((acc, t) => acc + t.amount, 0);
+        orderListCountEl.textContent = totalCount;
+        orderListTotalEl.textContent = formatMoney(totalAmount);
+        orderListItemsEl.innerHTML = '';
+        if (results.length === 0) {
+            orderListItemsEl.innerHTML = '<li class="text-center text-gray-500 py-6 md:py-8">✅ ไม่มีรายการสั่งซื้อที่ยังไม่ได้รับ</li>';
+            orderListSummaryEl.classList.add('hidden');
+        } else {
+            orderListSummaryEl.classList.remove('hidden');
+            results.sort((a, b) => parseLocalDate(a.date) - parseLocalDate(b.date));
+            results.forEach(addOrderListDOM);
+        }
+    }
+
+    function getDaysSinceOrder(orderDate) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const order = parseLocalDate(orderDate);
+        order.setHours(0, 0, 0, 0);
+        const diffTime = today.getTime() - order.getTime();
+        const diffDays = Math.round(diffTime / (1000 * 3600 * 24));
+        return diffDays;
+    }
+    
+    function formatMoney(number) { 
+        return (typeof number === 'number' ? number : 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'); 
+    }
+    
+    function getFormattedMonthAndYear(year, month) {
+        if (!year) return '(กำลังโหลด...)';
+        if (month === 'all') return `(ทั้งปี ${parseInt(year) + 543})`;
+        const date = new Date(parseInt(year), parseInt(month) - 1, 1);
+        return `(${date.toLocaleDateString('th-TH', { year: 'numeric', month: 'long' })})`;
+    }
+    
+    function updateLocalStorage() { 
+        localStorage.setItem('transactions_cache', JSON.stringify(transactions));
+    }
+    
+    function getFilteredTransactions() {
+        const year = filterYearInput.value;
+        const month = filterMonthInput.value;
+        if (!year || !month) return [];
+        
+        return transactions.filter(t => {
+            if (!t.date) return false;
+            const transactionDate = parseLocalDate(t.date);
+            const transactionYear = transactionDate.getFullYear();
+            const transactionMonth = transactionDate.getMonth() + 1;
+            
+            if (month === 'all') {
+                return transactionYear === parseInt(year);
+            } else {
+                return transactionYear === parseInt(year) && transactionMonth === parseInt(month);
+            }
+        });
+    }
+    
+    function getPlatformColor(platform) {
+        const colors = { 
+            'Shopee(Auy)': 'platform-shopee-auy',
+            'Shopee(Aom)': 'platform-shopee-aom',
+            'Lazada(Auy)': 'platform-lazada-uy', 
+            'Lazada(Aom)': 'platform-lazada-aom', 
+            'ลูกค้า(อื่นๆ)': 'platform-customer', 
+            'สั่งซื้อสินค้า': 'platform-order', 
+            'เงินเดือนพนักงาน': 'platform-salary',
+            'รายจ่ายอื่นๆ': 'text-gray-600'
+        };
+        return colors[platform] || 'text-gray-600';
     }
 
     // Thai months and date functions
@@ -1953,225 +2358,6 @@
             }
         });
     };
-
-    function formatMoney(number) { 
-        return (typeof number === 'number' ? number : 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'); 
-    }
-    
-    function getFormattedMonthAndYear(year, month) {
-        if (!year) return '(กำลังโหลด...)';
-        if (month === 'all') return `(ทั้งปี ${parseInt(year) + 543})`;
-        const date = new Date(parseInt(year), parseInt(month) - 1, 1);
-        return `(${date.toLocaleDateString('th-TH', { year: 'numeric', month: 'long' })})`;
-    }
-    
-    function updateLocalStorage() { 
-        localStorage.setItem('transactions_cache', JSON.stringify(transactions));
-    }
-    
-    function getFilteredTransactions() {
-        const year = filterYearInput.value;
-        const month = filterMonthInput.value;
-        if (!year || !month) return [];
-        
-        return transactions.filter(t => {
-            if (!t.date) return false;
-            const transactionDate = parseLocalDate(t.date);
-            const transactionYear = transactionDate.getFullYear();
-            const transactionMonth = transactionDate.getMonth() + 1;
-            
-            if (month === 'all') {
-                return transactionYear === parseInt(year);
-            } else {
-                return transactionYear === parseInt(year) && transactionMonth === parseInt(month);
-            }
-        });
-    }
-    
-    function getPlatformColor(platform) {
-        const colors = { 
-            'Shopee(Auy)': 'platform-shopee-auy',
-            'Shopee(Aom)': 'platform-shopee-aom',
-            'Lazada(Auy)': 'platform-lazada-uy', 
-            'Lazada(Aom)': 'platform-lazada-aom', 
-            'ลูกค้า(อื่นๆ)': 'platform-customer', 
-            'สั่งซื้อสินค้า': 'platform-order', 
-            'เงินเดือนพนักงาน': 'platform-salary',
-            'รายจ่ายอื่นๆ': 'text-gray-600'
-        };
-        return colors[platform] || 'text-gray-600';
-    }
-
-    function getDaysSinceOrder(orderDate) {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const order = parseLocalDate(orderDate);
-        order.setHours(0, 0, 0, 0);
-        const diffTime = today.getTime() - order.getTime();
-        const diffDays = Math.round(diffTime / (1000 * 3600 * 24));
-        return diffDays;
-    }
-
-    // ฟังก์ชัน salary modal (คงเดิม)
-    function loadSalaryData() {
-        if (!salaryYearSelect) return;
-        
-        const selectedYear = salaryYearSelect.value;
-        
-        let salaryTransactions = transactions.filter(t => t.platform === 'เงินเดือนพนักงาน');
-        
-        if (selectedYear !== 'all') {
-            salaryTransactions = salaryTransactions.filter(t => {
-                const year = t.date ? t.date.substring(0, 4) : '';
-                return year === selectedYear;
-            });
-        }
-        
-        const monthlySummary = {};
-        const thaiMonths = {
-            '01': 'มกราคม', '02': 'กุมภาพันธ์', '03': 'มีนาคม',
-            '04': 'เมษายน', '05': 'พฤษภาคม', '06': 'มิถุนายน',
-            '07': 'กรกฎาคม', '08': 'สิงหาคม', '09': 'กันยายน',
-            '10': 'ตุลาคม', '11': 'พฤศจิกายน', '12': 'ธันวาคม'
-        };
-        
-        salaryTransactions.forEach(t => {
-            if (t.date) {
-                const year = t.date.substring(0, 4);
-                const month = t.date.substring(5, 7);
-                const amount = t.amount;
-                const key = `${year}-${month}`;
-                if (!monthlySummary[key]) {
-                    monthlySummary[key] = {
-                        year: year,
-                        month: month,
-                        amount: 0
-                    };
-                }
-                monthlySummary[key].amount += amount;
-            }
-        });
-        
-        const sortedKeys = Object.keys(monthlySummary).sort((a, b) => {
-            const [yearA, monthA] = a.split('-');
-            const [yearB, monthB] = b.split('-');
-            if (yearA !== yearB) return yearB - yearA;
-            return monthA - monthB;
-        });
-        
-        if (salaryListEl) {
-            salaryListEl.innerHTML = '';
-            
-            if (sortedKeys.length === 0) {
-                salaryListEl.innerHTML = '<li class="text-center text-gray-500 py-6 md:py-8">📭 ไม่พบข้อมูลเงินเดือน</li>';
-                if (salarySummaryEl) salarySummaryEl.classList.add('hidden');
-                return;
-            }
-            
-            let totalYear = 0;
-            
-            sortedKeys.forEach(key => {
-                const data = monthlySummary[key];
-                const amount = data.amount;
-                const yearAD = parseInt(data.year);
-                const yearBE = yearAD + 543;
-                const monthName = thaiMonths[data.month] || data.month;
-                
-                totalYear += amount;
-                
-                const item = document.createElement('li');
-                item.className = 'p-3 md:p-4 border rounded-xl flex justify-between items-center bg-gradient-to-r from-purple-50 to-white hover:shadow-md transition-all duration-200';
-                item.innerHTML = `
-                    <div>
-                        <div class="font-semibold text-gray-800 text-base">📅 ${monthName} ${yearBE}</div>
-                        <div class="text-xs text-gray-500 mt-1">เงินเดือนพนักงาน</div>
-                    </div>
-                    <div class="font-bold text-xl text-purple-600">฿${formatMoney(amount)}</div>
-                `;
-                salaryListEl.appendChild(item);
-            });
-            
-            if (salaryTotalEl) salaryTotalEl.textContent = `฿${formatMoney(totalYear)}`;
-            if (salarySummaryEl) salarySummaryEl.classList.remove('hidden');
-        }
-    }
-
-    function showSalaryModal() {
-        const years = [...new Set(transactions
-            .filter(t => t.platform === 'เงินเดือนพนักงาน')
-            .map(t => t.date ? t.date.substring(0, 4) : null)
-            .filter(y => y))];
-        
-        if (salaryYearSelect) {
-            const currentYear = salaryYearSelect.value;
-            salaryYearSelect.innerHTML = '<option value="all">ทุกปี</option>';
-            years.sort((a,b) => b - a).forEach(y => {
-                const option = document.createElement('option');
-                option.value = y;
-                option.textContent = parseInt(y) + 543;
-                salaryYearSelect.appendChild(option);
-            });
-            if (currentYear && years.includes(currentYear)) salaryYearSelect.value = currentYear;
-        }
-        
-        loadSalaryData();
-        salaryModal.classList.remove('hidden');
-    }
-
-    function addOrderListDOM(transaction) {
-        const item = document.createElement('li');
-        const localDate = parseLocalDate(transaction.date);
-        const displayDate = localDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
-        const daysSinceOrder = getDaysSinceOrder(transaction.date);
-        
-        let daysText = '';
-        if (daysSinceOrder === 0) {
-            daysText = 'วันนี้';
-        } else if (daysSinceOrder === 1) {
-            daysText = '1 วัน';
-        } else {
-            daysText = `${daysSinceOrder} วัน`;
-        }
-        
-        const isChecked = (String(transaction.receivedstatus).toLowerCase() === 'true');
-        
-        item.className = `p-3 md:p-4 border rounded-xl flex flex-col transition duration-200 ${isChecked ? 'bg-green-50' : 'bg-gray-50 hover:bg-gray-100'}`;
-        item.innerHTML = `
-            <div>
-                <div class="flex justify-between items-start w-full gap-2">
-                    <div class="flex-grow">
-                        <div class="font-semibold md:font-bold text-sm md:text-base text-gray-800">${transaction.description || '-'}</div>
-                        <div class="text-xs md:text-sm text-gray-500 mt-1">
-                            <span>📅 สั่งซื้อ: ${displayDate}</span>
-                        </div>
-                        <div class="text-xs md:text-sm text-amber-600 font-medium mt-1">
-                            ⏱️ รอรับสินค้า ${daysText}
-                        </div>
-                    </div>
-                    <div class="text-right flex-shrink-0">
-                        <div class="font-bold text-base md:text-xl text-red-600">
-                            -฿${formatMoney(transaction.amount)}
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-2 md:mt-3 pt-2 md:pt-3 border-t border-gray-200">
-                    <label class="inline-flex items-center space-x-2 cursor-pointer">
-                        <input type="checkbox" class="h-4 w-4 md:h-5 md:w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 toggle-received-btn" data-id="${transaction.id}" ${isChecked ? 'checked disabled' : ''}>
-                        <span class="text-xs md:text-sm text-gray-700">✅ ได้รับสินค้าแล้ว</span>
-                    </label>
-                </div>
-            </div>`;
-        
-        const checkbox = item.querySelector('.toggle-received-btn');
-        if (checkbox) {
-            checkbox.addEventListener('change', function(e) {
-                e.stopPropagation();
-                window.toggleReceivedStatus(this, transaction.id);
-            });
-        }
-        
-        orderListItemsEl.appendChild(item);
-    }
 
     function addTransactionDOM(transaction) {
         const item = document.createElement('li');
@@ -2579,21 +2765,109 @@
         renderSkuAnalysis(fullSkuAnalysis);
     }
 
-    function showOrderList() {
-        const results = transactions.filter(t => t.platform === 'สั่งซื้อสินค้า' && String(t.receivedstatus).toLowerCase() !== 'true');
-        const totalCount = results.length;
-        const totalAmount = results.reduce((acc, t) => acc + t.amount, 0);
-        orderListCountEl.textContent = totalCount;
-        orderListTotalEl.textContent = formatMoney(totalAmount);
-        orderListItemsEl.innerHTML = '';
-        if (results.length === 0) {
-            orderListItemsEl.innerHTML = '<li class="text-center text-gray-500 py-6 md:py-8">✅ ไม่มีรายการสั่งซื้อที่ยังไม่ได้รับ</li>';
-            orderListSummaryEl.classList.add('hidden');
-        } else {
-            orderListSummaryEl.classList.remove('hidden');
-            results.sort((a, b) => parseLocalDate(a.date) - parseLocalDate(b.date));
-            results.forEach(addOrderListDOM);
+    function loadSalaryData() {
+        if (!salaryYearSelect) return;
+        
+        const selectedYear = salaryYearSelect.value;
+        
+        let salaryTransactions = transactions.filter(t => t.platform === 'เงินเดือนพนักงาน');
+        
+        if (selectedYear !== 'all') {
+            salaryTransactions = salaryTransactions.filter(t => {
+                const year = t.date ? t.date.substring(0, 4) : '';
+                return year === selectedYear;
+            });
         }
+        
+        const monthlySummary = {};
+        const thaiMonths = {
+            '01': 'มกราคม', '02': 'กุมภาพันธ์', '03': 'มีนาคม',
+            '04': 'เมษายน', '05': 'พฤษภาคม', '06': 'มิถุนายน',
+            '07': 'กรกฎาคม', '08': 'สิงหาคม', '09': 'กันยายน',
+            '10': 'ตุลาคม', '11': 'พฤศจิกายน', '12': 'ธันวาคม'
+        };
+        
+        salaryTransactions.forEach(t => {
+            if (t.date) {
+                const year = t.date.substring(0, 4);
+                const month = t.date.substring(5, 7);
+                const amount = t.amount;
+                const key = `${year}-${month}`;
+                if (!monthlySummary[key]) {
+                    monthlySummary[key] = {
+                        year: year,
+                        month: month,
+                        amount: 0
+                    };
+                }
+                monthlySummary[key].amount += amount;
+            }
+        });
+        
+        const sortedKeys = Object.keys(monthlySummary).sort((a, b) => {
+            const [yearA, monthA] = a.split('-');
+            const [yearB, monthB] = b.split('-');
+            if (yearA !== yearB) return yearB - yearA;
+            return monthA - monthB;
+        });
+        
+        if (salaryListEl) {
+            salaryListEl.innerHTML = '';
+            
+            if (sortedKeys.length === 0) {
+                salaryListEl.innerHTML = '<li class="text-center text-gray-500 py-6 md:py-8">📭 ไม่พบข้อมูลเงินเดือน</li>';
+                if (salarySummaryEl) salarySummaryEl.classList.add('hidden');
+                return;
+            }
+            
+            let totalYear = 0;
+            
+            sortedKeys.forEach(key => {
+                const data = monthlySummary[key];
+                const amount = data.amount;
+                const yearAD = parseInt(data.year);
+                const yearBE = yearAD + 543;
+                const monthName = thaiMonths[data.month] || data.month;
+                
+                totalYear += amount;
+                
+                const item = document.createElement('li');
+                item.className = 'p-3 md:p-4 border rounded-xl flex justify-between items-center bg-gradient-to-r from-purple-50 to-white hover:shadow-md transition-all duration-200';
+                item.innerHTML = `
+                    <div>
+                        <div class="font-semibold text-gray-800 text-base">📅 ${monthName} ${yearBE}</div>
+                        <div class="text-xs text-gray-500 mt-1">เงินเดือนพนักงาน</div>
+                    </div>
+                    <div class="font-bold text-xl text-purple-600">฿${formatMoney(amount)}</div>
+                `;
+                salaryListEl.appendChild(item);
+            });
+            
+            if (salaryTotalEl) salaryTotalEl.textContent = `฿${formatMoney(totalYear)}`;
+            if (salarySummaryEl) salarySummaryEl.classList.remove('hidden');
+        }
+    }
+
+    function showSalaryModal() {
+        const years = [...new Set(transactions
+            .filter(t => t.platform === 'เงินเดือนพนักงาน')
+            .map(t => t.date ? t.date.substring(0, 4) : null)
+            .filter(y => y))];
+        
+        if (salaryYearSelect) {
+            const currentYear = salaryYearSelect.value;
+            salaryYearSelect.innerHTML = '<option value="all">ทุกปี</option>';
+            years.sort((a,b) => b - a).forEach(y => {
+                const option = document.createElement('option');
+                option.value = y;
+                option.textContent = parseInt(y) + 543;
+                salaryYearSelect.appendChild(option);
+            });
+            if (currentYear && years.includes(currentYear)) salaryYearSelect.value = currentYear;
+        }
+        
+        loadSalaryData();
+        salaryModal.classList.remove('hidden');
     }
 
     function handleSearch() {
@@ -2629,7 +2903,6 @@
         });
     }
     
-    // Salary button
     const salaryBtn = document.getElementById('salary-btn');
     if (salaryBtn) {
         salaryBtn.addEventListener('click', showSalaryModal);
@@ -2714,6 +2987,7 @@
             return {...t, amount: parseFloat(t.amount) || 0};
         });
         updateUI();
+        checkAndShowOverdueBanner();
     }
     
     setTimeout(() => {
