@@ -210,6 +210,83 @@
             }
         }
         
+        .modal-content {
+            border-radius: 28px;
+            max-width: 95%;
+            width: 500px;
+            margin: 16px;
+        }
+        
+        @media (max-width: 640px) {
+            .modal-content {
+                border-radius: 24px;
+                margin: 12px;
+                width: calc(100% - 24px);
+            }
+        }
+        
+        .platform-shopee-auy, .platform-shopee-aom, .platform-lazada-uy, 
+        .platform-lazada-aom, .platform-customer, .platform-order, .platform-salary {
+            font-weight: 700;
+            display: inline-block;
+        }
+        .platform-shopee-auy { 
+            background: linear-gradient(135deg, #ee4d2d 0%, #d43f21 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .platform-shopee-aom { 
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .platform-lazada-uy { 
+            background: linear-gradient(135deg, #0f136d 0%, #1e1a7a 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .platform-lazada-aom { 
+            background: linear-gradient(135deg, #1e88e5 0%, #0d47a1 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .platform-customer { 
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .platform-order { 
+            background: linear-gradient(135deg, #ec489a 0%, #db2777 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .platform-salary { 
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .header-gradient {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 1.75rem;
+        }
+        
+        @media (min-width: 768px) {
+            .header-gradient {
+                font-size: 2.5rem;
+            }
+        }
+        
         /* Page Navigation Styles */
         .page {
             display: none;
@@ -292,6 +369,13 @@
             height: 16px;
             flex-shrink: 0;
             color: #3b82f6;
+        }
+        
+        @media (min-width: 768px) {
+            .shipping-icon {
+                width: 18px;
+                height: 18px;
+            }
         }
         
         .shipping-range {
@@ -548,6 +632,7 @@
             color: #f87171;
         }
         
+        /* ปุ่มประวัติ - สีเขียว */
         .balance-history-button {
             display: flex;
             flex-direction: column;
@@ -581,16 +666,13 @@
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
         }
         
-        .balance-history-button:active {
-            transform: translateY(0);
-        }
-        
-        .search-bottom-button {
+        /* ปุ่มรายการสั่งซื้อ - สีส้ม */
+        .order-list-bottom-button {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 2px;
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
             border: none;
             padding: 4px 8px;
             border-radius: 12px;
@@ -602,24 +684,86 @@
             flex-shrink: 0;
         }
         
-        .search-bottom-button svg {
+        .order-list-bottom-button svg {
             width: 18px;
             height: 18px;
             stroke-width: 1.8;
         }
         
-        .search-bottom-button span {
+        .order-list-bottom-button span {
             font-size: 9px;
             font-weight: 600;
         }
         
-        .search-bottom-button:hover {
+        .order-list-bottom-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
         }
         
-        .search-bottom-button:active {
-            transform: translateY(0);
+        /* ปุ่มจัดการ SKU - สีเขียวอมฟ้า */
+        .manage-sku-bottom-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            border: none;
+            padding: 4px 8px;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 55px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0;
+        }
+        
+        .manage-sku-bottom-button svg {
+            width: 18px;
+            height: 18px;
+            stroke-width: 1.8;
+        }
+        
+        .manage-sku-bottom-button span {
+            font-size: 9px;
+            font-weight: 600;
+        }
+        
+        .manage-sku-bottom-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.4);
+        }
+        
+        /* ปุ่มเงินเดือน - สีม่วง */
+        .salary-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            border: none;
+            padding: 4px 8px;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 55px;
+            flex-shrink: 0;
+        }
+        
+        .salary-button svg {
+            width: 14px;
+            height: 14px;
+        }
+        
+        .salary-button span {
+            font-size: 9px;
+            font-weight: 600;
+        }
+        
+        .salary-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
         }
         
         .balance-history-item {
@@ -885,15 +1029,37 @@
             .balance-history-button span {
                 font-size: 10px;
             }
-            .search-bottom-button {
+            .order-list-bottom-button {
                 padding: 5px 10px;
                 min-width: 65px;
             }
-            .search-bottom-button svg {
+            .order-list-bottom-button svg {
                 width: 20px;
                 height: 20px;
             }
-            .search-bottom-button span {
+            .order-list-bottom-button span {
+                font-size: 10px;
+            }
+            .manage-sku-bottom-button {
+                padding: 5px 10px;
+                min-width: 65px;
+            }
+            .manage-sku-bottom-button svg {
+                width: 20px;
+                height: 20px;
+            }
+            .manage-sku-bottom-button span {
+                font-size: 10px;
+            }
+            .salary-button {
+                padding: 5px 10px;
+                min-width: 65px;
+            }
+            .salary-button svg {
+                width: 16px;
+                height: 16px;
+            }
+            .salary-button span {
                 font-size: 10px;
             }
             .view-expense-btn {
@@ -941,15 +1107,37 @@
             .balance-history-button span {
                 font-size: 8px;
             }
-            .search-bottom-button {
+            .order-list-bottom-button {
                 padding: 3px 6px;
                 min-width: 48px;
             }
-            .search-bottom-button svg {
+            .order-list-bottom-button svg {
                 width: 14px;
                 height: 14px;
             }
-            .search-bottom-button span {
+            .order-list-bottom-button span {
+                font-size: 8px;
+            }
+            .manage-sku-bottom-button {
+                padding: 3px 6px;
+                min-width: 48px;
+            }
+            .manage-sku-bottom-button svg {
+                width: 14px;
+                height: 14px;
+            }
+            .manage-sku-bottom-button span {
+                font-size: 8px;
+            }
+            .salary-button {
+                padding: 3px 6px;
+                min-width: 48px;
+            }
+            .salary-button svg {
+                width: 12px;
+                height: 12px;
+            }
+            .salary-button span {
                 font-size: 8px;
             }
             .view-expense-btn {
@@ -1219,31 +1407,56 @@
     </div>
 </div>
 
-<!-- Bottom Summary Bar -->
+<!-- Bottom Summary Bar - ใหม่ (ไม่มีปุ่มค้นหา) -->
 <div class="bottom-summary-bar">
+    <!-- กำไรเดือนนี้ -->
     <div class="summary-item">
         <span class="summary-label">📊 กำไรเดือนนี้</span>
         <span id="bottom-monthly-profit" class="summary-value profit-positive">0.00%</span>
     </div>
+    
+    <!-- กำไรทั้งหมด -->
     <div class="summary-item">
         <span class="summary-label">📈 กำไรทั้งหมด</span>
         <span id="bottom-overall-profit" class="summary-value profit-positive">0.00%</span>
     </div>
+    
+    <!-- ยอดคงเหลือ (คลิกได้) -->
     <div id="balance-click-area" class="summary-item summary-item-clickable">
         <span class="summary-label">💰 ยอดคงเหลือ</span>
         <span id="bottom-total-balance" class="summary-value">฿0.00</span>
     </div>
+    
+    <!-- ปุ่มประวัติ (สีเขียว) -->
     <button id="balance-history-btn" class="balance-history-button">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
         </svg>
         <span>ประวัติ</span>
     </button>
-    <button id="search-bottom-btn" class="search-bottom-button">
+    
+    <!-- ปุ่มรายการสั่งซื้อ (ใหม่ - สีส้ม) -->
+    <button id="order-list-bottom-btn" class="order-list-bottom-button">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
         </svg>
-        <span>ค้นหา</span>
+        <span>รายการสั่งซื้อ</span>
+    </button>
+    
+    <!-- ปุ่มจัดการ SKU (ใหม่ - สีเขียวอมฟ้า) -->
+    <button id="manage-sku-bottom-btn" class="manage-sku-bottom-button">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+        </svg>
+        <span>จัดการ SKU</span>
+    </button>
+    
+    <!-- ปุ่มเงินเดือน (สีม่วง) -->
+    <button id="salary-btn" class="salary-button">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span>เงินเดือน</span>
     </button>
 </div>
 
@@ -1350,72 +1563,7 @@
     </div>
 </div>
 
-<!-- Other Modals -->
-<div id="custom-modal" class="modal fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden items-center justify-center z-[80] p-3 md:p-4">
-    <div class="bg-white rounded-2xl md:rounded-3xl shadow-2xl max-w-md w-full modal-content">
-        <div class="p-4 md:p-6">
-            <div class="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
-                <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
-                    <svg class="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                <h3 class="text-lg md:text-xl font-bold text-gray-800">แจ้งเตือน</h3>
-            </div>
-            <p id="modal-message" class="text-sm md:text-base text-gray-600 mb-4 md:mb-6 whitespace-pre-line"></p>
-            <button id="modal-close-btn" class="w-full btn-gradient">ตกลง</button>
-        </div>
-    </div>
-</div>
-
-<div id="confirm-modal" class="modal fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden items-center justify-center z-[80] p-3 md:p-4">
-    <div class="bg-white rounded-2xl md:rounded-3xl shadow-2xl max-w-md w-full modal-content">
-        <div class="p-4 md:p-6">
-            <div class="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
-                <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center">
-                    <svg class="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                    </svg>
-                </div>
-                <h3 class="text-lg md:text-xl font-bold text-gray-800">ยืนยันการดำเนินการ</h3>
-            </div>
-            <p id="confirm-message" class="text-sm md:text-base text-gray-600 mb-4 md:mb-6"></p>
-            <div class="flex gap-2 md:gap-3">
-                <button id="confirm-cancel-btn" class="flex-1 bg-gray-200 text-gray-700 font-semibold py-2 md:py-3 rounded-xl hover:bg-gray-300 transition">ยกเลิก</button>
-                <button id="confirm-ok-btn" class="flex-1 bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold py-2 md:py-3 rounded-xl hover:shadow-lg transition">ยืนยัน</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="search-modal" class="modal fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden items-start justify-center z-50 p-3 md:p-4 pt-16 md:pt-20">
-    <div class="bg-white rounded-2xl md:rounded-3xl shadow-2xl max-w-2xl w-full modal-content">
-        <div class="p-4 md:p-6">
-            <div class="flex justify-between items-center mb-3 md:mb-4">
-                <div class="flex items-center gap-2 md:gap-3">
-                    <div class="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
-                        <svg class="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg md:text-xl font-bold text-gray-800">ค้นหาประวัติรายการ</h3>
-                </div>
-                <button id="search-modal-close-btn" class="text-gray-400 hover:text-gray-600 transition">
-                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-            <div class="mb-3 md:mb-4 flex flex-col sm:flex-row gap-2">
-                <input type="text" id="search-input" placeholder="🔍 ค้นหารายการ..." class="modern-input flex-1">
-                <button id="filter-not-received-btn" class="btn-gradient whitespace-nowrap text-sm">📦 รายการสั่งซื้อ</button>
-                <button id="manage-sku-btn" class="btn-secondary whitespace-nowrap text-sm">🏷️ จัดการ SKU</button>
-            </div>
-            <ul id="search-results-list" class="space-y-2 md:space-y-3 max-h-80 md:max-h-96 overflow-y-auto pr-1"></ul>
-        </div>
-    </div>
-</div>
-
+<!-- Salary Modal -->
 <div id="salary-modal" class="modal fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden items-start justify-center z-[70] p-3 md:p-4 pt-16 md:pt-20">
     <div class="bg-white rounded-2xl md:rounded-3xl shadow-2xl max-w-2xl w-full modal-content">
         <div class="p-4 md:p-6">
@@ -1447,6 +1595,45 @@
                     <span class="text-sm font-semibold text-gray-600">💰 รวมเงินเดือนทั้งปี:</span>
                     <span id="salary-total" class="text-xl font-bold text-purple-600">฿0.00</span>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Modal -->
+<div id="custom-modal" class="modal fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden items-center justify-center z-[80] p-3 md:p-4">
+    <div class="bg-white rounded-2xl md:rounded-3xl shadow-2xl max-w-md w-full modal-content">
+        <div class="p-4 md:p-6">
+            <div class="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+                <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg md:text-xl font-bold text-gray-800">แจ้งเตือน</h3>
+            </div>
+            <p id="modal-message" class="text-sm md:text-base text-gray-600 mb-4 md:mb-6 whitespace-pre-line"></p>
+            <button id="modal-close-btn" class="w-full btn-gradient">ตกลง</button>
+        </div>
+    </div>
+</div>
+
+<!-- Confirm Modal -->
+<div id="confirm-modal" class="modal fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm hidden items-center justify-center z-[80] p-3 md:p-4">
+    <div class="bg-white rounded-2xl md:rounded-3xl shadow-2xl max-w-md w-full modal-content">
+        <div class="p-4 md:p-6">
+            <div class="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+                <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg md:text-xl font-bold text-gray-800">ยืนยันการดำเนินการ</h3>
+            </div>
+            <p id="confirm-message" class="text-sm md:text-base text-gray-600 mb-4 md:mb-6"></p>
+            <div class="flex gap-2 md:gap-3">
+                <button id="confirm-cancel-btn" class="flex-1 bg-gray-200 text-gray-700 font-semibold py-2 md:py-3 rounded-xl hover:bg-gray-300 transition">ยกเลิก</button>
+                <button id="confirm-ok-btn" class="flex-1 bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold py-2 md:py-3 rounded-xl hover:shadow-lg transition">ยืนยัน</button>
             </div>
         </div>
     </div>
@@ -1505,14 +1692,6 @@
     let confirmOkBtn = document.getElementById('confirm-ok-btn');
     const refreshDataBtn = document.getElementById('refresh-data-btn');
 
-    // Search Modal Elements
-    const searchModal = document.getElementById('search-modal');
-    const searchModalCloseBtn = document.getElementById('search-modal-close-btn');
-    const searchInput = document.getElementById('search-input');
-    const searchResultsList = document.getElementById('search-results-list');
-    const filterNotReceivedBtn = document.getElementById('filter-not-received-btn');
-    const manageSkuBtn = document.getElementById('manage-sku-btn');
-
     // Salary Modal Elements
     const salaryModal = document.getElementById('salary-modal');
     const salaryModalCloseBtn = document.getElementById('salary-modal-close-btn');
@@ -1567,17 +1746,19 @@
     const historyReceivedPage = document.getElementById('history-received-page');
     const historyPendingPage = document.getElementById('history-pending-page');
 
+    // Bottom Bar Elements (ใหม่)
+    const orderListBottomBtn = document.getElementById('order-list-bottom-btn');
+    const manageSkuBottomBtn = document.getElementById('manage-sku-bottom-btn');
+    const salaryBtn = document.getElementById('salary-btn');
+    const bottomTotalBalanceEl = document.getElementById('bottom-total-balance');
+    const bottomMonthlyProfitEl = document.getElementById('bottom-monthly-profit');
+    const bottomOverallProfitEl = document.getElementById('bottom-overall-profit');
+
     // Banner Elements
     const overdueBanner = document.getElementById('overdue-banner');
     const overdueBannerText = document.getElementById('overdue-banner-text');
     const overdueBannerDetail = document.getElementById('overdue-banner-detail');
     const overdueBannerClose = document.getElementById('overdue-banner-close');
-
-    // Bottom Bar Elements
-    const bottomTotalBalanceEl = document.getElementById('bottom-total-balance');
-    const bottomMonthlyProfitEl = document.getElementById('bottom-monthly-profit');
-    const bottomOverallProfitEl = document.getElementById('bottom-overall-profit');
-    const searchBottomBtn = document.getElementById('search-bottom-btn');
 
     // State
     let transactions = [];
@@ -2132,6 +2313,36 @@
         });
     }
     
+    // Page Navigation Event Listeners
+    if (manageSkuBottomBtn) {
+        manageSkuBottomBtn.addEventListener('click', () => {
+            showSkuPage();
+        });
+    }
+    
+    if (orderListBottomBtn) {
+        orderListBottomBtn.addEventListener('click', () => {
+            showOrderList();
+            orderListModal.classList.remove('hidden');
+        });
+    }
+    
+    if (backToMainFromSku) {
+        backToMainFromSku.addEventListener('click', showMainPage);
+    }
+    
+    if (backToSkuFromHistory) {
+        backToSkuFromHistory.addEventListener('click', showSkuPage);
+    }
+    
+    if (closeSkuPage) {
+        closeSkuPage.addEventListener('click', showMainPage);
+    }
+    
+    if (closeSkuHistoryPage) {
+        closeSkuHistoryPage.addEventListener('click', showMainPage);
+    }
+    
     // ฟังก์ชันตรวจสอบและแสดงแบนเนอร์สินค้าเลยกำหนด
     function checkAndShowOverdueBanner() {
         const today = new Date();
@@ -2201,33 +2412,9 @@
     if (overdueBanner) {
         overdueBanner.addEventListener('click', (e) => {
             if (e.target !== overdueBannerClose) {
-                filterNotReceivedBtn.click();
+                if (orderListBottomBtn) orderListBottomBtn.click();
             }
         });
-    }
-
-    // Page Navigation Event Listeners
-    if (manageSkuBtn) {
-        manageSkuBtn.addEventListener('click', () => {
-            searchModal.classList.add('hidden');
-            showSkuPage();
-        });
-    }
-    
-    if (backToMainFromSku) {
-        backToMainFromSku.addEventListener('click', showMainPage);
-    }
-    
-    if (backToSkuFromHistory) {
-        backToSkuFromHistory.addEventListener('click', showSkuPage);
-    }
-    
-    if (closeSkuPage) {
-        closeSkuPage.addEventListener('click', showMainPage);
-    }
-    
-    if (closeSkuHistoryPage) {
-        closeSkuHistoryPage.addEventListener('click', showMainPage);
     }
 
     // Balance History Functions
@@ -2759,7 +2946,6 @@
                 updateUI();
                 
                 if (!orderListModal.classList.contains('hidden')) showOrderList();
-                if (!searchModal.classList.contains('hidden')) handleSearch();
                 if (skuHistoryPage.classList.contains('active') && currentSkuName) {
                     loadSkuHistoryForPage(currentSkuName, currentHistoryFilter);
                 }
@@ -2857,33 +3043,6 @@
         }
         
         transactionListEl.appendChild(item);
-    }
-
-    function addSearchResultDOM(transaction) {
-        const item = document.createElement('li');
-        const isIncome = transaction.type === 'income';
-        const localDate = parseLocalDate(transaction.date);
-        const displayDate = localDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
-        
-        item.className = `p-3 md:p-4 border rounded-xl flex flex-col transition duration-200 bg-gray-50 hover:bg-gray-100`;
-        item.innerHTML = `
-            <div>
-                <div class="flex justify-between items-start w-full gap-2">
-                    <div class="flex-grow">
-                        <div class="font-semibold md:font-bold text-sm md:text-base text-gray-800">${transaction.description || '-'}</div>
-                        <div class="text-xs md:text-sm text-gray-500 mt-1">
-                            <span>📅 ${displayDate}</span> |
-                            <span class="${getPlatformColor(transaction.platform)} font-semibold">${transaction.platform}</span>
-                        </div>
-                    </div>
-                    <div class="text-right flex-shrink-0">
-                        <div class="font-bold text-base md:text-xl ${isIncome ? 'text-green-600' : 'text-red-600'}">
-                            ${isIncome ? '+' : '-'}฿${formatMoney(transaction.amount)}
-                        </div>
-                    </div>
-                </div>
-            </div>`;
-        searchResultsList.appendChild(item);
     }
 
     function updateValues(filtered) {
@@ -3147,40 +3306,12 @@
         salaryModal.classList.remove('hidden');
     }
 
-    function handleSearch() {
-        const query = searchInput.value.toLowerCase().trim();
-        searchResultsList.innerHTML = '';
-        if (query.length === 0) return;
-        const results = transactions.filter(t =>
-            (t.description || '').toLowerCase().includes(query) ||
-            (t.platform || '').toLowerCase().includes(query)
-        );
-        if (results.length === 0) {
-            searchResultsList.innerHTML = '<li class="text-center text-gray-500 py-6 md:py-8">🔍 ไม่พบรายการที่ตรงกัน</li>';
-        } else {
-            results.sort((a, b) => parseLocalDate(b.date) - parseLocalDate(a.date));
-            results.forEach(addSearchResultDOM);
-        }
-    }
-
     // Event Listeners
     form.addEventListener('submit', addTransaction);
     filterYearInput.addEventListener('change', () => updateUI());
     filterMonthInput.addEventListener('change', () => updateUI());
     typeInput.addEventListener('change', updatePlatformOptions);
     
-    if (searchBottomBtn) {
-        searchBottomBtn.addEventListener('click', () => {
-            if (searchModal) searchModal.classList.remove('hidden');
-            if (searchInput) {
-                searchInput.value = '';
-                handleSearch();
-                searchInput.focus();
-            }
-        });
-    }
-    
-    const salaryBtn = document.getElementById('salary-btn');
     if (salaryBtn) {
         salaryBtn.addEventListener('click', showSalaryModal);
     }
@@ -3227,18 +3358,12 @@
         expenseOtherBtn.addEventListener('click', () => renderExpenseList('other'));
     }
     
-    searchModalCloseBtn.addEventListener('click', () => searchModal.classList.add('hidden'));
-    searchInput.addEventListener('input', handleSearch);
-    
-    filterNotReceivedBtn.addEventListener('click', () => {
-        searchModal.classList.add('hidden');
-        showOrderList();
-        orderListModal.classList.remove('hidden');
-    });
-    orderListModalCloseBtn.addEventListener('click', () => {
-        orderListModal.classList.add('hidden');
-        searchModal.classList.remove('hidden');
-    });
+    // Order List Modal Close
+    if (orderListModalCloseBtn) {
+        orderListModalCloseBtn.addEventListener('click', () => {
+            orderListModal.classList.add('hidden');
+        });
+    }
     
     initializeDateDropdowns();
     
